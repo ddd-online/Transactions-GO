@@ -8,7 +8,6 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/billadm/constant"
-	"github.com/billadm/logger"
 	"github.com/billadm/util"
 )
 
@@ -24,25 +23,8 @@ func NewWorkspace(directory string) (*Workspace, error) {
 			return nil, err
 		}
 	}
-	// Initialize log
-	log := logrus.New()
-	logFile := filepath.Join(directory, constant.LogName)
-	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0640)
-	if err != nil {
-		return nil, err
-	}
-	log.SetOutput(file)
-	log.SetFormatter(&logger.CustomFormatter{})
-	logLevel, err := logrus.ParseLevel(util.Config.LogLevel)
-	if err != nil {
-		return nil, err
-	}
-	log.SetLevel(logLevel)
-	// Initialize db
+	// Initialize db with auto-migration
 	dbFile := filepath.Join(directory, constant.DbName)
-	if err := util.OpenAndInit(dbFile); err != nil {
-		return nil, err
-	}
 	db, err := util.NewDbInstance(dbFile)
 	if err != nil {
 		return nil, err
