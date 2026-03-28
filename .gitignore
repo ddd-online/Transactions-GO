@@ -1,0 +1,5 @@
+kernel/*db
+kernel/dist
+kernel/*exe
+kernel/test
+build/target

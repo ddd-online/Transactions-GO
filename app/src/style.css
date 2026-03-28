@@ -1,0 +1,30 @@
+:root {
+    /* 窗口的颜色 */
+    --billadm-color-major-background-color: #ffffff;
+    --billadm-color-minor-background-color: #f5f5f5;
+    --billadm-color-window-border-color: #e0e0e0;
+
+    /* 按钮的颜色 */
+    --billadm-color-icon-hover-bg-color: #e4e4e4;
+
+    /* 界面尺寸 */
+    --billadm-ui-size-menu-width: 40px;
+
+    /* 文本 */
+    --billadm-color-text-major-color: #333;
+    --billadm-color-text-minor-color: #7b7b7b;
+    --billadm-size-text-large-size: 18px;
+    --billadm-size-text-title-size: 16px;
+    --billadm-size-text-base-size: 14px;
+    --billadm-size-text-small-size: 13px;
+
+    /* 颜色 */
+    --billadm-color-major-background: #ffffff;
+    --billadm-color-minor-background: #f5f5f5;
+    --billadm-color-positive: #1677ff;
+    --billadm-color-negative: #f5222d;
+
+    /* 尺寸 */
+    --billadm-size-header-height: 40px;
+    --billadm-size-sider-width: 48px;
+}

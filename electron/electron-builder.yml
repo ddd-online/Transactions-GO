@@ -1,0 +1,30 @@
+appId: com.github.billadm
+productName: Billadm
+asar: false
+directories:
+  output: out
+files:
+  - src/**
+  - node_modules/**
+  - package.json
+  - dist/**
+  - Billadm-Kernel.exe
+  - billadm.sql
+win:
+  icon: "assets/billadm.ico"
+  requestedExecutionLevel: "asInvoker"
+  target: nsis
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  allowElevation: true
+  deleteAppDataOnUninstall: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: "Billadm"
+  license: "../LICENSE"
+  #  include: "nsis/installer.nsh"
+  warningsAsErrors: false
+  installerSidebar: "nsis/installerSidebar.bmp"
+  uninstallerSidebar: "nsis/uninstallerSidebar.bmp"
