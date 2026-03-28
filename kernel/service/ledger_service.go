@@ -8,6 +8,7 @@ import (
 	"github.com/billadm/models"
 	"github.com/billadm/util"
 	"github.com/billadm/workspace"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -49,26 +50,24 @@ type ledgerServiceImpl struct {
 
 // CreateLedger 创建成功返回创建账本id
 func (l *ledgerServiceImpl) CreateLedger(ws *workspace.Workspace, ledgerName string) (string, error) {
-	log := ws.GetLogger()
-	log.Infof("start to create ledger, name: %s", ledgerName)
+	logrus.Infof("start to create ledger, name: %s", ledgerName)
 	ledger := &models.Ledger{
 		ID:   util.GetUUID(),
 		Name: ledgerName,
 	}
 
 	if err := l.ledgerDao.CreateLedger(ws, ledger); err != nil {
-		log.Errorf("create ledger failed, name: %s, err: %v", ledgerName, err)
+		logrus.Errorf("create ledger failed, name: %s, err: %v", ledgerName, err)
 		return "", err
 	}
 
-	log.Infof("create ledger success, name: %s", ledgerName)
+	logrus.Infof("create ledger success, name: %s", ledgerName)
 	return ledger.ID, nil
 }
 
 // ModifyLedgerName 修改指定账本的名称
 func (l *ledgerServiceImpl) ModifyLedgerName(ws *workspace.Workspace, ledgerId, ledgerName string) error {
-	log := ws.GetLogger()
-	log.Infof("start to modify ledger name, id: %s, new name: %s", ledgerId, ledgerName)
+	logrus.Infof("start to modify ledger name, id: %s, new name: %s", ledgerId, ledgerName)
 
 	ledger := &models.Ledger{
 		ID:   ledgerId,
@@ -76,48 +75,45 @@ func (l *ledgerServiceImpl) ModifyLedgerName(ws *workspace.Workspace, ledgerId, 
 	}
 
 	if err := l.ledgerDao.ModifyLedgerName(ws, ledger); err != nil {
-		log.Errorf("modify ledger name failed, id: %s, err: %v", ledgerId, err)
+		logrus.Errorf("modify ledger name failed, id: %s, err: %v", ledgerId, err)
 		return err
 	}
 
-	log.Infof("modify ledger name success")
+	logrus.Infof("modify ledger name success")
 	return nil
 }
 
 // ListAllLedger 查询所有账本
 func (l *ledgerServiceImpl) ListAllLedger(ws *workspace.Workspace) ([]models.Ledger, error) {
-	log := ws.GetLogger()
-	log.Infof("start to list all ledgers")
+	logrus.Infof("start to list all ledgers")
 
 	ledgers, err := l.ledgerDao.ListAllLedger(ws)
 	if err != nil {
-		log.Errorf("list all ledgers failed, err: %v", err)
+		logrus.Errorf("list all ledgers failed, err: %v", err)
 		return nil, err
 	}
 
-	log.Infof("end to list all ledgers, len: %d", len(ledgers))
+	logrus.Infof("end to list all ledgers, len: %d", len(ledgers))
 	return ledgers, nil
 }
 
 // QueryLedgerById 查询单个账本
 func (l *ledgerServiceImpl) QueryLedgerById(ws *workspace.Workspace, ledgerId string) (*models.Ledger, error) {
-	log := ws.GetLogger()
-	log.Infof("start to query ledger by id, id: %s", ledgerId)
+	logrus.Infof("start to query ledger by id, id: %s", ledgerId)
 
 	ledger, err := l.ledgerDao.QueryLedgerById(ws, ledgerId)
 	if err != nil {
-		log.Errorf("query ledger by id failed, id: %s, err: %v", ledgerId, err)
+		logrus.Errorf("query ledger by id failed, id: %s, err: %v", ledgerId, err)
 		return nil, err
 	}
 
-	log.Infof("end to query ledger by id, id: %s", ledgerId)
+	logrus.Infof("end to query ledger by id, id: %s", ledgerId)
 	return ledger, nil
 }
 
 // DeleteLedgerById deletes a ledger and all its associated transaction records and tags in a transaction.
 func (l *ledgerServiceImpl) DeleteLedgerById(ws *workspace.Workspace, ledgerId string) error {
-	log := ws.GetLogger()
-	log.Infof("start to delete ledger by id, id: %s", ledgerId)
+	logrus.Infof("start to delete ledger by id, id: %s", ledgerId)
 
 	err := ws.Transaction(func(tx *workspace.Workspace) error {
 		// Delete all tags for this ledger's transactions
@@ -130,7 +126,7 @@ func (l *ledgerServiceImpl) DeleteLedgerById(ws *workspace.Workspace, ledgerId s
 		if err != nil {
 			return fmt.Errorf("count trs: %w", err)
 		}
-		log.Infof("will delete trs by ledger id: %s, count: %d", ledgerId, cnt)
+		logrus.Infof("will delete trs by ledger id: %s, count: %d", ledgerId, cnt)
 
 		if err := l.trDao.DeleteAllTrByLedgerId(tx, ledgerId); err != nil {
 			return fmt.Errorf("delete trs: %w", err)
@@ -144,10 +140,10 @@ func (l *ledgerServiceImpl) DeleteLedgerById(ws *workspace.Workspace, ledgerId s
 	})
 
 	if err != nil {
-		log.Errorf("delete ledger by id failed, id: %s, err: %v", ledgerId, err)
+		logrus.Errorf("delete ledger by id failed, id: %s, err: %v", ledgerId, err)
 		return err
 	}
 
-	log.Infof("end to delete ledger by id, id: %s", ledgerId)
+	logrus.Infof("end to delete ledger by id, id: %s", ledgerId)
 	return nil
 }

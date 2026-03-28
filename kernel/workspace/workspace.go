@@ -14,7 +14,6 @@ import (
 
 type Workspace struct {
 	directory string
-	logger    *logrus.Logger
 	db        *gorm.DB
 }
 
@@ -25,7 +24,7 @@ func NewWorkspace(directory string) (*Workspace, error) {
 			return nil, err
 		}
 	}
-	// 实例化log
+	// Initialize log
 	log := logrus.New()
 	logFile := filepath.Join(directory, constant.LogName)
 	file, err := os.OpenFile(logFile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0640)
@@ -39,7 +38,7 @@ func NewWorkspace(directory string) (*Workspace, error) {
 		return nil, err
 	}
 	log.SetLevel(logLevel)
-	// 实例化db
+	// Initialize db
 	dbFile := filepath.Join(directory, constant.DbName)
 	if err := util.OpenAndInit(dbFile); err != nil {
 		return nil, err
@@ -51,13 +50,8 @@ func NewWorkspace(directory string) (*Workspace, error) {
 
 	return &Workspace{
 		directory: directory,
-		logger:    log,
 		db:        db,
 	}, nil
-}
-
-func (w *Workspace) GetLogger() *logrus.Logger {
-	return w.logger
 }
 
 func (w *Workspace) GetDb() *gorm.DB {
@@ -75,7 +69,6 @@ func (w *Workspace) Transaction(fn func(tx *Workspace) error) error {
 	return w.db.Transaction(func(tx *gorm.DB) error {
 		txWorkspace := &Workspace{
 			directory: w.directory,
-			logger:    w.logger,
 			db:        tx,
 		}
 		return fn(txWorkspace)
@@ -85,10 +78,10 @@ func (w *Workspace) Transaction(fn func(tx *Workspace) error) error {
 func (w *Workspace) Close() {
 	sqlDb, err := w.db.DB()
 	if err != nil {
-		w.logger.Error(err)
+		logrus.Error(err)
 	}
 	err = sqlDb.Close()
 	if err != nil {
-		w.logger.Error(err)
+		logrus.Error(err)
 	}
 }

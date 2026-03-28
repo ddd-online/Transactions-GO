@@ -6,6 +6,7 @@ import (
 	"github.com/billadm/dao"
 	"github.com/billadm/models"
 	"github.com/billadm/workspace"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -38,12 +39,12 @@ type tagServiceImpl struct {
 }
 
 func (t *tagServiceImpl) QueryTags(ws *workspace.Workspace, category string) ([]models.Tag, error) {
-	ws.GetLogger().Info("start to query tag")
+	logrus.Info("start to query tag")
 	tags, err := t.tagDao.QueryTags(ws, category)
 	if err != nil {
 		return nil, err
 	}
 
-	ws.GetLogger().Infof("query tag success, length: %v", tags)
+	logrus.Infof("query tag success, length: %v", tags)
 	return tags, nil
 }

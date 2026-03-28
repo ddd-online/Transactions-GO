@@ -10,6 +10,7 @@ import (
 	"github.com/billadm/pkg/operator"
 	"github.com/billadm/util"
 	"github.com/billadm/workspace"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -47,8 +48,7 @@ type transactionRecordServiceImpl struct {
 
 // CreateTr creates a transaction record and its tags in a single transaction.
 func (t *transactionRecordServiceImpl) CreateTr(ws *workspace.Workspace, trDto *dto.TransactionRecordDto) (string, error) {
-	log := ws.GetLogger()
-	log.Infof("start to create transaction record, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
+	logrus.Infof("start to create transaction record, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
 
 	transactionID := util.GetUUID()
 
@@ -77,17 +77,16 @@ func (t *transactionRecordServiceImpl) CreateTr(ws *workspace.Workspace, trDto *
 	})
 
 	if err != nil {
-		log.Errorf("create transaction record failed: %v", err)
+		logrus.Errorf("create transaction record failed: %v", err)
 		return "", err
 	}
 
-	log.Infof("create transaction record success, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
+	logrus.Infof("create transaction record success, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
 	return transactionID, nil
 }
 
 func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspace, condition *dto.TrQueryCondition) (*dto.TrQueryResult, error) {
-	log := ws.GetLogger()
-	log.Infof("start to query trs, condition: %#v", condition)
+	logrus.Infof("start to query trs, condition: %#v", condition)
 
 	// Query all matching transaction records
 	trs, err := t.trDao.QueryTrsOnCondition(ws, condition)
@@ -132,13 +131,12 @@ func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspa
 		Page(condition.Offset, condition.Limit).
 		Summary()
 
-	log.Infof("query trs by page success, len: %d", len(summary.Items))
+	logrus.Infof("query trs by page success, len: %d", len(summary.Items))
 	return summary, nil
 }
 
 func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trId string) error {
-	log := ws.GetLogger()
-	log.Infof("start to delete transaction record, tr id: %s", trId)
+	logrus.Infof("start to delete transaction record, tr id: %s", trId)
 
 	// Use transaction for atomicity
 	err := ws.Transaction(func(tx *workspace.Workspace) error {
@@ -152,10 +150,10 @@ func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trI
 	})
 
 	if err != nil {
-		log.Errorf("delete transaction record failed: %v", err)
+		logrus.Errorf("delete transaction record failed: %v", err)
 		return err
 	}
 
-	log.Infof("delete transaction record success, tr id: %s", trId)
+	logrus.Infof("delete transaction record success, tr id: %s", trId)
 	return nil
 }

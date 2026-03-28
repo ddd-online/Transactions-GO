@@ -6,6 +6,7 @@ import (
 	"github.com/billadm/dao"
 	"github.com/billadm/models"
 	"github.com/billadm/workspace"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -38,12 +39,12 @@ type categoryServiceImpl struct {
 }
 
 func (c *categoryServiceImpl) QueryCategory(ws *workspace.Workspace, trType string) ([]models.Category, error) {
-	ws.GetLogger().Infof("start to query category by %s", trType)
+	logrus.Infof("start to query category by %s", trType)
 	categories, err := c.categoryDao.QueryCategory(ws, trType)
 	if err != nil {
 		return nil, err
 	}
 
-	ws.GetLogger().Infof("query category success, length: %v", categories)
+	logrus.Infof("query category success, length: %v", categories)
 	return categories, nil
 }
