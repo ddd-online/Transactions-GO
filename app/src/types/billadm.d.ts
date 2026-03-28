@@ -4,46 +4,14 @@ import type {Dayjs} from "dayjs";
  * 表示一个前端使用的消费记录
  */
 export interface TrForm {
-    /**
-     * 交易ID. 对应 transaction_id.
-     */
     id: string;
-    /**
-     * 金额. 对应 price.
-     */
     price: string;
-    /**
-     * 交易类型 (e.g., 'income', 'expense', 'transfer'). 对应 transaction_type.
-     */
     type: string;
-    /**
-     * 消费类型. 对应 category.
-     */
     category: string;
-    /**
-     * 描述. 对应 description.
-     */
     description: string;
-    /**
-     * 标签. 对应 tags.
-     */
     tags: string[];
-    /**
-     * 标记. 对应 flags.
-     */
     flags: string[];
-    /**
-     * 交易时间. 对应 transaction_at. 时间戳转 Date 对象.
-     */
     time: Dayjs;
-}
-
-export interface ApiClient {
-    get<T = any>(url: string): Promise<Result<T>>;
-
-    post<T = any>(url: string, data?: any): Promise<Result<T>>;
-
-    isRespSuccess(result: Result, prefix?: string): void;
 }
 
 /**

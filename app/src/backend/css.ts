@@ -1,9 +1,9 @@
-import {ref} from 'vue'
+import { ref } from 'vue'
 
 /**
  * 获取 CSS 变量的值
  */
-function getCssVariable(variableName: string) {
+function getCssVariable(variableName: string): string {
     return getComputedStyle(document.documentElement)
         .getPropertyValue(variableName)
         .trim()
@@ -15,8 +15,7 @@ export function useCssVariables() {
     const siderWidthSize = ref(getCssVariable('--billadm-size-sider-width'))
     const positiveColor = ref(getCssVariable('--billadm-color-positive'))
     const negativeColor = ref(getCssVariable('--billadm-color-negative'))
-
-    const hoverBgColor = ref(getCssVariable('--billadm-color-icon-hover-bg-color'))
+    const hoverBgColor = ref(getCssVariable('--billadm-color-icon-hover-bg'))
     const uiSizeMenuWidth = ref(getCssVariable('--billadm-ui-size-menu-width'))
 
     return {
@@ -25,7 +24,6 @@ export function useCssVariables() {
         siderWidthSize,
         positiveColor,
         negativeColor,
-
         hoverBgColor,
         uiSizeMenuWidth,
     }

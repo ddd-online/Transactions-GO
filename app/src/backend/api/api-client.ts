@@ -1,36 +1,46 @@
-import axios, {type AxiosInstance, type AxiosResponse} from 'axios';
-import type {ApiClient, Result} from "@/types/billadm";
+import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
+import type { Result } from "@/types/billadm";
 
 const apiClient: AxiosInstance = axios.create({
     baseURL: 'http://127.0.0.1:31943/api',
-    timeout: 10000, // 请求超时时间 (毫秒)
-    headers: {
-        'Content-Type': 'application/json',
-    },
+    timeout: 10000,
+    headers: { 'Content-Type': 'application/json' },
 });
 
-const api: ApiClient = {
-    async post(url: string, data: object = {}): Promise<Result> {
+/**
+ * Check if the response indicates an error (code !== 0).
+ * Throws an Error with the message if so.
+ */
+function checkSuccess(result: Result, prefix?: string): void {
+    if (result.code !== 0) {
+        throw new Error(`${prefix || ''}响应失败: ${result.msg}`);
+    }
+}
+
+export const api = {
+    async post<T = any>(url: string, data: object = {}, errorPrefix?: string): Promise<T> {
         try {
-            const response: AxiosResponse<Result> = await apiClient.post(url, data);
-            return response.data;
+            const response: AxiosResponse<Result<T>> = await apiClient.post(url, data);
+            checkSuccess(response.data, errorPrefix);
+            return response.data.data;
         } catch (error) {
-            console.error('API POST Error:', error);
+            if (axios.isAxiosError(error)) {
+                throw new Error(`${errorPrefix || '请求失败'}: ${error.message}`);
+            }
             throw error;
         }
     },
-    async get(url: string): Promise<Result> {
+
+    async get<T = any>(url: string, errorPrefix?: string): Promise<T> {
         try {
-            const response: AxiosResponse = await apiClient.get(url);
-            return response.data;
+            const response: AxiosResponse<Result<T>> = await apiClient.get(url);
+            checkSuccess(response.data, errorPrefix);
+            return response.data.data;
         } catch (error) {
-            console.error('API GET Error:', error);
+            if (axios.isAxiosError(error)) {
+                throw new Error(`${errorPrefix || '请求失败'}: ${error.message}`);
+            }
             throw error;
-        }
-    },
-    isRespSuccess(result: Result, prefix?: string): void {
-        if (result.code !== 0) {
-            throw `${prefix}响应code不为0, 响应msg: ${result.msg}`;
         }
     }
 };

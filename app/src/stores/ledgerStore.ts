@@ -77,7 +77,7 @@ export const useLedgerStore = defineStore('ledger', () => {
             await refreshLedgers();
             NotificationUtil.success(`修改账本名称为 ${name} 成功`);
         } catch (error) {
-            NotificationUtil.error(`修改账本名称为 ${name} 成功`, `${error}`);
+            NotificationUtil.error(`修改账本名称为 ${name} 失败`, `${error}`);
         }
     }
 

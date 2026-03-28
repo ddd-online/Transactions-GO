@@ -2,12 +2,12 @@
   <a-table :columns="columns" :data-source="items" :pagination="false" :sticky="true" size="small">
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex==='transactionAt'">
-        {{ formatTimestamp(record.transactionAt) }}
+        {{ formatTimestamp(record.transactionAt, 'YYYY-MM-DD') }}
       </template>
 
       <template v-else-if="column.dataIndex==='transactionType'">
         <a-typography-text :style="{color: TransactionTypeToColor.get(record.transactionType)}">
-          {{ formatTransactionType(record.transactionType) }}
+          {{ TransactionTypeToLabel.get(record.transactionType) || record.transactionType }}
         </a-typography-text>
       </template>
 
@@ -42,19 +42,10 @@
 
 <script setup lang="ts">
 import type {TransactionRecord} from '@/types/billadm';
-import {centsToYuan, formatTimestamp} from "@/backend/functions.ts";
-import {useCssVariables} from "@/backend/css.ts";
-import type {CSSProperties} from "vue";
+import {centsToYuan, formatTimestamp} from "@/backend/functions";
+import {editButtonStyle, deleteButtonStyle} from "@/backend/styles";
+import {TransactionTypeToColor, TransactionTypeToLabel} from "@/backend/constant";
 import type {ColumnsType} from "ant-design-vue/es/table";
-import {TransactionTypeToColor} from "@/backend/constant.ts";
-
-const {positiveColor, negativeColor} = useCssVariables();
-const editButtonStyle: CSSProperties = {
-  color: positiveColor.value,
-};
-const deleteButtonStyle: CSSProperties = {
-  color: negativeColor.value,
-};
 
 const columns: ColumnsType = [
   {
@@ -107,28 +98,16 @@ interface Props {
 
 defineProps<Props>()
 
-// 定义可触发的事件
 const emit = defineEmits<{
   (e: 'edit', record: TransactionRecord): void;
   (e: 'delete', record: TransactionRecord): void;
 }>();
 
-// 处理编辑操作
 const handleEdit = (record: TransactionRecord) => {
   emit('edit', record);
 };
 
-// 处理删除操作
 const handleDelete = (record: TransactionRecord) => {
   emit('delete', record);
 };
-
-const formatTransactionType = (type: string): string => {
-  const map: Record<string, string> = {
-    expense: '支出',
-    income: '收入',
-    transfer: '转账'
-  }
-  return map[type] || type
-}
 </script>

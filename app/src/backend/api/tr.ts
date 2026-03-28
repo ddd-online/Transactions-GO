@@ -1,21 +1,14 @@
-import api_client from "@/backend/api/api-client.ts";
-import type {Result, TransactionRecord, TrQueryCondition, TrQueryResult} from "@/types/billadm";
+import api from "@/backend/api/api-client";
+import type { TransactionRecord, TrQueryCondition, TrQueryResult } from "@/types/billadm";
 
 export async function queryTrOnCondition(condition: TrQueryCondition): Promise<TrQueryResult> {
-    const resp: Result<TrQueryResult> = await api_client.post('/v1/tr/query', condition);
-    api_client.isRespSuccess(resp, 'queryTrsOnCondition错误: ');
-    return resp.data;
+    return api.post<TrQueryResult>('/v1/tr/query', condition, '查询消费记录');
 }
 
 export async function createTrForLedger(data: TransactionRecord): Promise<string> {
-    const resp: Result<string> = await api_client.post('/v1/tr/create-one', data);
-    api_client.isRespSuccess(resp, 'createTrForLedger错误: ');
-    return resp.data;
+    return api.post<string>('/v1/tr/create-one', data, '创建消费记录');
 }
 
-export async function deleteTrById(id: string) {
-    const resp: Result = await api_client.post('/v1/tr/delete-by-id', {
-        'trId': id,
-    });
-    api_client.isRespSuccess(resp, 'deleteTrById错误: ');
+export async function deleteTrById(id: string): Promise<void> {
+    return api.post<void>('/v1/tr/delete-by-id', { trId: id }, '删除消费记录');
 }

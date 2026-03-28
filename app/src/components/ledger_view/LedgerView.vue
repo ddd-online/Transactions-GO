@@ -31,7 +31,7 @@
     <a-layout-content :style="contentStyle">
       <div class="card-grid">
         <a-card v-for="ledger in ledgerStore.ledgers"
-                :key:="ledger.id"
+                :key="ledger.id"
                 hoverable
         >
           <a-descriptions :title="ledger.name" layout="vertical">
@@ -52,10 +52,10 @@
               </a-popconfirm>
             </template>
             <a-descriptions-item label="创建时间">
-              {{ formatTimestamp(ledger.createdAt) }}
+              {{ formatTimestamp(ledger.createdAt, 'YYYY-MM-DD HH:mm:ss') }}
             </a-descriptions-item>
             <a-descriptions-item label="更新时间">
-              {{ formatTimestamp(ledger.updatedAt) }}
+              {{ formatTimestamp(ledger.updatedAt, 'YYYY-MM-DD HH:mm:ss') }}
             </a-descriptions-item>
           </a-descriptions>
         </a-card>
@@ -67,9 +67,9 @@
 <script setup lang="ts">
 import type {CSSProperties} from "vue";
 import {ref} from 'vue';
-import {useLedgerStore} from "@/stores/ledgerStore.ts";
-import dayjs from "dayjs";
-import {useCssVariables} from "@/backend/css.ts";
+import {useLedgerStore} from "@/stores/ledgerStore";
+import {formatTimestamp} from "@/backend/functions";
+import {useCssVariables} from "@/backend/css";
 import {PlusOutlined} from "@ant-design/icons-vue";
 
 const {majorBgColor, positiveColor, negativeColor} = useCssVariables();
@@ -94,10 +94,6 @@ const ledgerModal = ref<boolean>(false);
 const modalTitle = ref<string>("");
 const ledgerId = ref<string>("");
 const ledgerName = ref<string>("");
-
-const formatTimestamp = (ts: number) => {
-  return dayjs(ts * 1000).format('YYYY-MM-DD HH:mm:ss');
-}
 
 const openLedgerModal = () => {
   modalTitle.value = "创建账本";

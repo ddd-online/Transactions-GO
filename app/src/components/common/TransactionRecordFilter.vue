@@ -107,7 +107,7 @@
         >
           <template #title>
             <span style="font-weight: normal">
-              {{ getTransactionTypeLabel(item.transactionType) }}
+              {{ TransactionTypeToLabel.get(item.transactionType) || item.transactionType }}
               {{ item.category ? ` · ${item.category}` : '' }}
               {{ item.tags && item.tags.length ? ` · 标签(${item.tags.join(', ')})` : '' }}
               {{ item.description ? ` · "${item.description}"` : '' }}
@@ -131,8 +131,9 @@
 import {ref, watch} from 'vue';
 import type {Category, TrQueryConditionItem} from '@/types/billadm';
 import type {DefaultOptionType} from 'ant-design-vue/es/vc-cascader';
-import {getCategoryByType, getTagsByCategory} from '@/backend/functions.ts';
-import {useTrQueryConditionStore} from '@/stores/trQueryConditionStore.ts';
+import {getCategoryByType, getTagsByCategory} from '@/backend/functions';
+import {useTrQueryConditionStore} from '@/stores/trQueryConditionStore';
+import {TransactionTypeToLabel} from '@/backend/constant';
 
 // 双向绑定 modal 开关
 const open = defineModel<boolean>();
@@ -197,15 +198,6 @@ function resetTempInputs() {
   tempTagPolicy.value = 'any';
   tempTagNot.value = "no";
   tempDescription.value = '';
-}
-
-function getTransactionTypeLabel(type: string): string {
-  const map: Record<string, string> = {
-    income: '收入',
-    expense: '支出',
-    transfer: '转账',
-  };
-  return map[type] || type;
 }
 
 function addCondition() {

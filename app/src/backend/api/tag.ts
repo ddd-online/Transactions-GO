@@ -1,8 +1,6 @@
-import api_client from "@/backend/api/api-client.ts";
-import type {Result, Tag} from "@/types/billadm";
+import api from "@/backend/api/api-client";
+import type { Tag } from "@/types/billadm";
 
 export async function queryTags(category: string): Promise<Tag[]> {
-    const resp: Result<Tag[]> = await api_client.post(`/v1/tag/query/${category}`);
-    api_client.isRespSuccess(resp, 'queryTags错误: ');
-    return resp.data;
+    return api.post<Tag[]>(`/v1/tag/query/${category}`, {}, '查询标签');
 }
