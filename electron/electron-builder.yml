@@ -9,7 +9,6 @@ files:
   - package.json
   - dist/**
   - Billadm-Kernel.exe
-  - billadm.sql
 win:
   icon: "assets/billadm.ico"
   requestedExecutionLevel: "asInvoker"

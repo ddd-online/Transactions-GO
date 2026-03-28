@@ -16,7 +16,6 @@ $electronDistDir   = Join-Path $projectRoot "electron" "dist"
 $electronLogsDir   = Join-Path $projectRoot "electron" "logs"
 $electronOutDir    = Join-Path $projectRoot "electron" "out"
 $electronKernelExe = Join-Path $projectRoot "electron" "Billadm-Kernel.exe"
-$electronSqlFile   = Join-Path $projectRoot "electron" "billadm.sql"
 
 # 颜色辅助函数（提升可读性）
 function Write-Info { param($msg) Write-Host "📦 $msg" -ForegroundColor Cyan }
@@ -36,8 +35,7 @@ try {
         $electronDistDir,
         $electronLogsDir,
         $electronOutDir,
-        $electronKernelExe,
-        $electronSqlFile
+        $electronKernelExe
     )
 
     foreach ($item in $itemsToRemove) {

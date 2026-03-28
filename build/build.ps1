@@ -16,7 +16,6 @@ $electronDir = Join-Path $projectRoot "electron"
 
 $appDistDir = Join-Path $vueDir "dist"
 $kernelExe = Join-Path $kernelDir "Billadm-Kernel.exe"
-$sqlFile = Join-Path $kernelDir "billadm.sql"
 
 # 颜色辅助函数（可选，提升可读性）
 function Write-Info { param($msg) Write-Host "📦 $msg" -ForegroundColor Cyan }
@@ -117,9 +116,8 @@ try {
     # 清理 electron 目录中的旧资源
     $targetDist = Join-Path $electronDir "dist"
     $targetKernel = Join-Path $electronDir "Billadm-Kernel.exe"
-    $targetSql = Join-Path $electronDir "billadm.sql"
 
-    foreach ($item in @($targetDist, $targetKernel, $targetSql)) {
+    foreach ($item in @($targetDist, $targetKernel)) {
         if (Test-Path $item) {
             Write-Warn "正在删除旧文件/目录: $(Split-Path $item -Leaf)"
             Remove-Item $item -Recurse -Force -ErrorAction Stop
@@ -141,14 +139,6 @@ try {
     }
     Copy-Item -Path $kernelExe -Destination $electronDir -Force -ErrorAction Stop
     Write-Success "已拷贝 Billadm-Kernel.exe 到 $electronDir"
-
-    # 拷贝 SQL 文件
-    if (-not (Test-Path $sqlFile)) {
-        Write-ErrorCustom "SQL 初始化文件缺失: $sqlFile"
-        exit 1
-    }
-    Copy-Item -Path $sqlFile -Destination $electronDir -Force -ErrorAction Stop
-    Write-Success "已拷贝 billadm.sql 到 $electronDir"
 
 
     # ==============================
