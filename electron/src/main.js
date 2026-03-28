@@ -8,18 +8,15 @@ process.noAsar = false;
 const isDev = !app.isPackaged;
 const appPath = isDev ? path.dirname(__dirname) : app.getAppPath();
 
-const getServer = () => {
-    return "http://127.0.0.1:31943"
-};
+const API_SERVER = 'http://127.0.0.1:31943';
 
 const getUiServer = () => {
     if (isDev) {
-        return "http://localhost:31945/static"
+        return 'http://localhost:31945/static';
     } else {
-        return "http://127.0.0.1:31943/static/index.html"
+        return `${API_SERVER}/static/index.html`;
     }
-}
-
+};
 
 // 应用日志
 const logDir = path.join(appPath, 'logs');
@@ -31,8 +28,7 @@ if (!fs.existsSync(logDir)) {
 const logStream = fs.createWriteStream(logFile, {flags: 'a'});
 const log = (message) => {
     const time = new Date().toISOString();
-    const logMessage = `[${time}] ${message}\n`;
-    logStream.write(logMessage);
+    logStream.write(`[${time}] ${message}\n`);
 };
 
 let billadmCfg = {
@@ -43,38 +39,29 @@ function readBilladmFile() {
     if (isDev) return;
     const homeDir = os.homedir();
     const filePath = path.join(homeDir, '.billadm');
-    let tmpObj;
     try {
         const fileContent = fs.readFileSync(filePath, 'utf8');
-        tmpObj = JSON.parse(fileContent);
-        billadmCfg = {
-            ...billadmCfg, ...tmpObj,
-        }
+        const tmpObj = JSON.parse(fileContent);
+        billadmCfg = {...billadmCfg, ...tmpObj};
     } catch (err) {
-        log(`读取 .billadm 文件时发生错误:', ${err.message}`);
+        log(`读取 .billadm 文件失败: ${err.message}`);
     }
-
-    log(`窗口宽度 ${billadmCfg.width} 窗口高度 ${billadmCfg.height} 工作空间路径 ${billadmCfg.workspaceDir}`)
+    log(`窗口 ${billadmCfg.width}x${billadmCfg.height} workspace ${billadmCfg.workspaceDir}`);
 }
 
 function saveBilladmConfig() {
     if (isDev) return;
     const homeDir = os.homedir();
     const filePath = path.join(homeDir, '.billadm');
-
     try {
         if (typeof billadmCfg !== 'object' || billadmCfg === null) {
-            log('billadmCfg 不是一个有效的对象，无法保存');
-            return false;
+            log('billadmCfg 无效，无法保存');
+            return;
         }
-
-        const data = JSON.stringify(billadmCfg, null, 2);
-
-        fs.writeFileSync(filePath, data, 'utf8');
-
-        log(`配置已成功保存至: ${filePath}`);
+        fs.writeFileSync(filePath, JSON.stringify(billadmCfg, null, 2), 'utf8');
+        log(`配置已保存至 ${filePath}`);
     } catch (err) {
-        log(`保存 .billadm 文件时发生错误 ${err.message}`);
+        log(`保存配置失败: ${err.message}`);
     }
 }
 
@@ -104,6 +91,19 @@ const startKernel = () => {
     // 进程关闭
     kernelProcess.on('close', (code) => {
         log(`[Kernel Process] kernel [pid=${kernelProcess.pid}] closed with code ${code}`);
+        kernelProcess = null;
+    });
+
+    // 进程异常退出
+    kernelProcess.on('exit', (code) => {
+        log(`[Kernel Process] kernel exited with code ${code}`);
+        if (code !== 0 && code !== null) {
+            dialog.showMessageBox({
+                type: 'error',
+                title: '后台服务异常退出',
+                message: `后台服务异常退出，退出码: ${code}\n请重启应用`,
+            });
+        }
         kernelProcess = null;
     });
 
@@ -140,9 +140,14 @@ const createWindow = () => {
                 break;
             case 'close':
                 try {
-                    await net.fetch(getServer() + "/api/v1/app/exit", {method: "POST"});
+                    await net.fetch(API_SERVER + "/api/v1/app/exit", {method: "POST"});
                 } catch (e) {
-                    log(`请求kernel关闭失败 ${e}`)
+                    log(`请求kernel关闭失败 ${e}`);
+                    dialog.showMessageBox(mainWindow, {
+                        type: 'error',
+                        title: '关闭失败',
+                        message: '无法关闭后台服务，请手动关闭',
+                    });
                 }
                 const bounds = mainWindow.getBounds();
                 billadmCfg = {...billadmCfg, ...bounds}
@@ -154,7 +159,7 @@ const createWindow = () => {
     ipcMain.handle('dialog:open', async (event, options) => {
         try {
             return await dialog.showOpenDialog({
-                properties: ['openFile'], ...options,
+                properties: ['openDirectory'], ...options,
             });
         } catch (err) {
             log(`Dialog error: ${err.message}`);
@@ -192,7 +197,7 @@ app.whenReady().then(() => {
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        if (kernelProcess && kernelProcess.exitCode === null) {
+        if (kernelProcess) {
             kernelProcess.kill();
         }
         saveBilladmConfig();
