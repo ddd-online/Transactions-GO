@@ -47,7 +47,7 @@ type transactionRecordServiceImpl struct {
 
 // CreateTr creates a transaction record and its tags in a single transaction.
 func (t *transactionRecordServiceImpl) CreateTr(ws *workspace.Workspace, trDto *dto.TransactionRecordDto) (string, error) {
-	log := WorkspaceLogger(ws)
+	log := ws.GetLogger()
 	log.Infof("start to create transaction record, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
 
 	transactionID := util.GetUUID()
@@ -86,7 +86,7 @@ func (t *transactionRecordServiceImpl) CreateTr(ws *workspace.Workspace, trDto *
 }
 
 func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspace, condition *dto.TrQueryCondition) (*dto.TrQueryResult, error) {
-	log := WorkspaceLogger(ws)
+	log := ws.GetLogger()
 	log.Infof("start to query trs, condition: %#v", condition)
 
 	// Query all matching transaction records
@@ -137,7 +137,7 @@ func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspa
 }
 
 func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trId string) error {
-	log := WorkspaceLogger(ws)
+	log := ws.GetLogger()
 	log.Infof("start to delete transaction record, tr id: %s", trId)
 
 	// Use transaction for atomicity

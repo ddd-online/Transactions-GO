@@ -49,7 +49,7 @@ type ledgerServiceImpl struct {
 
 // CreateLedger 创建成功返回创建账本id
 func (l *ledgerServiceImpl) CreateLedger(ws *workspace.Workspace, ledgerName string) (string, error) {
-	log := WorkspaceLogger(ws)
+	log := ws.GetLogger()
 	log.Infof("start to create ledger, name: %s", ledgerName)
 	ledger := &models.Ledger{
 		ID:   util.GetUUID(),
@@ -67,7 +67,7 @@ func (l *ledgerServiceImpl) CreateLedger(ws *workspace.Workspace, ledgerName str
 
 // ModifyLedgerName 修改指定账本的名称
 func (l *ledgerServiceImpl) ModifyLedgerName(ws *workspace.Workspace, ledgerId, ledgerName string) error {
-	log := WorkspaceLogger(ws)
+	log := ws.GetLogger()
 	log.Infof("start to modify ledger name, id: %s, new name: %s", ledgerId, ledgerName)
 
 	ledger := &models.Ledger{
@@ -86,7 +86,7 @@ func (l *ledgerServiceImpl) ModifyLedgerName(ws *workspace.Workspace, ledgerId, 
 
 // ListAllLedger 查询所有账本
 func (l *ledgerServiceImpl) ListAllLedger(ws *workspace.Workspace) ([]models.Ledger, error) {
-	log := WorkspaceLogger(ws)
+	log := ws.GetLogger()
 	log.Infof("start to list all ledgers")
 
 	ledgers, err := l.ledgerDao.ListAllLedger(ws)
@@ -101,7 +101,7 @@ func (l *ledgerServiceImpl) ListAllLedger(ws *workspace.Workspace) ([]models.Led
 
 // QueryLedgerById 查询单个账本
 func (l *ledgerServiceImpl) QueryLedgerById(ws *workspace.Workspace, ledgerId string) (*models.Ledger, error) {
-	log := WorkspaceLogger(ws)
+	log := ws.GetLogger()
 	log.Infof("start to query ledger by id, id: %s", ledgerId)
 
 	ledger, err := l.ledgerDao.QueryLedgerById(ws, ledgerId)
@@ -116,7 +116,7 @@ func (l *ledgerServiceImpl) QueryLedgerById(ws *workspace.Workspace, ledgerId st
 
 // DeleteLedgerById deletes a ledger and all its associated transaction records and tags in a transaction.
 func (l *ledgerServiceImpl) DeleteLedgerById(ws *workspace.Workspace, ledgerId string) error {
-	log := WorkspaceLogger(ws)
+	log := ws.GetLogger()
 	log.Infof("start to delete ledger by id, id: %s", ledgerId)
 
 	err := ws.Transaction(func(tx *workspace.Workspace) error {
