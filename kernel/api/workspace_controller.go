@@ -9,6 +9,7 @@ import (
 	"github.com/billadm/workspace"
 )
 
+// POST /workspace
 func openWorkspace(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -33,7 +34,8 @@ func openWorkspace(c *gin.Context) {
 	}
 }
 
-func hasOpenedWorkspace(c *gin.Context) {
+// GET /workspace/status
+func getWorkspaceStatus(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 

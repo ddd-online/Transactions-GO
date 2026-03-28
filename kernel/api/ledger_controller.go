@@ -14,7 +14,9 @@ import (
 	"github.com/billadm/workspace"
 )
 
-func queryAllLedgers(c *gin.Context) {
+// GET /ledgers?id=all or id=uuid1,uuid2
+// POST /ledgers (body: {name: string})
+func listLedgers(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
@@ -25,15 +27,10 @@ func queryAllLedgers(c *gin.Context) {
 		return
 	}
 
-	arg, ok := JsonArg(c, ret)
-	if !ok {
-		return
-	}
-
-	ledgerId, ok := arg["id"].(string)
-	if !ok {
+	ledgerId := c.Query("id")
+	if ledgerId == "" {
 		ret.Code = -1
-		ret.Msg = "'id'在请求体中不存在"
+		ret.Msg = "missing required query parameter: id"
 		return
 	}
 
@@ -71,6 +68,7 @@ func queryAllLedgers(c *gin.Context) {
 	ret.Data = ledgerDtos
 }
 
+// POST /ledgers
 func createLedger(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -104,7 +102,8 @@ func createLedger(c *gin.Context) {
 	ret.Data = ledgerId
 }
 
-func modifyLedgerName(c *gin.Context) {
+// GET /ledgers/:id
+func getLedger(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
@@ -115,15 +114,46 @@ func modifyLedgerName(c *gin.Context) {
 		return
 	}
 
-	arg, ok := JsonArg(c, ret)
-	if !ok {
+	id := c.Param("id")
+	if id == "" {
+		ret.Code = -1
+		ret.Msg = "missing ledger id"
 		return
 	}
 
-	ledgerId, ok := arg["id"].(string)
-	if !ok {
+	ledger, err := service.GetLedgerService().QueryLedgerById(ws, id)
+	if err != nil {
 		ret.Code = -1
-		ret.Msg = "id在请求体中不存在"
+		ret.Msg = err.Error()
+		return
+	}
+
+	ledgerDto := dto.LedgerDto{}
+	ledgerDto.FromLedger(ledger)
+	ret.Data = ledgerDto
+}
+
+// PATCH /ledgers/:id
+func updateLedger(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		ret.Code = -1
+		ret.Msg = "missing ledger id"
+		return
+	}
+
+	arg, ok := JsonArg(c, ret)
+	if !ok {
 		return
 	}
 
@@ -134,7 +164,7 @@ func modifyLedgerName(c *gin.Context) {
 		return
 	}
 
-	err := service.GetLedgerService().ModifyLedgerName(ws, ledgerId, ledgerName)
+	err := service.GetLedgerService().ModifyLedgerName(ws, id, ledgerName)
 	if err != nil {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -142,6 +172,7 @@ func modifyLedgerName(c *gin.Context) {
 	}
 }
 
+// DELETE /ledgers/:id
 func deleteLedger(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -153,19 +184,14 @@ func deleteLedger(c *gin.Context) {
 		return
 	}
 
-	arg, ok := JsonArg(c, ret)
-	if !ok {
-		return
-	}
-
-	trId, ok := arg["id"].(string)
-	if !ok {
+	id := c.Param("id")
+	if id == "" {
 		ret.Code = -1
-		ret.Msg = "id在请求体中不存在"
+		ret.Msg = "missing ledger id"
 		return
 	}
 
-	err := service.GetLedgerService().DeleteLedgerById(ws, trId)
+	err := service.GetLedgerService().DeleteLedgerById(ws, id)
 	if err != nil {
 		ret.Code = -1
 		ret.Msg = err.Error()

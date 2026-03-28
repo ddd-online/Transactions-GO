@@ -11,7 +11,8 @@ import (
 	"github.com/billadm/workspace"
 )
 
-func queryCategoryByType(c *gin.Context) {
+// GET /categories?type=all|income|expense|transfer
+func listCategories(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
@@ -22,8 +23,7 @@ func queryCategoryByType(c *gin.Context) {
 		return
 	}
 
-	// 支持all, income, expense, transfer
-	trType := c.Param("type")
+	trType := c.Query("type")
 	categories, err := service.GetCategoryService().QueryCategory(ws, trType)
 	if err != nil {
 		ret.Code = -1

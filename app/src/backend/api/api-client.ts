@@ -18,6 +18,19 @@ function checkSuccess(result: Result, prefix?: string): void {
 }
 
 export const api = {
+    async get<T = any>(url: string, errorPrefix?: string): Promise<T> {
+        try {
+            const response: AxiosResponse<Result<T>> = await apiClient.get(url);
+            checkSuccess(response.data, errorPrefix);
+            return response.data.data;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                throw new Error(`${errorPrefix || '请求失败'}: ${error.message}`);
+            }
+            throw error;
+        }
+    },
+
     async post<T = any>(url: string, data: object = {}, errorPrefix?: string): Promise<T> {
         try {
             const response: AxiosResponse<Result<T>> = await apiClient.post(url, data);
@@ -31,9 +44,22 @@ export const api = {
         }
     },
 
-    async get<T = any>(url: string, errorPrefix?: string): Promise<T> {
+    async patch<T = any>(url: string, data: object = {}, errorPrefix?: string): Promise<T> {
         try {
-            const response: AxiosResponse<Result<T>> = await apiClient.get(url);
+            const response: AxiosResponse<Result<T>> = await apiClient.patch(url, data);
+            checkSuccess(response.data, errorPrefix);
+            return response.data.data;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                throw new Error(`${errorPrefix || '请求失败'}: ${error.message}`);
+            }
+            throw error;
+        }
+    },
+
+    async delete<T = any>(url: string, errorPrefix?: string): Promise<T> {
+        try {
+            const response: AxiosResponse<Result<T>> = await apiClient.delete(url);
             checkSuccess(response.data, errorPrefix);
             return response.data.data;
         } catch (error) {

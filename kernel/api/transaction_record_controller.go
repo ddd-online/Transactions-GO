@@ -12,7 +12,8 @@ import (
 	"github.com/billadm/workspace"
 )
 
-func queryTrOnCondition(c *gin.Context) {
+// POST /transactions/query
+func queryTransactions(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
@@ -39,7 +40,8 @@ func queryTrOnCondition(c *gin.Context) {
 	ret.Data = result
 }
 
-func createTransactionRecord(c *gin.Context) {
+// POST /transactions
+func createTransaction(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
@@ -71,7 +73,8 @@ func createTransactionRecord(c *gin.Context) {
 	ret.Data = trId
 }
 
-func deleteTransactionRecordById(c *gin.Context) {
+// DELETE /transactions/:id
+func deleteTransaction(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
 
@@ -82,19 +85,14 @@ func deleteTransactionRecordById(c *gin.Context) {
 		return
 	}
 
-	arg, ok := JsonArg(c, ret)
-	if !ok {
-		return
-	}
-
-	trId, ok := arg["trId"].(string)
-	if !ok {
+	id := c.Param("id")
+	if id == "" {
 		ret.Code = -1
-		ret.Msg = "trId在请求体中不存在"
+		ret.Msg = "missing transaction id"
 		return
 	}
 
-	err := service.GetTrService().DeleteTrById(ws, trId)
+	err := service.GetTrService().DeleteTrById(ws, id)
 	if err != nil {
 		ret.Code = -1
 		ret.Msg = err.Error()

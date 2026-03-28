@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -9,28 +10,46 @@ import (
 )
 
 func ServeAPI(ginServer *gin.Engine) {
-	// app
-	ginServer.POST("/api/v1/app/exit", exitApp)
-	// ledger
-	ginServer.POST("/api/v1/ledger/query-all", queryAllLedgers)
-	ginServer.POST("/api/v1/ledger/create-one", createLedger)
-	ginServer.POST("/api/v1/ledger/modify-name", modifyLedgerName)
-	ginServer.POST("/api/v1/ledger/delete-one", deleteLedger)
-	// transaction record
-	ginServer.POST("/api/v1/tr/query", queryTrOnCondition)
-	ginServer.POST("/api/v1/tr/create-one", createTransactionRecord)
-	ginServer.POST("/api/v1/tr/delete-by-id", deleteTransactionRecordById)
-	// category
-	ginServer.POST("/api/v1/category/query/:type", queryCategoryByType)
-	// tag
-	ginServer.POST("/api/v1/tag/query/:category", queryTagsByCategory)
-	// workspace
-	ginServer.POST("/api/v1/workspace/open", openWorkspace)
-	ginServer.POST("/api/v1/workspace/is-opened", hasOpenedWorkspace)
+	v1 := ginServer.Group("/api/v1")
+	{
+		// App control
+		v1.POST("/app/exit", exitApp)
+
+		// Ledgers: RESTful CRUD
+		ledgers := v1.Group("/ledgers")
+		{
+			ledgers.GET("", listLedgers)
+			ledgers.POST("", createLedger)
+			ledgers.GET("/:id", getLedger)
+			ledgers.PATCH("/:id", updateLedger)
+			ledgers.DELETE("/:id", deleteLedger)
+		}
+
+		// Transactions: query uses POST for complex filters, others RESTful
+		transactions := v1.Group("/transactions")
+		{
+			transactions.POST("/query", queryTransactions)
+			transactions.POST("", createTransaction)
+			transactions.DELETE("/:id", deleteTransaction)
+		}
+
+		// Categories: GET by type query param
+		v1.GET("/categories", listCategories)
+
+		// Tags: GET by category query param
+		v1.GET("/tags", listTags)
+
+		// Workspace
+		workspace := v1.Group("/workspace")
+		{
+			workspace.POST("", openWorkspace)
+			workspace.GET("/status", getWorkspaceStatus)
+		}
+	}
 }
 
-func JsonArg(c *gin.Context, result *models.Result) (arg map[string]interface{}, ok bool) {
-	arg = map[string]interface{}{}
+func JsonArg(c *gin.Context, result *models.Result) (arg map[string]any, ok bool) {
+	arg = make(map[string]any)
 	if err := c.BindJSON(&arg); nil != err {
 		result.Code = -1
 		result.Msg = fmt.Sprintf("parses request failed: %v", err)
@@ -39,4 +58,14 @@ func JsonArg(c *gin.Context, result *models.Result) (arg map[string]interface{},
 
 	ok = true
 	return
+}
+
+func PathParam(c *gin.Context, name string) (val string, ok bool) {
+	val = c.Param(name)
+	ok = val != ""
+	return
+}
+
+func okResult(c *gin.Context) {
+	c.JSON(http.StatusOK, models.NewResult())
 }
