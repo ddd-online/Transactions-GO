@@ -39,15 +39,12 @@ func IsDirectoryExists(path string) bool {
 	return fileInfo.IsDir()
 }
 
+// IsFileExists checks if a file exists at the given path.
+// Returns false if the file does not exist or if access is denied.
 func IsFileExists(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
-		// 如果错误是 "不存在"，则返回 false
-		if os.IsNotExist(err) {
-			return false
-		}
+		return false
 	}
-	// 其他情况（如权限错误等）也视为“不存在”或不可访问
-	// 如果你希望区分错误类型，可以返回 (bool, error)，见下方增强版
 	return true
 }

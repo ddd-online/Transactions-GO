@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/billadm/constant"
 	"github.com/billadm/models"
 )
 
@@ -34,7 +35,9 @@ type TransactionRecordDto struct {
 func (dto *TransactionRecordDto) Validate(result *models.Result) bool {
 	// TODO:校验账本ID是否合法
 	// 校验交易类型是否合法
-	if dto.TransactionType != models.Income && dto.TransactionType != models.Expense && dto.TransactionType != models.Transfer {
+	if dto.TransactionType != constant.TransactionTypeIncome &&
+		dto.TransactionType != constant.TransactionTypeExpense &&
+		dto.TransactionType != constant.TransactionTypeTransfer {
 		result.Code = -1
 		result.Msg = fmt.Sprintf("invalid transaction type: %s", dto.TransactionType)
 		return false
@@ -55,8 +58,12 @@ func (dto *TransactionRecordDto) ToTransactionRecord() *models.TransactionRecord
 	flags := models.TransactionRecordFlags{
 		Outlier: dto.Outlier,
 	}
-	flagsStr, _ := json.Marshal(flags)
-	tr.Flags = string(flagsStr)
+	flagsStr, err := json.Marshal(flags)
+	if err != nil {
+		tr.Flags = "{}"
+	} else {
+		tr.Flags = string(flagsStr)
+	}
 	return tr
 }
 
@@ -70,6 +77,7 @@ func (dto *TransactionRecordDto) FromTransactionRecord(tr *models.TransactionRec
 	dto.Tags = make([]string, 0)
 	dto.TransactionAt = tr.TransactionAt
 	flags := models.TransactionRecordFlags{}
-	json.Unmarshal([]byte(tr.Flags), &flags)
-	dto.Outlier = flags.Outlier
+	if err := json.Unmarshal([]byte(tr.Flags), &flags); err == nil {
+		dto.Outlier = flags.Outlier
+	}
 }

@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/billadm/dao"
@@ -44,63 +45,80 @@ type transactionRecordServiceImpl struct {
 	trTagDao dao.TrTagDao
 }
 
-// CreateTr 创建成功返回交易记录的id
+// CreateTr creates a transaction record and its tags in a single transaction.
 func (t *transactionRecordServiceImpl) CreateTr(ws *workspace.Workspace, trDto *dto.TransactionRecordDto) (string, error) {
-	ws.GetLogger().Infof("start to create transaction record, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
+	log := WorkspaceLogger(ws)
+	log.Infof("start to create transaction record, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
 
 	transactionID := util.GetUUID()
 
-	// 先创建消费记录
 	record := trDto.ToTransactionRecord()
 	record.TransactionID = transactionID
-	if err := t.trDao.CreateTr(ws, record); err != nil {
-		ws.GetLogger().Errorf("create transaction record failed, ledger id: %s, description: %s, err: %v", record.LedgerID, record.Description, err)
-		return "", err
-	}
 
-	// 再插入消费记录的tag
-	trTags := make([]*models.TrTag, 0, len(trDto.Tags))
-	for _, tag := range trDto.Tags {
-		trTag := &models.TrTag{
-			LedgerID:      trDto.LedgerID,
-			TransactionID: transactionID,
-			Tag:           tag,
+	// Use transaction for atomicity
+	err := ws.Transaction(func(tx *workspace.Workspace) error {
+		if err := t.trDao.CreateTr(tx, record); err != nil {
+			return fmt.Errorf("create transaction record: %w", err)
 		}
-		trTags = append(trTags, trTag)
-	}
-	if err := t.trTagDao.CreateTrTags(ws, trTags); err != nil {
-		ws.GetLogger().Errorf("create trTags failed, ledger id: %s, description: %s, err: %v", record.LedgerID, record.Description, err)
+
+		trTags := make([]*models.TrTag, 0, len(trDto.Tags))
+		for _, tag := range trDto.Tags {
+			trTag := &models.TrTag{
+				LedgerID:      trDto.LedgerID,
+				TransactionID: transactionID,
+				Tag:           tag,
+			}
+			trTags = append(trTags, trTag)
+		}
+		if err := t.trTagDao.CreateTrTags(tx, trTags); err != nil {
+			return fmt.Errorf("create tr tags: %w", err)
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Errorf("create transaction record failed: %v", err)
 		return "", err
 	}
 
-	ws.GetLogger().Infof("create transaction record success, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
+	log.Infof("create transaction record success, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
 	return transactionID, nil
 }
 
 func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspace, condition *dto.TrQueryCondition) (*dto.TrQueryResult, error) {
-	ws.GetLogger().Infof("start to query trs, condition: %#v", condition)
+	log := WorkspaceLogger(ws)
+	log.Infof("start to query trs, condition: %#v", condition)
 
-	var err error
-	// 根据时间范围和交易类型查询到所有的tr
+	// Query all matching transaction records
 	trs, err := t.trDao.QueryTrsOnCondition(ws, condition)
 	if err != nil {
 		return nil, err
 	}
-	// 查询tr的tags进行组装
+
+	// Batch query all tags in a single query (fixes N+1 problem)
+	trIds := make([]string, len(trs))
+	for i, tr := range trs {
+		trIds[i] = tr.TransactionID
+	}
+	tagMap, err := t.trTagDao.QueryTrTagsByTrIds(ws, trIds)
+	if err != nil {
+		return nil, err
+	}
+
+	// Assemble DTOs
 	trDtos := make([]*dto.TransactionRecordDto, 0, len(trs))
 	for _, tr := range trs {
-		trTags, err := t.trTagDao.QueryTrTagsByTrId(ws, tr.TransactionID)
-		if err != nil {
-			return nil, err
-		}
 		trDto := &dto.TransactionRecordDto{}
 		trDto.FromTransactionRecord(tr)
-		for _, tag := range trTags {
-			trDto.Tags = append(trDto.Tags, tag.Tag)
+		if tags, ok := tagMap[tr.TransactionID]; ok {
+			for _, tag := range tags {
+				trDto.Tags = append(trDto.Tags, tag.Tag)
+			}
 		}
 		trDtos = append(trDtos, trDto)
 	}
-	// 根据分类标签进行过滤
+
+	// Filter, sort, paginate and summarize
 	sortFields := []operator.SortField{
 		{
 			Field: "transactionAt",
@@ -114,23 +132,30 @@ func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspa
 		Page(condition.Offset, condition.Limit).
 		Summary()
 
-	ws.GetLogger().Infof("query trs by page success, len: %d", len(summary.Items))
-	return summary, err
+	log.Infof("query trs by page success, len: %d", len(summary.Items))
+	return summary, nil
 }
 
 func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trId string) error {
-	ws.GetLogger().Infof("start to delete transaction record, tr id: %s", trId)
+	log := WorkspaceLogger(ws)
+	log.Infof("start to delete transaction record, tr id: %s", trId)
 
-	// 先删除消费记录的tags
-	if err := t.trTagDao.DeleteTrTagByTrId(ws, trId); err != nil {
+	// Use transaction for atomicity
+	err := ws.Transaction(func(tx *workspace.Workspace) error {
+		if err := t.trTagDao.DeleteTrTagByTrId(tx, trId); err != nil {
+			return fmt.Errorf("delete tr tags: %w", err)
+		}
+		if err := t.trDao.DeleteTrById(tx, trId); err != nil {
+			return fmt.Errorf("delete transaction record: %w", err)
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Errorf("delete transaction record failed: %v", err)
 		return err
 	}
 
-	// 再删除对应的消费记录
-	if err := t.trDao.DeleteTrById(ws, trId); err != nil {
-		return err
-	}
-
-	ws.GetLogger().Infof("delete transaction record success, tr id: %s", trId)
+	log.Infof("delete transaction record success, tr id: %s", trId)
 	return nil
 }

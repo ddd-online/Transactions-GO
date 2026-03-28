@@ -10,7 +10,6 @@ import (
 
 const (
 	Any = "any"
-	All = "all"
 	Not = "not"
 )
 

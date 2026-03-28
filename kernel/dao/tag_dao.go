@@ -3,6 +3,7 @@ package dao
 import (
 	"sync"
 
+	"github.com/billadm/constant"
 	"github.com/billadm/models"
 	"github.com/billadm/workspace"
 )
@@ -33,7 +34,7 @@ type TagDaoImpl struct{}
 func (t *TagDaoImpl) QueryTags(ws *workspace.Workspace, category string) ([]models.Tag, error) {
 	tags := make([]models.Tag, 0)
 	db := ws.GetDb()
-	if category != "all" {
+	if category != constant.All {
 		db = db.Where("category = ?", category)
 	}
 	if err := db.Find(&tags).Error; err != nil {

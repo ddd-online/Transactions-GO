@@ -17,9 +17,16 @@ type WsManager struct {
 	lock      sync.Mutex
 }
 
+// OpenWorkspace opens a workspace at the given directory.
+// If a workspace is already open, it will be closed first.
 func (wm *WsManager) OpenWorkspace(directory string) error {
 	wm.lock.Lock()
 	defer wm.lock.Unlock()
+
+	// Close existing workspace if any
+	if wm.workspace != nil {
+		wm.workspace.Close()
+	}
 
 	ws, err := NewWorkspace(directory)
 	if err != nil {
@@ -44,5 +51,6 @@ func (wm *WsManager) Close() {
 
 	if wm.workspace != nil {
 		wm.workspace.Close()
+		wm.workspace = nil
 	}
 }

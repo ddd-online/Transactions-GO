@@ -29,6 +29,7 @@ type TrTagDao interface {
 	DeleteTrTagByLedgerId(ws *workspace.Workspace, ledgerId string) error
 	DeleteTrTagByTrId(ws *workspace.Workspace, trId string) error
 	QueryTrTagsByTrId(ws *workspace.Workspace, trId string) ([]*models.TrTag, error)
+	QueryTrTagsByTrIds(ws *workspace.Workspace, trIds []string) (map[string][]*models.TrTag, error)
 }
 
 var _ TrTagDao = &trTagDaoImpl{}
@@ -65,4 +66,20 @@ func (t *trTagDaoImpl) QueryTrTagsByTrId(ws *workspace.Workspace, trId string) (
 		return nil, err
 	}
 	return trTags, nil
+}
+
+// QueryTrTagsByTrIds batch queries tags for multiple transaction IDs in a single query.
+func (t *trTagDaoImpl) QueryTrTagsByTrIds(ws *workspace.Workspace, trIds []string) (map[string][]*models.TrTag, error) {
+	if len(trIds) == 0 {
+		return make(map[string][]*models.TrTag), nil
+	}
+	trTags := make([]*models.TrTag, 0)
+	if err := ws.GetDb().Where("transaction_id IN ?", trIds).Find(&trTags).Error; err != nil {
+		return nil, err
+	}
+	result := make(map[string][]*models.TrTag)
+	for _, tag := range trTags {
+		result[tag.TransactionID] = append(result[tag.TransactionID], tag)
+	}
+	return result, nil
 }

@@ -68,6 +68,20 @@ func (w *Workspace) GetDirectory() string {
 	return w.directory
 }
 
+// Transaction executes fn within a database transaction.
+// If fn returns an error, the transaction is rolled back.
+// If fn succeeds, the transaction is committed.
+func (w *Workspace) Transaction(fn func(tx *Workspace) error) error {
+	return w.db.Transaction(func(tx *gorm.DB) error {
+		txWorkspace := &Workspace{
+			directory: w.directory,
+			logger:    w.logger,
+			db:        tx,
+		}
+		return fn(txWorkspace)
+	})
+}
+
 func (w *Workspace) Close() {
 	sqlDb, err := w.db.DB()
 	if err != nil {

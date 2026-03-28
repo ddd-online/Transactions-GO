@@ -3,6 +3,7 @@ package dao
 import (
 	"sync"
 
+	"github.com/billadm/constant"
 	"github.com/billadm/models"
 	"github.com/billadm/workspace"
 )
@@ -33,7 +34,7 @@ type categoryDaoImpl struct{}
 func (c *categoryDaoImpl) QueryCategory(ws *workspace.Workspace, trType string) ([]models.Category, error) {
 	categories := make([]models.Category, 0)
 	db := ws.GetDb()
-	if trType != "all" {
+	if trType != constant.All {
 		db = db.Where("transaction_type = ?", trType)
 	}
 

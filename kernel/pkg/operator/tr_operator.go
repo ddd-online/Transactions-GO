@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/billadm/constant"
 	"github.com/billadm/models/dto"
 )
 
@@ -154,15 +155,15 @@ func (t *TrOperator) Summary() *dto.TrQueryResult {
 
 	// 初始化 trStatistics
 	trStatistics := map[string]int64{
-		"income":   0,
-		"expense":  0,
-		"transfer": 0,
+		constant.TransactionTypeIncome:   0,
+		constant.TransactionTypeExpense:  0,
+		constant.TransactionTypeTransfer: 0,
 	}
 
 	// 遍历所有记录（分页前）进行金额汇总
 	for _, tr := range t.trDtos {
 		switch tr.TransactionType {
-		case "income", "expense", "transfer":
+		case constant.TransactionTypeIncome, constant.TransactionTypeExpense, constant.TransactionTypeTransfer:
 			trStatistics[tr.TransactionType] += tr.Price
 		default:
 			// 可选：忽略未知类型，或归入其他

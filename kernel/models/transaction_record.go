@@ -1,10 +1,7 @@
 package models
 
-const (
-	Income   = "income"
-	Expense  = "expense"
-	Transfer = "transfer"
-)
+// Transaction types are defined in constant package.
+// Use constant.TransactionTypeIncome, constant.TransactionTypeExpense, constant.TransactionTypeTransfer
 
 // TransactionRecord 消费记录结构体
 type TransactionRecord struct {
