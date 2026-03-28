@@ -3,7 +3,11 @@
     "allow": [
       "Bash(go build:*)",
       "Bash(go test:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
