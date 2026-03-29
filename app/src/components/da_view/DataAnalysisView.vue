@@ -2,10 +2,15 @@
   <div class="da-view">
     <!-- 工具栏 -->
     <div class="da-toolbar">
-      <BilladmTimeRangePicker
-          v-model:time-range="trQueryConditionStore.timeRange"
-          v-model:time-range-type="trQueryConditionStore.timeRangeType"
-      />
+      <div class="da-toolbar-left">
+        <BilladmTimeRangePicker
+            v-model:time-range="trQueryConditionStore.timeRange"
+            v-model:time-range-type="trQueryConditionStore.timeRangeType"
+        />
+      </div>
+      <div class="da-toolbar-right">
+        <billadm-ledger-select/>
+      </div>
     </div>
 
     <!-- 图表展示 -->
@@ -33,8 +38,19 @@ const trQueryConditionStore = useTrQueryConditionStore();
 
 .da-toolbar {
   display: flex;
+  justify-content: space-between;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.da-toolbar-left {
+  display: flex;
+  gap: 8px;
+}
+
+.da-toolbar-right {
+  display: flex;
+  gap: 8px;
 }
 
 .da-content {
