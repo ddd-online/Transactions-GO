@@ -3,6 +3,7 @@ productName: Transactions
 asar: false
 directories:
   output: out
+  buildResources: assets
 files:
   - src/**
   - node_modules/**
@@ -10,7 +11,7 @@ files:
   - dist/**
   - Billadm-Kernel.exe
 win:
-  icon: "assets/Transactions.ico"
+  icon: "Transactions.ico"
   requestedExecutionLevel: "asInvoker"
   target: nsis
 nsis:
@@ -27,3 +28,5 @@ nsis:
   warningsAsErrors: false
   installerSidebar: "nsis/installerSidebar.bmp"
   uninstallerSidebar: "nsis/uninstallerSidebar.bmp"
+  installerIcon: "Transactions.ico"
+  uninstallerIcon: "Transactions.ico"
