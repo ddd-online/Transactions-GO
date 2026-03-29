@@ -95,10 +95,16 @@ const loadAllChartData = async () => {
   })
   await Promise.all(promises)
 
-  // 初始化选中第一个图表
+  // 初始化选中第一个图表，或更新当前选中图表的数据
   if (!selectedChart.value && KEEP_CHART_CONFIGS.length > 0) {
     const firstConfig = KEEP_CHART_CONFIGS[0]!
     selectedChart.value = chartDataCache.value.get(firstConfig.title) || null
+  } else if (selectedChart.value) {
+    // 更新已选中图表的数据
+    const updatedData = chartDataCache.value.get(selectedChart.value.title)
+    if (updatedData) {
+      selectedChart.value = updatedData
+    }
   }
 }
 
