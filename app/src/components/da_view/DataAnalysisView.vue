@@ -13,18 +13,112 @@
       </div>
     </div>
 
-    <!-- 图表展示 -->
-    <div class="da-content">
-      <billadm-chart-display/>
+    <!-- 主内容区：左侧边栏 + 右侧图表显示 -->
+    <div class="da-main">
+      <!-- 左侧图表列表 -->
+      <div class="da-sidebar">
+        <billadm-chart-list
+            :chart-configs="KEEP_CHART_CONFIGS"
+            @select="onChartSelect"
+        />
+      </div>
+
+      <!-- 右侧图表显示 -->
+      <div class="da-content">
+        <billadm-chart-view
+            v-if="selectedChart"
+            :title="selectedChart.title"
+            :data="selectedChart.data"
+        />
+        <a-empty v-else description="请选择图表" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import BilladmChartDisplay from "@/components/da_view/BilladmChartDisplay.vue";
-import {useTrQueryConditionStore} from "@/stores/trQueryConditionStore.ts";
+import {ref, watch, onMounted} from 'vue'
+import BilladmTimeRangePicker from '@/components/common/BilladmTimeRangePicker.vue'
+import BilladmChartList from '@/components/da_view/BilladmChartList.vue'
+import BilladmChartView from '@/components/da_view/BilladmChartView.vue'
+import {useLedgerStore} from '@/stores/ledgerStore.ts'
+import {useTrQueryConditionStore} from '@/stores/trQueryConditionStore.ts'
+import {convertToUnixTimeRange} from '@/backend/timerange.ts'
+import {getTrOnCondition} from '@/backend/functions.ts'
+import {buildLineChartData, KEEP_CHART_CONFIGS, type ChartConfig, type TimeSeriesData} from '@/backend/chart'
+import type {TransactionRecord} from '@/types/billadm'
 
-const trQueryConditionStore = useTrQueryConditionStore();
+const ledgerStore = useLedgerStore()
+const trQueryConditionStore = useTrQueryConditionStore()
+
+interface ChartInstance {
+  title: string
+  data: TimeSeriesData[]
+}
+
+const selectedChart = ref<ChartInstance | null>(null)
+
+// 查询交易记录
+const queryTrs = async (): Promise<TransactionRecord[]> => {
+  if (!ledgerStore.currentLedgerId) return []
+  const trCondition = {
+    ledgerId: ledgerStore.currentLedgerId,
+    tsRange: trQueryConditionStore.timeRange
+        ? convertToUnixTimeRange(trQueryConditionStore.timeRange)
+        : undefined,
+  }
+  const result = await getTrOnCondition(trCondition)
+  return result.items || []
+}
+
+// 加载图表数据
+const loadChartData = async (config: ChartConfig): Promise<ChartInstance> => {
+  const data = await queryTrs()
+  const chartData = buildLineChartData(data, {
+    granularity: config.granularity,
+    lineDisplayTypes: config.lineDisplayTypes,
+    includeOutlier: config.includeOutlier,
+  })
+  return {
+    title: config.title,
+    data: chartData,
+  }
+}
+
+// 缓存所有图表数据
+const chartDataCache = ref<Map<string, ChartInstance>>(new Map())
+
+const loadAllChartData = async () => {
+  const promises = KEEP_CHART_CONFIGS.map(async (config) => {
+    const chartInstance = await loadChartData(config)
+    chartDataCache.value.set(config.title, chartInstance)
+  })
+  await Promise.all(promises)
+
+  // 初始化选中第一个图表
+  if (!selectedChart.value && KEEP_CHART_CONFIGS.length > 0) {
+    const firstConfig = KEEP_CHART_CONFIGS[0]!
+    selectedChart.value = chartDataCache.value.get(firstConfig.title) || null
+  }
+}
+
+// 图表选择
+const onChartSelect = (config: ChartConfig) => {
+  selectedChart.value = chartDataCache.value.get(config.title) || null
+}
+
+onMounted(() => {
+  loadAllChartData()
+})
+
+// 监听查询条件或账本变化，重新加载
+watch(
+    () => [ledgerStore.currentLedgerId, trQueryConditionStore.timeRange],
+    () => {
+      loadAllChartData()
+    },
+    {deep: true}
+)
 </script>
 
 <style scoped>
@@ -53,8 +147,25 @@ const trQueryConditionStore = useTrQueryConditionStore();
   gap: 8px;
 }
 
+.da-main {
+  flex: 1;
+  display: flex;
+  gap: 16px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.da-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  background-color: var(--billadm-color-major-background, #fff);
+  border-radius: 8px;
+  overflow-y: auto;
+}
+
 .da-content {
   flex: 1;
-  overflow-y: auto;
+  min-width: 0;
+  overflow: hidden;
 }
 </style>
