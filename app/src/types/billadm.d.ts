@@ -66,9 +66,8 @@ export interface Category {
  * 消费标签
  */
 export interface Tag {
-    name: string;      // 标签名称
-    scope: string;     // 作用域
-    category: string;  // 分类ID
+    name: string;                      // 标签名称
+    categoryTransactionType: string;  // 分类:交易类型，格式如"餐饮:支出"
 }
 
 /**

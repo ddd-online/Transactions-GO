@@ -240,8 +240,10 @@ watch(() => trForm.value.type, async () => {
 });
 
 watch(() => trForm.value.category, async () => {
-  if (trForm.value.category === '') return;
-  const tagList = await getTagsByCategory(trForm.value.category);
+  if (trForm.value.category === '' || !trForm.value.type) return;
+  // 组合分类和交易类型，格式为"分类:交易类型"
+  const categoryTransactionType = `${trForm.value.category}:${trForm.value.type}`;
+  const tagList = await getTagsByCategory(categoryTransactionType);
   tags.value = tagList.map(t => ({value: t.name}));
   const tagNames = tagList.map(t => t.name);
   if (tagNames.length > 0 && trForm.value.tags) {

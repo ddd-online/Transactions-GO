@@ -108,11 +108,11 @@ export async function getCategoryByType(trType: string): Promise<Category[]> {
     }
 }
 
-export async function getTagsByCategory(category: string): Promise<Tag[]> {
+export async function getTagsByCategory(categoryTransactionType: string): Promise<Tag[]> {
     try {
-        return await queryTags(category);
+        return await queryTags(categoryTransactionType);
     } catch (error) {
-        NotificationUtil.error(`查询 ${category} 消费标签失败`, `${error}`);
+        NotificationUtil.error(`查询 ${categoryTransactionType} 消费标签失败`, `${error}`);
         return [];
     }
 }

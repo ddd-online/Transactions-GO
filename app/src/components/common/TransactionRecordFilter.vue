@@ -182,7 +182,9 @@ watch(() => tempCategory.value, async (newVal) => {
     tempTags.value = [];
     return;
   }
-  const tagList = await getTagsByCategory(newVal);
+  // 组合分类和交易类型，格式为"分类:交易类型"
+  const categoryTransactionType = `${newVal}:${tempTransactionType.value}`;
+  const tagList = await getTagsByCategory(categoryTransactionType);
   tags.value = tagList.map((t) => ({value: t.name}));
 });
 

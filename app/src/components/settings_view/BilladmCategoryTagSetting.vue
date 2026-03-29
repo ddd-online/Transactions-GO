@@ -75,10 +75,11 @@ const transferCategory = ref<CategoryWithTags[]>([]);
 
 const refreshDataWithType = async (trType: TransactionType) => {
   const categories = await getCategoryByType(trType);
-  // 为每个 category 并行加载其 tags
+  // 为每个 category 并行加载其 tags，组合为"分类:交易类型"格式
   return await Promise.all(
       categories.map(async (category) => {
-        const tags = await getTagsByCategory(category.name);
+        const categoryTransactionType = `${category.name}:${trType}`;
+        const tags = await getTagsByCategory(categoryTransactionType);
         return {...category, tags};
       })
   );

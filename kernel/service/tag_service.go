@@ -29,7 +29,7 @@ func GetTagService() TagService {
 }
 
 type TagService interface {
-	QueryTags(ws *workspace.Workspace, category string) ([]models.Tag, error)
+	QueryTags(ws *workspace.Workspace, categoryTransactionType string) ([]models.Tag, error)
 }
 
 var _ TagService = &tagServiceImpl{}
@@ -38,9 +38,9 @@ type tagServiceImpl struct {
 	tagDao dao.TagDao
 }
 
-func (t *tagServiceImpl) QueryTags(ws *workspace.Workspace, category string) ([]models.Tag, error) {
+func (t *tagServiceImpl) QueryTags(ws *workspace.Workspace, categoryTransactionType string) ([]models.Tag, error) {
 	logrus.Info("start to query tag")
-	tags, err := t.tagDao.QueryTags(ws, category)
+	tags, err := t.tagDao.QueryTags(ws, categoryTransactionType)
 	if err != nil {
 		return nil, err
 	}

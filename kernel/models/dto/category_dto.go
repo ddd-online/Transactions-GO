@@ -4,7 +4,6 @@ import "github.com/billadm/models"
 
 type CategoryDto struct {
 	Name            string `json:"name"`
-	Scope           string `json:"scope"`
 	TransactionType string `json:"transactionType"`
 }
 
@@ -12,7 +11,6 @@ type CategoryDto struct {
 func (dto *CategoryDto) ToCategory() *models.Category {
 	return &models.Category{
 		Name:            dto.Name,
-		Scope:           dto.Scope,
 		TransactionType: dto.TransactionType,
 	}
 }
@@ -20,6 +18,5 @@ func (dto *CategoryDto) ToCategory() *models.Category {
 // FromCategory 从 Category 填充 CategoryDto
 func (dto *CategoryDto) FromCategory(category *models.Category) {
 	dto.Name = category.Name
-	dto.Scope = category.Scope
 	dto.TransactionType = category.TransactionType
 }

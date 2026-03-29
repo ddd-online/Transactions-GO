@@ -24,18 +24,18 @@ func GetTagDao() TagDao {
 }
 
 type TagDao interface {
-	QueryTags(ws *workspace.Workspace, category string) ([]models.Tag, error)
+	QueryTags(ws *workspace.Workspace, categoryTransactionType string) ([]models.Tag, error)
 }
 
 var _ TagDao = &TagDaoImpl{}
 
 type TagDaoImpl struct{}
 
-func (t *TagDaoImpl) QueryTags(ws *workspace.Workspace, category string) ([]models.Tag, error) {
+func (t *TagDaoImpl) QueryTags(ws *workspace.Workspace, categoryTransactionType string) ([]models.Tag, error) {
 	tags := make([]models.Tag, 0)
 	db := ws.GetDb()
-	if category != constant.All {
-		db = db.Where("category = ?", category)
+	if categoryTransactionType != constant.All {
+		db = db.Where("category_transaction_type = ?", categoryTransactionType)
 	}
 	if err := db.Find(&tags).Error; err != nil {
 		return nil, err
