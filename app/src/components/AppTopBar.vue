@@ -4,7 +4,6 @@
       <div class="menu-bar-avatar">
         <a-avatar shape="square" :src="IconBilladm"/>
       </div>
-      <billadm-ledger-select v-if="route.path!='/ledger_view'"/>
     </div>
     <div class="menu-bar-center">
       <a-typography-text class="typography-section">

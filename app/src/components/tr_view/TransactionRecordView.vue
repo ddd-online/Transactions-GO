@@ -2,10 +2,15 @@
   <div class="tr-view">
     <!-- 工具栏 -->
     <div class="tr-toolbar">
-      <BilladmTimeRangePicker
-          v-model:time-range="trQueryConditionStore.timeRange"
-          v-model:time-range-type="trQueryConditionStore.timeRangeType"
-      />
+      <div class="tr-toolbar-left">
+        <BilladmTimeRangePicker
+            v-model:time-range="trQueryConditionStore.timeRange"
+            v-model:time-range-type="trQueryConditionStore.timeRangeType"
+        />
+      </div>
+      <div class="tr-toolbar-right">
+        <billadm-ledger-select/>
+      </div>
     </div>
 
     <!-- 主内容区 -->
@@ -258,8 +263,19 @@ watch(() => trForm.value.category, async () => {
 
 .tr-toolbar {
   display: flex;
+  justify-content: space-between;
   gap: 8px;
   flex-shrink: 0;
+}
+
+.tr-toolbar-left {
+  display: flex;
+  gap: 8px;
+}
+
+.tr-toolbar-right {
+  display: flex;
+  gap: 8px;
 }
 
 .tr-content {
