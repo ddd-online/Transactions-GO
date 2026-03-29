@@ -1,5 +1,5 @@
-appId: com.github.billadm
-productName: Billadm
+appId: com.github.Transactions
+productName: Transactions
 asar: false
 directories:
   output: out
@@ -10,7 +10,7 @@ files:
   - dist/**
   - Billadm-Kernel.exe
 win:
-  icon: "assets/billadm.ico"
+  icon: "assets/Transactions.ico"
   requestedExecutionLevel: "asInvoker"
   target: nsis
 nsis:
@@ -21,7 +21,7 @@ nsis:
   deleteAppDataOnUninstall: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: "Billadm"
+  shortcutName: "Transactions"
   license: "../LICENSE"
   #  include: "nsis/installer.nsh"
   warningsAsErrors: false
