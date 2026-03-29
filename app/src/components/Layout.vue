@@ -7,15 +7,10 @@
     <a-layout-header class="layout-header">
       <app-top-bar/>
     </a-layout-header>
-    <a-layout style="height: calc(100vh - var(--billadm-size-header-height))" has-sider>
-      <a-layout-sider
-          :style="siderStyle"
-          :width="siderWidthSize"
-          :trigger="null"
-          :collapsible="false"
-      >
+    <a-layout style="height: calc(100vh - var(--billadm-size-header-height))">
+      <div class="layout-sider">
         <app-left-bar/>
-      </a-layout-sider>
+      </div>
       <a-layout style="height: 100%">
         <a-layout-content :style="contentStyle">
           <a-card style="height: 100%;padding: 16px" :body-style="{padding:'0px',height:'100%'}" :bordered="false">
@@ -41,12 +36,7 @@ import {useRoute} from "vue-router";
 
 const route = useRoute();
 
-const {minorBgColor, siderWidthSize} = useCssVariables();
-
-const siderStyle: CSSProperties = {
-  backgroundColor: minorBgColor.value,
-  minHeight: '100%',
-};
+const {minorBgColor} = useCssVariables();
 
 const contentStyle: CSSProperties = {
   backgroundColor: minorBgColor.value,
@@ -87,6 +77,14 @@ onMounted(initWorkspace)
   background-color: var(--billadm-color-minor-background);
   padding: 0;
   line-height: var(--billadm-size-header-height);
+}
+
+.layout-sider {
+  width: var(--billadm-size-sider-width);
+  min-width: var(--billadm-size-sider-width);
+  height: 100%;
+  background-color: var(--billadm-color-minor-background);
+  flex-shrink: 0;
 }
 
 .layout-footer {

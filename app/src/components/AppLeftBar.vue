@@ -1,26 +1,26 @@
 <template>
-  <div class="icon-nav">
-    <div class="icon-nav-top">
+  <div class="app-left-bar">
+    <div class="app-left-bar-top">
       <a-button :type="route.path==='/ledger_view' ? 'primary': 'text'" @click="navigate('ledger_view')">
         <template #icon>
-          <BookOutlined style="display: flex;justify-content: center;align-items: center;font-size: medium"/>
+          <BookOutlined style="font-size: 18px"/>
         </template>
       </a-button>
       <a-button :type="route.path==='/tr_view' ? 'primary': 'text'" @click="navigate('tr_view')">
         <template #icon>
-          <TransactionOutlined style="display: flex;justify-content: center;align-items: center;font-size: medium"/>
+          <TransactionOutlined style="font-size: 18px"/>
         </template>
       </a-button>
       <a-button :type="route.path==='/da_view' ? 'primary': 'text'" @click="navigate('da_view')">
         <template #icon>
-          <LineChartOutlined style="display: flex;justify-content: center;align-items: center;font-size: medium"/>
+          <LineChartOutlined style="font-size: 18px"/>
         </template>
       </a-button>
     </div>
-    <div class="icon-nav-bottom">
+    <div class="app-left-bar-bottom">
       <a-button :type="route.path==='/settings_view' ? 'primary': 'text'" @click="navigate('settings_view')">
         <template #icon>
-          <SettingOutlined style="display: flex;justify-content: center;align-items: center;font-size: medium"/>
+          <SettingOutlined style="font-size: 18px"/>
         </template>
       </a-button>
     </div>
@@ -40,24 +40,23 @@ const navigate = (path: string) => {
 </script>
 
 <style scoped>
-.icon-nav {
+.app-left-bar {
   display: flex;
   flex-direction: column;
-  width: 100%;
+  justify-content: space-between;
   height: 100%;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 0;
+  width: 100%;
+  padding: 8px 4px;
+  background-color: var(--billadm-color-minor-background);
 }
 
-.icon-nav-top {
-  margin-bottom: auto;
+.app-left-bar-top {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.icon-nav-bottom {
+.app-left-bar-bottom {
   display: flex;
   flex-direction: column;
   gap: 8px;
