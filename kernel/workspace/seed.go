@@ -35,6 +35,16 @@ var defaultData = map[string]map[string][]string{
 }
 
 func seedData(db *gorm.DB) error {
+	var count int64
+	if err := db.Model(&models.Category{}).Count(&count).Error; err != nil {
+		logrus.Errorf("检查分类数据失败: %v", err)
+		return err
+	}
+	if count > 0 {
+		logrus.Info("数据库已存在数据，跳过预置")
+		return nil
+	}
+
 	for transactionType, categories := range defaultData {
 		for categoryName, tags := range categories {
 			category := models.Category{
