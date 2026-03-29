@@ -26,9 +26,7 @@
       </template>
 
       <template v-else-if="column.dataIndex === 'price'">
-        <a-typography-text class="typography-amount">
-          {{ centsToYuan(record.price) }}
-        </a-typography-text>
+        {{ centsToYuan(record.price) }}
       </template>
 
       <template v-else-if="column.dataIndex === 'action'">
