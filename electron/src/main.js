@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain, dialog, net} = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, net } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -23,9 +23,9 @@ const logDir = path.join(appPath, 'logs');
 const logFile = path.join(logDir, 'app.log');
 
 if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir, {recursive: true});
+    fs.mkdirSync(logDir, { recursive: true });
 }
-const logStream = fs.createWriteStream(logFile, {flags: 'a'});
+const logStream = fs.createWriteStream(logFile, { flags: 'a' });
 const log = (message) => {
     const time = new Date().toISOString();
     logStream.write(`[${time}] ${message}\n`);
@@ -42,7 +42,7 @@ function readBilladmFile() {
     try {
         const fileContent = fs.readFileSync(filePath, 'utf8');
         const tmpObj = JSON.parse(fileContent);
-        billadmCfg = {...billadmCfg, ...tmpObj};
+        billadmCfg = { ...billadmCfg, ...tmpObj };
     } catch (err) {
         log(`读取 .billadm 文件失败: ${err.message}`);
     }
@@ -90,13 +90,18 @@ const startKernel = () => {
 
     // 进程关闭
     kernelProcess.on('close', (code) => {
-        log(`[Kernel Process] kernel [pid=${kernelProcess.pid}] closed with code ${code}`);
+        if (kernelProcess) {
+            log(`[Kernel Process] kernel [pid=${kernelProcess.pid}] closed with code ${code}`);
+        } else {
+            log(`[Kernel Process] kernel closed with code ${code}`);
+        }
         kernelProcess = null;
     });
 
     // 进程异常退出
     kernelProcess.on('exit', (code) => {
-        log(`[Kernel Process] kernel exited with code ${code}`);
+        const pid = kernelProcess ? kernelProcess.pid : 'unknown';
+        log(`[Kernel Process] kernel [pid=${pid}] exited with code ${code}`);
         if (code !== 0 && code !== null) {
             dialog.showMessageBox({
                 type: 'error',
@@ -140,17 +145,12 @@ const createWindow = () => {
                 break;
             case 'close':
                 try {
-                    await net.fetch(API_SERVER + "/api/v1/app/exit", {method: "POST"});
+                    await net.fetch(API_SERVER + "/api/v1/app/exit", { method: "POST" });
                 } catch (e) {
                     log(`请求kernel关闭失败 ${e}`);
-                    dialog.showMessageBox(mainWindow, {
-                        type: 'error',
-                        title: '关闭失败',
-                        message: '无法关闭后台服务，请手动关闭',
-                    });
                 }
                 const bounds = mainWindow.getBounds();
-                billadmCfg = {...billadmCfg, ...bounds}
+                billadmCfg = { ...billadmCfg, ...bounds }
                 mainWindow.close();
                 break;
         }
@@ -163,7 +163,7 @@ const createWindow = () => {
             });
         } catch (err) {
             log(`Dialog error: ${err.message}`);
-            return {canceled: true, filePaths: [], error: err.message};
+            return { canceled: true, filePaths: [], error: err.message };
         }
     });
 
