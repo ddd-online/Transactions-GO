@@ -11,7 +11,7 @@ import (
 	"github.com/billadm/workspace"
 )
 
-// GET /tags?category=xxx
+// GET /tags?categoryTransactionType=xxx
 func listTags(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -23,8 +23,8 @@ func listTags(c *gin.Context) {
 		return
 	}
 
-	category := c.Query("category")
-	tags, err := service.GetTagService().QueryTags(ws, category)
+	categoryTransactionType := c.Query("categoryTransactionType")
+	tags, err := service.GetTagService().QueryTags(ws, categoryTransactionType)
 	if err != nil {
 		ret.Code = -1
 		ret.Msg = err.Error()

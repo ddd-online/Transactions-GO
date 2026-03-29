@@ -10,7 +10,8 @@
       "Bash(git commit:*)",
       "Bash(npm list:*)",
       "Bash(cd:*)",
-      "Bash(xargs grep:*)"
+      "Bash(xargs grep:*)",
+      "Bash(cp:*)"
     ]
   }
 }
