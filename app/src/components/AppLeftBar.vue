@@ -53,12 +53,14 @@ const navigate = (path: string) => {
 .app-left-bar-top {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
 }
 
 .app-left-bar-bottom {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 8px;
 }
 </style>
