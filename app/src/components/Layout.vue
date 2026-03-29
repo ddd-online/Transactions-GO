@@ -7,11 +7,16 @@
     <a-layout-header class="layout-header">
       <app-top-bar/>
     </a-layout-header>
-    <a-layout style="height: 100%">
-      <a-layout-sider :style="siderStyle" :width="siderWidthSize">
+    <a-layout style="height: calc(100vh - var(--billadm-size-header-height))" has-sider>
+      <a-layout-sider
+          :style="siderStyle"
+          :width="siderWidthSize"
+          :trigger="null"
+          :collapsible="false"
+      >
         <app-left-bar/>
       </a-layout-sider>
-      <a-layout>
+      <a-layout style="height: 100%">
         <a-layout-content :style="contentStyle">
           <a-card style="height: 100%;padding: 16px" :body-style="{padding:'0px',height:'100%'}" :bordered="false">
             <router-view/>
@@ -40,6 +45,7 @@ const {minorBgColor, siderWidthSize} = useCssVariables();
 
 const siderStyle: CSSProperties = {
   backgroundColor: minorBgColor.value,
+  minHeight: '100%',
 };
 
 const contentStyle: CSSProperties = {
@@ -80,6 +86,7 @@ onMounted(initWorkspace)
   height: var(--billadm-size-header-height);
   background-color: var(--billadm-color-minor-background);
   padding: 0;
+  line-height: var(--billadm-size-header-height);
 }
 
 .layout-footer {

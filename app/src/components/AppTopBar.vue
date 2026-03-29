@@ -1,9 +1,9 @@
 <template>
   <div class="menu-bar">
-    <div class="menu-bar-avatar">
-      <a-avatar shape="square" :src="IconBilladm"/>
-    </div>
     <div class="menu-bar-left">
+      <div class="menu-bar-avatar">
+        <a-avatar shape="square" :src="IconBilladm"/>
+      </div>
       <billadm-ledger-select v-if="route.path!='/ledger_view'"/>
     </div>
     <div class="menu-bar-center">
@@ -56,27 +56,20 @@ const onClose = () => {
   -webkit-app-region: drag;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   height: 100%;
-  position: relative;
+  width: 100%;
+  padding: 0 8px;
 }
 
 .menu-bar > * {
   -webkit-app-region: no-drag;
 }
 
-.menu-bar-avatar {
-  width: var(--billadm-size-sider-width);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 .menu-bar-left {
-  margin-right: auto;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
 }
 
 .menu-bar-center {
@@ -88,8 +81,13 @@ const onClose = () => {
 .menu-bar-right {
   display: flex;
   align-items: center;
+  gap: 4px;
+}
+
+.menu-bar-avatar {
+  width: var(--billadm-size-sider-width);
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 8px;
-  margin-right: 8px;
 }
 </style>
