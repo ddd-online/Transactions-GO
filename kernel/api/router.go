@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 
@@ -64,8 +63,4 @@ func PathParam(c *gin.Context, name string) (val string, ok bool) {
 	val = c.Param(name)
 	ok = val != ""
 	return
-}
-
-func okResult(c *gin.Context) {
-	c.JSON(http.StatusOK, models.NewResult())
 }
