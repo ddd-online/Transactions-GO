@@ -150,15 +150,16 @@ watch(
 .da-main {
   flex: 1;
   display: flex;
-  gap: 16px;
+  gap: 12px;
   min-height: 0;
   overflow: hidden;
 }
 
 .da-sidebar {
-  width: 220px;
+  width: 200px;
   flex-shrink: 0;
-  background-color: var(--billadm-color-major-background, #fff);
+  background-color: var(--billadm-color-minor-background, #f5f5f5);
+  border: 1px solid var(--billadm-color-border, #e8e8e8);
   border-radius: 8px;
   overflow-y: auto;
 }
@@ -166,6 +167,10 @@ watch(
 .da-content {
   flex: 1;
   min-width: 0;
+  background-color: var(--billadm-color-major-background, #fff);
+  border: 1px solid var(--billadm-color-border, #e8e8e8);
+  border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
 }
 </style>

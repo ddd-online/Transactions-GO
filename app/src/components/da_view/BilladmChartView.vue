@@ -5,12 +5,7 @@
       <h3 class="chart-view-title">{{ title }}</h3>
       <a-button type="text" @click="showEnlarged = true">
         <template #icon>
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M6 1H15V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M1 6V15H10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M1 10L5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M10 1L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
+          <ArrowsAltOutlined/>
         </template>
       </a-button>
     </div>
@@ -37,9 +32,7 @@
               <h3 class="chart-enlarge-title">{{ title }}</h3>
               <a-button type="text" @click="showEnlarged = false">
                 <template #icon>
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M4 4L16 16M16 4L4 16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
+                  <CloseOutlined/>
                 </template>
               </a-button>
             </div>
@@ -63,6 +56,7 @@
 
 <script setup lang="ts">
 import {ref} from 'vue'
+import {ArrowsAltOutlined, CloseOutlined} from '@ant-design/icons-vue'
 import BilladmChart from '@/components/da_view/BilladmChart.vue'
 import type {TimeSeriesData} from '@/backend/chart'
 

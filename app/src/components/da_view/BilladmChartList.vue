@@ -8,18 +8,7 @@
         @click="selectChart(chart)"
     >
       <div class="chart-list-item-icon">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path
-              d="M1 12L5 8L8 10L15 3"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-          />
-          <circle cx="5" cy="8" r="1.5" fill="currentColor"/>
-          <circle cx="8" cy="10" r="1.5" fill="currentColor"/>
-          <circle cx="15" cy="3" r="1.5" fill="currentColor"/>
-        </svg>
+        <RiseOutlined style="font-size: 14px"/>
       </div>
       <span class="chart-list-item-title">{{ chart.title }}</span>
     </div>
@@ -28,6 +17,7 @@
 
 <script setup lang="ts">
 import {ref} from 'vue'
+import {RiseOutlined} from '@ant-design/icons-vue'
 import type {ChartConfig} from '@/backend/chart'
 
 interface Props {
@@ -72,8 +62,9 @@ const selectChart = (config: ChartConfig) => {
 }
 
 .chart-list-item.active {
-  background-color: var(--billadm-color-minor-background, #e6f4ff);
+  background-color: #ffffff;
   color: var(--billadm-color-primary, #1677ff);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .chart-list-item-icon {
