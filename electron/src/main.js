@@ -31,34 +31,34 @@ const log = (message) => {
     logStream.write(`[${time}] ${message}\n`);
 };
 
-let billadmCfg = {
+let transactionsCfg = {
     width: 1400, height: 1000, x: undefined, y: undefined, workspaceDir: '',
 };
 
-function readBilladmFile() {
+function readTransactionsCfg() {
     if (isDev) return;
     const homeDir = os.homedir();
-    const filePath = path.join(homeDir, '.billadm');
+    const filePath = path.join(homeDir, '.transactions.json');
     try {
         const fileContent = fs.readFileSync(filePath, 'utf8');
         const tmpObj = JSON.parse(fileContent);
-        billadmCfg = { ...billadmCfg, ...tmpObj };
+        transactionsCfg = { ...transactionsCfg, ...tmpObj };
     } catch (err) {
-        log(`读取 .billadm 文件失败: ${err.message}`);
+        log(`读取 .transactions.json 文件失败: ${err.message}`);
     }
-    log(`窗口 ${billadmCfg.width}x${billadmCfg.height} workspace ${billadmCfg.workspaceDir}`);
+    log(`窗口 ${transactionsCfg.width}x${transactionsCfg.height} workspace ${transactionsCfg.workspaceDir}`);
 }
 
-function saveBilladmConfig() {
+function saveTransactionsCfg() {
     if (isDev) return;
     const homeDir = os.homedir();
-    const filePath = path.join(homeDir, '.billadm');
+    const filePath = path.join(homeDir, '.transactions.json');
     try {
-        if (typeof billadmCfg !== 'object' || billadmCfg === null) {
-            log('billadmCfg 无效，无法保存');
+        if (typeof transactionsCfg !== 'object' || transactionsCfg === null) {
+            log('transactionsCfg 无效，无法保存');
             return;
         }
-        fs.writeFileSync(filePath, JSON.stringify(billadmCfg, null, 2), 'utf8');
+        fs.writeFileSync(filePath, JSON.stringify(transactionsCfg, null, 2), 'utf8');
         log(`配置已保存至 ${filePath}`);
     } catch (err) {
         log(`保存配置失败: ${err.message}`);
@@ -74,7 +74,7 @@ const startKernel = () => {
     const kernelExe = path.join(appPath, 'Billadm-Kernel.exe');
     log(`Starting kernel: ${kernelExe}`);
     const cp = require("child_process");
-    kernelProcess = cp.spawn(kernelExe, ['-mode', 'release', '-workspace', billadmCfg.workspaceDir], {
+    kernelProcess = cp.spawn(kernelExe, ['-mode', 'release', '-workspace', transactionsCfg.workspaceDir], {
         detached: false,
     });
 
@@ -119,10 +119,10 @@ const startKernel = () => {
 
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
-        width: billadmCfg.width,
-        height: billadmCfg.height,
-        x: billadmCfg.x,
-        y: billadmCfg.y,
+        width: transactionsCfg.width,
+        height: transactionsCfg.height,
+        x: transactionsCfg.x,
+        y: transactionsCfg.y,
         frame: false,
         webPreferences: {
             nodeIntegration: false, contextIsolation: true, preload: path.join(__dirname, 'preload.js'),
@@ -150,7 +150,7 @@ const createWindow = () => {
                     log(`请求kernel关闭失败 ${e}`);
                 }
                 const bounds = mainWindow.getBounds();
-                billadmCfg = { ...billadmCfg, ...bounds }
+                transactionsCfg = { ...transactionsCfg, ...bounds }
                 mainWindow.close();
                 break;
         }
@@ -168,7 +168,7 @@ const createWindow = () => {
     });
 
     ipcMain.on('workspace:set', (event, workspaceDir) => {
-        billadmCfg.workspaceDir = workspaceDir;
+        transactionsCfg.workspaceDir = workspaceDir;
     });
 
     ipcMain.handle('app', async (event, field) => {
@@ -184,7 +184,7 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
-    readBilladmFile();
+    readTransactionsCfg();
     startKernel();
     createWindow();
 
@@ -200,7 +200,7 @@ app.on('window-all-closed', () => {
         if (kernelProcess) {
             kernelProcess.kill();
         }
-        saveBilladmConfig();
+        saveTransactionsCfg();
         app.quit();
     }
 });
