@@ -1,81 +1,60 @@
 <template>
-  <a-float-button
-      type="primary"
-      class="float-actions-primary"
-      @click="openLedgerModal">
-    <template #icon>
-      <PlusOutlined/>
-    </template>
-  </a-float-button>
-  <a-modal
-      :title="modalTitle"
-      :open="ledgerModal"
-      width="800px"
-      @ok="confirmLedgerModal"
-      ok-text="确认"
-      @cancel="ledgerModal=false"
-      cancel-text="取消"
-      centered
-  >
-    <a-input v-model:value.lazy="ledgerName" placeholder="输入账本名称"/>
-  </a-modal>
-  <a-layout style="height: 100%">
-    <a-layout-header class="layout-header">
-      <div class="toolbar-left">
-      </div>
-      <div class="toolbar-center">
-      </div>
-      <div class="toolbar-right">
-      </div>
-    </a-layout-header>
-    <a-layout-content :style="contentStyle">
-      <div class="card-grid">
-        <a-card v-for="ledger in ledgerStore.ledgers"
-                :key="ledger.id"
-                hoverable
-        >
-          <a-descriptions :title="ledger.name" layout="vertical">
-            <template #extra>
-              <a-button type="text" class="btn-primary" @click="modifyLedgerName(ledger.id,ledger.name)">
-                编辑
-              </a-button>
-              <a-popconfirm
-                  title="确认删除吗"
-                  ok-text="确认"
-                  :showCancel="false"
-                  @confirm="ledgerStore.deleteLedger(ledger.id)"
-              >
-                <a-button type="text" class="btn-danger">删除</a-button>
-              </a-popconfirm>
-            </template>
-            <a-descriptions-item :label="createTimeLabel">
-              {{ formatTimestamp(ledger.createdAt, 'YYYY-MM-DD HH:mm:ss') }}
-            </a-descriptions-item>
-            <a-descriptions-item :label="updateTimeLabel">
-              {{ formatTimestamp(ledger.updatedAt, 'YYYY-MM-DD HH:mm:ss') }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </a-card>
-      </div>
-    </a-layout-content>
-  </a-layout>
+  <div class="ledger-view">
+    <!-- 悬浮按钮 -->
+    <a-float-button type="primary" class="float-primary" @click="openLedgerModal">
+      <template #icon>
+        <PlusOutlined/>
+      </template>
+    </a-float-button>
+
+    <!-- 账本卡片网格 -->
+    <div class="ledger-grid">
+      <a-card v-for="ledger in ledgerStore.ledgers" :key="ledger.id" hoverable>
+        <a-descriptions :title="ledger.name" layout="vertical">
+          <template #extra>
+            <a-button type="text" class="btn-primary" @click="modifyLedgerName(ledger.id, ledger.name)">
+              编辑
+            </a-button>
+            <a-popconfirm
+                title="确认删除吗"
+                ok-text="确认"
+                :showCancel="false"
+                @confirm="ledgerStore.deleteLedger(ledger.id)"
+            >
+              <a-button type="text" class="btn-danger">删除</a-button>
+            </a-popconfirm>
+          </template>
+          <a-descriptions-item :label="createTimeLabel">
+            {{ formatTimestamp(ledger.createdAt, 'YYYY-MM-DD HH:mm:ss') }}
+          </a-descriptions-item>
+          <a-descriptions-item :label="updateTimeLabel">
+            {{ formatTimestamp(ledger.updatedAt, 'YYYY-MM-DD HH:mm:ss') }}
+          </a-descriptions-item>
+        </a-descriptions>
+      </a-card>
+    </div>
+
+    <!-- 编辑/新建弹窗 -->
+    <a-modal
+        :title="modalTitle"
+        :open="ledgerModal"
+        width="800px"
+        @ok="confirmLedgerModal"
+        ok-text="确认"
+        @cancel="ledgerModal=false"
+        cancel-text="取消"
+        centered
+    >
+      <a-input v-model:value.lazy="ledgerName" placeholder="输入账本名称"/>
+    </a-modal>
+  </div>
 </template>
 
 <script setup lang="ts">
-import type {CSSProperties} from "vue";
 import {ref} from 'vue';
 import {useLedgerStore} from "@/stores/ledgerStore";
 import {formatTimestamp} from "@/backend/functions";
-import {useCssVariables} from "@/backend/css";
 import {PlusOutlined} from "@ant-design/icons-vue";
-
-const {majorBgColor} = useCssVariables();
-
-const contentStyle: CSSProperties = {
-  backgroundColor: majorBgColor.value,
-  "overflow-y": "auto",
-  "margin-bottom": "auto"
-};
 
 const ledgerStore = useLedgerStore();
 
@@ -83,7 +62,6 @@ const ledgerModal = ref<boolean>(false);
 const modalTitle = ref<string>("");
 const ledgerId = ref<string>("");
 const ledgerName = ref<string>("");
-
 const createTimeLabel = '创建时间';
 const updateTimeLabel = '更新时间';
 
@@ -112,42 +90,22 @@ const confirmLedgerModal = async () => {
 </script>
 
 <style scoped>
-.layout-header {
-  height: auto;
-  background-color: var(--billadm-color-major-background);
-  padding: 0 0 16px 0;
+.ledger-view {
   display: flex;
-  align-items: start;
-  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  gap: 16px;
 }
 
-.toolbar-left {
-  margin-right: auto;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.toolbar-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  gap: 8px;
-}
-
-.toolbar-right {
-  display: flex;
-  gap: 8px;
-}
-
-.card-grid {
+.ledger-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 16px;
-  padding: 16px;
+  overflow-y: auto;
 }
 
-.float-actions-primary {
+.float-primary {
   right: 50px;
   bottom: 80px;
 }

@@ -1,49 +1,42 @@
 <template>
-  <a-layout style="height: 100vh">
-    <billadm-file-select v-model="showWorkspaceSelect"
-                         title="新建工作目录或打开已存在的工作目录"
-                         @confirm="handleOpenWorkspace"
+  <div class="app-shell">
+    <!-- 工作空间选择弹窗 -->
+    <billadm-file-select
+        v-model="showWorkspaceSelect"
+        title="新建工作目录或打开已存在的工作目录"
+        @confirm="handleOpenWorkspace"
     />
-    <a-layout-header class="layout-header">
-      <app-top-bar/>
-    </a-layout-header>
-    <a-layout style="height: calc(100vh - var(--billadm-size-header-height))">
-      <div class="layout-sider">
-        <app-left-bar/>
+
+    <!-- 主布局 -->
+    <div class="app-shell-body">
+      <!-- 顶部状态栏 -->
+      <header class="app-header">
+        <app-top-bar/>
+      </header>
+
+      <!-- 主体区域 -->
+      <div class="app-main">
+        <!-- 侧边栏 -->
+        <aside class="app-sidebar">
+          <app-left-bar/>
+        </aside>
+
+        <!-- 内容区域 -->
+        <main class="app-content">
+          <router-view/>
+        </main>
       </div>
-      <a-layout style="height: 100%">
-        <a-layout-content :style="contentStyle">
-          <a-card style="height: 100%;padding: 16px" :body-style="{padding:'0px',height:'100%'}" :bordered="false">
-            <router-view/>
-          </a-card>
-        </a-layout-content>
-        <a-layout-footer v-if="route.path==='/tr_view'" class="layout-footer">
-          <billadm-statistics-footer/>
-        </a-layout-footer>
-      </a-layout>
-    </a-layout>
-  </a-layout>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import {type CSSProperties, onMounted, ref} from "vue";
-import {useCssVariables} from "@/backend/css.ts";
+import {onMounted, ref} from "vue";
 import {useLedgerStore} from "@/stores/ledgerStore.ts";
 import {openWorkspace} from "@/backend/api/workspace.ts";
 import NotificationUtil from "@/backend/notification.ts";
-import BilladmStatisticsFooter from "@/components/common/BilladmStatisticsFooter.vue";
-import {useRoute} from "vue-router";
-
-const route = useRoute();
-
-const {minorBgColor} = useCssVariables();
-
-const contentStyle: CSSProperties = {
-  backgroundColor: minorBgColor.value,
-};
 
 const ledgerStore = useLedgerStore();
-
 const showWorkspaceSelect = ref(true);
 
 const handleOpenWorkspace = async (workspaceDir: string) => {
@@ -61,38 +54,62 @@ const initWorkspace = async () => {
   if (!ledgerStore.workspaceStatus.isOpened) {
     showWorkspaceSelect.value = true;
     return;
-  } else {
-    showWorkspaceSelect.value = false;
-    window.electronAPI.setWorkspace(ledgerStore.workspaceStatus.workspaceDir);
   }
+  showWorkspaceSelect.value = false;
+  window.electronAPI.setWorkspace(ledgerStore.workspaceStatus.workspaceDir);
   await ledgerStore.init();
 }
 
-onMounted(initWorkspace)
+onMounted(initWorkspace);
 </script>
 
 <style scoped>
-.layout-header {
-  height: var(--billadm-size-header-height);
-  background-color: var(--billadm-color-minor-background);
-  padding: 0;
-  line-height: var(--billadm-size-header-height);
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
-.layout-sider {
+.app-shell-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 顶部状态栏 - 次要背景色 */
+.app-header {
+  height: var(--billadm-size-header-height);
+  background-color: var(--billadm-color-minor-background);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--billadm-color-window-border);
+}
+
+/* 主体区域 */
+.app-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* 侧边栏 - 次要背景色 */
+.app-sidebar {
   width: var(--billadm-size-sider-width);
   min-width: var(--billadm-size-sider-width);
   height: 100%;
   background-color: var(--billadm-color-minor-background);
   flex-shrink: 0;
+  border-right: 1px solid var(--billadm-color-window-border);
 }
 
-.layout-footer {
-  height: var(--billadm-size-header-height);
-  background-color: var(--billadm-color-minor-background);
-  padding: 0 16px;
+/* 内容区域 - 主背景色 */
+.app-content {
+  flex: 1;
+  background-color: var(--billadm-color-major-background);
+  overflow: hidden;
   display: flex;
-  align-items: center;
-  justify-content: end;
+  flex-direction: column;
 }
 </style>

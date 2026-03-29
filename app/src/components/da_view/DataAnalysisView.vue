@@ -1,66 +1,44 @@
 <template>
-  <a-layout style="height: 100%">
-    <a-layout-header class="layout-header">
-      <div class="toolbar-left">
-        <BilladmTimeRangePicker
-            v-model:time-range="trQueryConditionStore.timeRange"
-            v-model:time-range-type="trQueryConditionStore.timeRangeType"
-        />
-      </div>
-      <div class="toolbar-center">
-      </div>
-      <div class="toolbar-right">
-      </div>
-    </a-layout-header>
-    <a-layout-content :style="contentStyle">
+  <div class="da-view">
+    <!-- 工具栏 -->
+    <div class="da-toolbar">
+      <BilladmTimeRangePicker
+          v-model:time-range="trQueryConditionStore.timeRange"
+          v-model:time-range-type="trQueryConditionStore.timeRangeType"
+      />
+    </div>
+
+    <!-- 图表展示 -->
+    <div class="da-content">
       <billadm-chart-display/>
-    </a-layout-content>
-  </a-layout>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import {type CSSProperties} from 'vue';
 import BilladmChartDisplay from "@/components/da_view/BilladmChartDisplay.vue";
 import {useTrQueryConditionStore} from "@/stores/trQueryConditionStore.ts";
-import {useCssVariables} from "@/backend/css.ts";
-
-const {majorBgColor} = useCssVariables();
-
-const contentStyle: CSSProperties = {
-  backgroundColor: majorBgColor.value,
-  "overflow-y": "auto",
-  "margin-bottom": "auto"
-};
 
 const trQueryConditionStore = useTrQueryConditionStore();
 </script>
 
 <style scoped>
-.layout-header {
-  height: auto;
-  background-color: var(--billadm-color-major-background);
-  padding: 0 0 16px 0;
+.da-view {
   display: flex;
-  align-items: start;
-  justify-content: center;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  gap: 16px;
 }
 
-.toolbar-left {
-  margin-right: auto;
+.da-toolbar {
   display: flex;
   gap: 8px;
-  align-items: center;
+  flex-shrink: 0;
 }
 
-.toolbar-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  gap: 8px;
-}
-
-.toolbar-right {
-  display: flex;
-  gap: 8px;
+.da-content {
+  flex: 1;
+  overflow-y: auto;
 }
 </style>
