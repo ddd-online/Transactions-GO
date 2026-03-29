@@ -1,13 +1,8 @@
 <template>
   <div class="menu-bar">
     <div class="menu-bar-left">
-      <div class="menu-bar-avatar">
-        <a-avatar shape="square" :src="IconBilladm"/>
-      </div>
-    </div>
-    <div class="menu-bar-center">
-      <a-typography-text class="typography-section">
-        Billadm-{{ route.name }}
+      <a-typography-text class="app-title">
+        Transactions
       </a-typography-text>
     </div>
     <div class="menu-bar-right">
@@ -31,11 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import {useRoute} from 'vue-router'
 import {BorderOutlined, CloseOutlined, LineOutlined} from "@ant-design/icons-vue";
-import IconBilladm from '@/assets/icons/billadm.svg';
-
-const route = useRoute()
 
 const onMinimize = () => {
   window.electronAPI.minimizeWindow();
@@ -58,7 +49,7 @@ const onClose = () => {
   justify-content: space-between;
   height: 100%;
   width: 100%;
-  padding: 0 8px;
+  padding: 0 12px;
 }
 
 .menu-bar > * {
@@ -68,25 +59,19 @@ const onClose = () => {
 .menu-bar-left {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
-.menu-bar-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+.app-title {
+  font-size: var(--billadm-size-text-title);
+  font-weight: var(--billadm-weight-medium);
+  color: var(--billadm-color-text-major);
+  margin: 0;
+  letter-spacing: 0.5px;
 }
 
 .menu-bar-right {
   display: flex;
   align-items: center;
   gap: 4px;
-}
-
-.menu-bar-avatar {
-  width: var(--billadm-size-sider-width);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 </style>
