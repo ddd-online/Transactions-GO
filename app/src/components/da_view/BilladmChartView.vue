@@ -5,7 +5,7 @@
       <h3 class="chart-view-title">{{ title }}</h3>
       <a-button type="text" @click="showEnlarged = true">
         <template #icon>
-          <ArrowsAltOutlined/>
+          <ArrowsAltOutlined />
         </template>
       </a-button>
     </div>
@@ -14,14 +14,8 @@
     <div class="chart-view-content">
       <div class="chart-wrapper">
         <div class="chart-container">
-          <BilladmChart
-              v-if="data.length > 0"
-              :data="data"
-              x-field="time"
-              y-field="amount"
-              series-field="type"
-              :title="title"
-          />
+          <BilladmChart v-if="data.length > 0" :data="data" x-field="time" y-field="amount" series-field="type"
+            :title="title" />
           <a-empty v-else description="暂无数据" />
         </div>
       </div>
@@ -36,21 +30,15 @@
               <h3 class="chart-enlarge-title">{{ title }}</h3>
               <a-button type="text" @click="showEnlarged = false">
                 <template #icon>
-                  <CloseOutlined/>
+                  <CloseOutlined />
                 </template>
               </a-button>
             </div>
             <div class="chart-enlarge-content">
               <div class="chart-wrapper">
                 <div class="chart-container">
-                  <BilladmChart
-                      v-if="data.length > 0"
-                      :data="data"
-                      x-field="time"
-                      y-field="amount"
-                      series-field="type"
-                      :title="title"
-                  />
+                  <BilladmChart v-if="data.length > 0" :data="data" x-field="time" y-field="amount" series-field="type"
+                    :title="title" />
                   <a-empty v-else description="暂无数据" />
                 </div>
               </div>
@@ -63,10 +51,10 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
-import {ArrowsAltOutlined, CloseOutlined} from '@ant-design/icons-vue'
+import { ref } from 'vue'
+import { ArrowsAltOutlined, CloseOutlined } from '@ant-design/icons-vue'
 import BilladmChart from '@/components/da_view/BilladmChart.vue'
-import type {TimeSeriesData} from '@/backend/chart'
+import type { TimeSeriesData } from '@/backend/chart'
 
 interface Props {
   title: string

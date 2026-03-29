@@ -3,10 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref, watch, nextTick} from 'vue'
-import {Chart} from '@antv/g2'
-import type {TimeSeriesData} from '@/backend/chart'
-import {TransactionTypeToColor} from '@/backend/constant'
+import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
+import { Chart } from '@antv/g2'
+import type { TimeSeriesData } from '@/backend/chart'
+import { TransactionTypeToColor } from '@/backend/constant'
 
 interface Props {
   data: TimeSeriesData[]
@@ -54,11 +54,11 @@ const initChart = () => {
   })
 
   chart.axis(props.xField, {
-    title: {text: xAxisTitle, fontSize: 12},
+    title: { text: xAxisTitle, fontSize: 12 },
     labelFontSize: 12,
   })
   chart.axis(props.yField, {
-    title: {text: '金额（元）', fontSize: 12},
+    title: { text: '金额（元）', fontSize: 12 },
     labelFontSize: 12,
     labelFormatter: (value: string) => `¥${parseFloat(value).toFixed(0)}`,
   })
@@ -97,7 +97,7 @@ onUnmounted(() => {
 
 watch(() => props.data, () => {
   initChart()
-}, {deep: true})
+}, { deep: true })
 </script>
 
 <style scoped>

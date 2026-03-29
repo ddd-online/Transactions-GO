@@ -3,13 +3,11 @@
     <!-- 工具栏 -->
     <div class="da-toolbar">
       <div class="da-toolbar-left">
-        <BilladmTimeRangePicker
-            v-model:time-range="trQueryConditionStore.timeRange"
-            v-model:time-range-type="trQueryConditionStore.timeRangeType"
-        />
+        <BilladmTimeRangePicker v-model:time-range="trQueryConditionStore.timeRange"
+          v-model:time-range-type="trQueryConditionStore.timeRangeType" />
       </div>
       <div class="da-toolbar-right">
-        <billadm-ledger-select/>
+        <billadm-ledger-select />
       </div>
     </div>
 
@@ -17,19 +15,12 @@
     <div class="da-main">
       <!-- 左侧图表列表 -->
       <div class="da-sidebar">
-        <billadm-chart-list
-            :chart-configs="KEEP_CHART_CONFIGS"
-            @select="onChartSelect"
-        />
+        <billadm-chart-list :chart-configs="KEEP_CHART_CONFIGS" @select="onChartSelect" />
       </div>
 
       <!-- 右侧图表显示 -->
       <div class="da-content">
-        <billadm-chart-view
-            v-if="selectedChart"
-            :title="selectedChart.title"
-            :data="selectedChart.data"
-        />
+        <billadm-chart-view v-if="selectedChart" :title="selectedChart.title" :data="selectedChart.data" />
         <a-empty v-else description="请选择图表" />
       </div>
     </div>
@@ -37,16 +28,16 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch, onMounted} from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import BilladmTimeRangePicker from '@/components/common/BilladmTimeRangePicker.vue'
 import BilladmChartList from '@/components/da_view/BilladmChartList.vue'
 import BilladmChartView from '@/components/da_view/BilladmChartView.vue'
-import {useLedgerStore} from '@/stores/ledgerStore.ts'
-import {useTrQueryConditionStore} from '@/stores/trQueryConditionStore.ts'
-import {convertToUnixTimeRange} from '@/backend/timerange.ts'
-import {getTrOnCondition} from '@/backend/functions.ts'
-import {buildLineChartData, KEEP_CHART_CONFIGS, type ChartConfig, type TimeSeriesData} from '@/backend/chart'
-import type {TransactionRecord} from '@/types/billadm'
+import { useLedgerStore } from '@/stores/ledgerStore.ts'
+import { useTrQueryConditionStore } from '@/stores/trQueryConditionStore.ts'
+import { convertToUnixTimeRange } from '@/backend/timerange.ts'
+import { getTrOnCondition } from '@/backend/functions.ts'
+import { buildLineChartData, KEEP_CHART_CONFIGS, type ChartConfig, type TimeSeriesData } from '@/backend/chart'
+import type { TransactionRecord } from '@/types/billadm'
 
 const ledgerStore = useLedgerStore()
 const trQueryConditionStore = useTrQueryConditionStore()
@@ -64,8 +55,8 @@ const queryTrs = async (): Promise<TransactionRecord[]> => {
   const trCondition = {
     ledgerId: ledgerStore.currentLedgerId,
     tsRange: trQueryConditionStore.timeRange
-        ? convertToUnixTimeRange(trQueryConditionStore.timeRange)
-        : undefined,
+      ? convertToUnixTimeRange(trQueryConditionStore.timeRange)
+      : undefined,
   }
   const result = await getTrOnCondition(trCondition)
   return result.items || []
@@ -119,11 +110,9 @@ onMounted(() => {
 
 // 监听查询条件或账本变化，重新加载
 watch(
-    () => [ledgerStore.currentLedgerId, trQueryConditionStore.timeRange],
-    () => {
-      loadAllChartData()
-    },
-    {deep: true}
+  () => [ledgerStore.currentLedgerId, trQueryConditionStore.timeRange],
+  () => loadAllChartData(),
+  { deep: true }
 )
 </script>
 

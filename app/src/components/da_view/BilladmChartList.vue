@@ -1,14 +1,9 @@
 <template>
   <div class="chart-list">
-    <div
-        v-for="chart in chartConfigs"
-        :key="chart.title"
-        class="chart-list-item"
-        :class="{ active: selectedTitle === chart.title }"
-        @click="selectChart(chart)"
-    >
+    <div v-for="chart in chartConfigs" :key="chart.title" class="chart-list-item"
+      :class="{ active: selectedTitle === chart.title }" @click="selectChart(chart)">
       <div class="chart-list-item-icon">
-        <RiseOutlined style="font-size: 14px"/>
+        <RiseOutlined style="font-size: 14px" />
       </div>
       <span class="chart-list-item-title">{{ chart.title }}</span>
     </div>
@@ -16,9 +11,9 @@
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
-import {RiseOutlined} from '@ant-design/icons-vue'
-import type {ChartConfig} from '@/backend/chart'
+import { ref } from 'vue'
+import { RiseOutlined } from '@ant-design/icons-vue'
+import type { ChartConfig } from '@/backend/chart'
 
 interface Props {
   chartConfigs: ChartConfig[]
