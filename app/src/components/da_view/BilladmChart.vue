@@ -48,19 +48,19 @@ const initChart = () => {
   const colorDomain = Array.from(TransactionTypeToColor.keys())
   const colorRange = colorDomain.map(k => TransactionTypeToColor.get(k)!)
 
+  console.log(colorDomain);
+  console.log(colorRange);
+
   chart.scale(props.seriesField, {
     domain: colorDomain,
     range: colorRange,
   })
 
-  chart.axis(props.xField, {
-    title: { text: xAxisTitle, fontSize: 12 },
-    labelFontSize: 12,
+  chart.axis('x', {
+    title: xAxisTitle,
   })
-  chart.axis(props.yField, {
-    title: { text: '金额（元）', fontSize: 12 },
-    labelFontSize: 12,
-    labelFormatter: (value: string) => `¥${parseFloat(value).toFixed(0)}`,
+  chart.axis('y', {
+    title: '金额（元）',
   })
 
   chart
@@ -79,6 +79,7 @@ const initChart = () => {
     .style('size', 4)
     .style('stroke', '#fff')
     .style('lineWidth', 1)
+    .tooltip(false)
 
   chart.render()
 }

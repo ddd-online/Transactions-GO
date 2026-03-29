@@ -1,6 +1,6 @@
-import type {TransactionRecord} from '@/types/billadm'
-import type {TrQueryConditionItem} from '@/types/billadm'
-import {TransactionTypeToLabel} from '@/backend/constant'
+import type { TransactionRecord } from '@/types/billadm'
+import type { TrQueryConditionItem } from '@/types/billadm'
+import { TransactionTypeToLabel } from '@/backend/constant'
 import dayjs from 'dayjs'
 
 /**
@@ -16,18 +16,18 @@ export interface TimeSeriesData {
  * 构建G2折线图数据
  */
 export function buildLineChartData(
-    trList: TransactionRecord[],
-    options: {
-      granularity: 'year' | 'month'
-      lineDisplayTypes: string[]
-      includeOutlier: boolean
-    }
+  trList: TransactionRecord[],
+  options: {
+    granularity: 'year' | 'month'
+    lineDisplayTypes: string[]
+    includeOutlier: boolean
+  }
 ): TimeSeriesData[] {
-  const {granularity, lineDisplayTypes, includeOutlier} = options
+  const { granularity, lineDisplayTypes, includeOutlier } = options
 
   // 过滤非异常且类型匹配的数据
   let filteredData = trList
-      .filter((item) => lineDisplayTypes.includes(item.transactionType))
+    .filter((item) => lineDisplayTypes.includes(item.transactionType))
 
   if (!includeOutlier) {
     filteredData = filteredData.filter((item) => !item.outlier)
@@ -39,9 +39,9 @@ export function buildLineChartData(
 
   // 找出时间范围
   let minYear = Infinity,
-      minMonth = Infinity
+    minMonth = Infinity
   let maxYear = -Infinity,
-      maxMonth = -Infinity
+    maxMonth = -Infinity
 
   filteredData.forEach((item) => {
     const date = dayjs(item.transactionAt * 1000)
@@ -79,13 +79,13 @@ export function buildLineChartData(
 
   // 初始化每月/每年数据结构
   const initData = () =>
-      lineDisplayTypes.reduce(
-          (acc, type) => {
-            acc[type] = 0
-            return acc
-          },
-          {} as Record<string, number>
-      )
+    lineDisplayTypes.reduce(
+      (acc, type) => {
+        acc[type] = 0
+        return acc
+      },
+      {} as Record<string, number>
+    )
 
   const timeDataMap = new Map<string, Record<string, number>>()
   timeLabels.forEach((label) => {
@@ -96,9 +96,9 @@ export function buildLineChartData(
   filteredData.forEach((item) => {
     const date = dayjs(item.transactionAt * 1000)
     const label =
-        granularity === 'year'
-          ? String(date.year())
-          : `${date.year()}-${String(date.month() + 1).padStart(2, '0')}`
+      granularity === 'year'
+        ? String(date.year())
+        : `${date.year()}-${String(date.month() + 1).padStart(2, '0')}`
 
     const type = item.transactionType
     const amount = item.price
