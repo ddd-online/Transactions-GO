@@ -1,0 +1,146 @@
+// ============================================
+// Billadm Theme Variables
+// 支持主题切换的CSS变量系统
+// ============================================
+@use 'sass:map';
+
+// 主题颜色
+$theme-colors: (
+  'primary': #1677ff,
+  'positive': #1677ff,
+  'negative': #f5222d,
+  'warning': #faad14,
+  'success': #52c41a,
+) !default;
+
+// 背景色
+$background-colors: (
+  'major': #ffffff,
+  'minor': #f5f5f5,
+  'window-border': #e0e0e0,
+) !default;
+
+// 文字颜色
+$text-colors: (
+  'major': #333333,
+  'secondary': #7b7b7b,
+  'disabled': #bfbfbf,
+) !default;
+
+// 字号层级 (记账软件需要清晰的层次感)
+$font-sizes: (
+  'display': 24px,    // 大标题/页面主标题
+  'title': 18px,       // 区块标题/卡片标题
+  'section': 16px,    // 小节标题/表单标题
+  'body': 14px,        // 正文内容
+  'caption': 13px,     // 辅助说明/时间戳
+  'small': 12px,       // 最小文字/徽标
+) !default;
+
+// 字重层级
+$font-weights: (
+  'bold': 600,
+  'medium': 500,
+  'regular': 400,
+) !default;
+
+// 间距系统 (基于8px网格)
+$spacing: (
+  'xs': 4px,
+  'sm': 8px,
+  'md': 12px,
+  'lg': 16px,
+  'xl': 24px,
+  'xxl': 32px,
+) !default;
+
+// 布局尺寸
+$layout-sizes: (
+  'header-height': 40px,
+  'sider-width': 48px,
+  'menu-width': 40px,
+  'content-padding': 16px,
+) !default;
+
+// 圆角
+$border-radius: (
+  'sm': 4px,
+  'md': 8px,
+  'lg': 12px,
+) !default;
+
+// ============================================
+// CSS Variables (用于运行时主题切换)
+// ============================================
+
+:root {
+  // 主题色
+  --billadm-color-primary: #{map.get($theme-colors, 'primary')};
+  --billadm-color-positive: #{map.get($theme-colors, 'positive')};
+  --billadm-color-negative: #{map.get($theme-colors, 'negative')};
+  --billadm-color-warning: #{map.get($theme-colors, 'warning')};
+  --billadm-color-success: #{map.get($theme-colors, 'success')};
+
+  // 背景色
+  --billadm-color-major-background: #{map.get($background-colors, 'major')};
+  --billadm-color-minor-background: #{map.get($background-colors, 'minor')};
+  --billadm-color-window-border: #{map.get($background-colors, 'window-border')};
+
+  // 按钮悬停
+  --billadm-color-icon-hover-bg: #e4e4e4;
+
+  // 文字色
+  --billadm-color-text-major: #{map.get($text-colors, 'major')};
+  --billadm-color-text-minor: #{map.get($text-colors, 'secondary')};
+  --billadm-color-text-disabled: #{map.get($text-colors, 'disabled')};
+
+  // 字号
+  --billadm-size-text-display: #{map.get($font-sizes, 'display')};
+  --billadm-size-text-title: #{map.get($font-sizes, 'title')};
+  --billadm-size-text-section: #{map.get($font-sizes, 'section')};
+  --billadm-size-text-body: #{map.get($font-sizes, 'body')};
+  --billadm-size-text-caption: #{map.get($font-sizes, 'caption')};
+  --billadm-size-text-small: #{map.get($font-sizes, 'small')};
+
+  // 字重
+  --billadm-weight-bold: #{map.get($font-weights, 'bold')};
+  --billadm-weight-medium: #{map.get($font-weights, 'medium')};
+  --billadm-weight-regular: #{map.get($font-weights, 'regular')};
+
+  // 间距
+  --billadm-space-xs: #{map.get($spacing, 'xs')};
+  --billadm-space-sm: #{map.get($spacing, 'sm')};
+  --billadm-space-md: #{map.get($spacing, 'md')};
+  --billadm-space-lg: #{map.get($spacing, 'lg')};
+  --billadm-space-xl: #{map.get($spacing, 'xl')};
+  --billadm-space-xxl: #{map.get($spacing, 'xxl')};
+
+  // 布局尺寸
+  --billadm-size-header-height: #{map.get($layout-sizes, 'header-height')};
+  --billadm-size-sider-width: #{map.get($layout-sizes, 'sider-width')};
+  --billadm-ui-size-menu-width: #{map.get($layout-sizes, 'menu-width')};
+
+  // 圆角
+  --billadm-radius-sm: #{map.get($border-radius, 'sm')};
+  --billadm-radius-md: #{map.get($border-radius, 'md')};
+  --billadm-radius-lg: #{map.get($border-radius, 'lg')};
+}
+
+// ============================================
+// Dark Theme (可选)
+// ============================================
+
+[data-theme='dark'] {
+  --billadm-color-major-background: #141414;
+  --billadm-color-minor-background: #1f1f1f;
+  --billadm-color-window-border: #434343;
+
+  --billadm-color-icon-hover-bg: #303030;
+
+  --billadm-color-text-major: #e8e8e8;
+  --billadm-color-text-minor: #a6a6a6;
+  --billadm-color-text-disabled: #595959;
+
+  --billadm-color-positive: #1668dc;
+  --billadm-color-negative: #dc4444;
+}

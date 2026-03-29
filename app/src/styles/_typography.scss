@@ -1,0 +1,166 @@
+// ============================================
+// Billadm Typography
+// 记账软件文字层次规范
+// 主次分明，层次清晰
+// ============================================
+
+// ============================================
+// Typography CSS Classes
+// 供组件直接引用的文字样式类
+// ============================================
+
+.typography {
+  // 标题层级
+  &-display {
+    font-size: var(--billadm-size-text-display);
+    font-weight: var(--billadm-weight-bold);
+    color: var(--billadm-color-text-major);
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  &-title {
+    font-size: var(--billadm-size-text-title);
+    font-weight: var(--billadm-weight-medium);
+    color: var(--billadm-color-text-major);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &-section {
+    font-size: var(--billadm-size-text-section);
+    font-weight: var(--billadm-weight-medium);
+    color: var(--billadm-color-text-major);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &-body {
+    font-size: var(--billadm-size-text-body);
+    font-weight: var(--billadm-weight-regular);
+    color: var(--billadm-color-text-major);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  &-caption {
+    font-size: var(--billadm-size-text-caption);
+    font-weight: var(--billadm-weight-regular);
+    color: var(--billadm-color-text-minor);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  &-small {
+    font-size: var(--billadm-size-text-small);
+    font-weight: var(--billadm-weight-regular);
+    color: var(--billadm-color-text-minor);
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  // 金额
+  &-amount {
+    font-size: var(--billadm-size-text-title);
+    font-weight: var(--billadm-weight-bold);
+    font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+    letter-spacing: 0;
+  }
+
+  &-amount-large {
+    font-size: var(--billadm-size-text-display);
+    font-weight: var(--billadm-weight-bold);
+    font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+    letter-spacing: 0;
+  }
+
+  &-amount-small {
+    font-size: var(--billadm-size-text-body);
+    font-weight: var(--billadm-weight-medium);
+    font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+    letter-spacing: 0;
+  }
+
+  // 标签文字
+  &-label {
+    font-size: var(--billadm-size-text-caption);
+    font-weight: var(--billadm-weight-medium);
+    color: var(--billadm-color-text-minor);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  // 辅助文字
+  &-secondary {
+    color: var(--billadm-color-text-minor);
+  }
+
+  // 禁用文字
+  &-disabled {
+    color: var(--billadm-color-text-disabled);
+  }
+
+  // 成功/错误
+  &-success {
+    color: var(--billadm-color-success);
+  }
+
+  &-danger {
+    color: var(--billadm-color-negative);
+  }
+}
+
+// ============================================
+// Ant Design Vue Typography 增强
+// ============================================
+
+.ant-typography {
+  color: var(--billadm-color-text-major);
+
+  &-secondary {
+    color: var(--billadm-color-text-minor);
+  }
+
+  &-disabled {
+    color: var(--billadm-color-text-disabled);
+  }
+
+  &.ant-typography-success {
+    color: var(--billadm-color-success);
+  }
+
+  &.ant-typography-danger {
+    color: var(--billadm-color-negative);
+  }
+}
+
+// ============================================
+// 统计数字展示
+// ============================================
+
+.statistic {
+  &-value {
+    font-size: var(--billadm-size-text-display);
+    font-weight: var(--billadm-weight-bold);
+    font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+    color: var(--billadm-color-text-major);
+  }
+
+  &-label {
+    font-size: var(--billadm-size-text-caption);
+    color: var(--billadm-color-text-minor);
+    margin: var(--billadm-space-xs) 0 0 0;
+  }
+
+  &-income {
+    .statistic-value {
+      color: var(--billadm-color-positive);
+    }
+  }
+
+  &-expense {
+    .statistic-value {
+      color: var(--billadm-color-negative);
+    }
+  }
+}

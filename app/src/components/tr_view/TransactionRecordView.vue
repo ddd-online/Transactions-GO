@@ -1,14 +1,14 @@
 <template>
   <a-float-button
       type="primary"
-      style="right: 50px;bottom: 80px"
+      class="float-actions-primary"
       @click="createTr">
     <template #icon>
       <PlusOutlined/>
     </template>
   </a-float-button>
   <a-float-button
-      style="right: 110px;bottom: 80px"
+      class="float-actions-secondary"
       @click="openTrFilterModal=true"
       :badge="{ count: trQueryConditionStore.conditionLen, color: 'blue' }"
   >
@@ -19,22 +19,22 @@
   <TransactionRecordFilter v-model="openTrFilterModal"/>
   <a-layout style="height: 100%">
     <a-layout>
-      <a-layout-header class="headerStyle">
-        <div class="left-groups">
+      <a-layout-header class="layout-header">
+        <div class="toolbar-left">
           <BilladmTimeRangePicker
               v-model:time-range="trQueryConditionStore.timeRange"
               v-model:time-range-type="trQueryConditionStore.timeRangeType"
           />
         </div>
-        <div class="center-groups">
+        <div class="toolbar-center">
         </div>
-        <div class="right-groups">
+        <div class="toolbar-right">
         </div>
       </a-layout-header>
       <a-layout-content :style="contentStyle">
         <transaction-record-table :items="tableData" @edit="updateTr" @delete="deleteTr"/>
       </a-layout-content>
-      <a-layout-footer class="footerStyle">
+      <a-layout-footer class="layout-footer">
         <a-pagination
             v-model:current="currentPage"
             v-model:pageSize="pageSize"
@@ -318,7 +318,7 @@ watch(() => trForm.value.category, async () => {
 </script>
 
 <style scoped>
-.headerStyle {
+.layout-header {
   height: auto;
   background-color: var(--billadm-color-major-background);
   padding: 0 0 16px 0;
@@ -327,7 +327,7 @@ watch(() => trForm.value.category, async () => {
   justify-content: center;
 }
 
-.footerStyle {
+.layout-footer {
   height: auto;
   background-color: var(--billadm-color-major-background);
   padding: 16px 0 0 0;
@@ -336,25 +336,32 @@ watch(() => trForm.value.category, async () => {
   justify-content: center;
 }
 
-/* 左边按钮 将它与后面的元素隔开 */
-.left-groups {
+.toolbar-left {
   margin-right: auto;
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-/* 中间按钮 */
-.center-groups {
+.toolbar-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   gap: 8px;
 }
 
-/* 右边按钮组 */
-.right-groups {
+.toolbar-right {
   display: flex;
   gap: 8px;
+}
+
+.float-actions-primary {
+  right: 50px;
+  bottom: 80px;
+}
+
+.float-actions-secondary {
+  right: 110px;
+  bottom: 80px;
 }
 </style>

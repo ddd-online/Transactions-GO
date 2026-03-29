@@ -1,0 +1,263 @@
+// ============================================
+// Billadm Styles Entry
+// 主样式入口文件
+// ============================================
+
+// 1. Variables (必须在最前面，因为其他文件依赖它)
+@use 'variables';
+
+// 2. Mixins
+@use 'mixins';
+
+// 3. Typography
+@use 'typography';
+
+// 4. Layout
+@use 'layout';
+
+// 5. Components
+@use 'components';
+
+// ============================================
+// Global Reset & Base Styles
+// ============================================
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: var(--billadm-size-text-body);
+  line-height: 1.6;
+  color: var(--billadm-color-text-major);
+  background-color: var(--billadm-color-minor-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// ============================================
+// Ant Design Vue 全局覆盖
+// ============================================
+
+.ant-layout {
+  background-color: var(--billadm-color-minor-background);
+}
+
+.ant-layout-header,
+.ant-layout-footer {
+  background-color: var(--billadm-color-minor-background);
+  color: var(--billadm-color-text-major);
+}
+
+.ant-layout-sider {
+  background-color: var(--billadm-color-minor-background);
+}
+
+.ant-layout-content {
+  background-color: var(--billadm-color-major-background);
+}
+
+// 按钮
+.ant-btn {
+  border-radius: var(--billadm-radius-sm);
+
+  &-text {
+    &:hover {
+      background-color: var(--billadm-color-icon-hover-bg);
+    }
+  }
+
+  &-primary {
+    background-color: var(--billadm-color-primary);
+    border-color: var(--billadm-color-primary);
+  }
+}
+
+// 卡片
+.ant-card {
+  border-radius: var(--billadm-radius-md);
+  border-color: var(--billadm-color-window-border);
+
+  &-hoverable:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+}
+
+// 模态框
+.ant-modal {
+  &-content {
+    border-radius: var(--billadm-radius-md);
+    overflow: hidden;
+  }
+
+  &-header {
+    border-bottom: 1px solid var(--billadm-color-window-border);
+  }
+
+  &-footer {
+    border-top: 1px solid var(--billadm-color-window-border);
+  }
+}
+
+// 表单
+.ant-form-item {
+  margin-bottom: var(--billadm-space-md);
+}
+
+.ant-form-item-label > label {
+  color: var(--billadm-color-text-major);
+}
+
+// 输入框
+.ant-input,
+.ant-select-selector,
+.ant-picker {
+  border-radius: var(--billadm-radius-sm);
+
+  &:hover {
+    border-color: var(--billadm-color-primary);
+  }
+
+  &:focus,
+  &.ant-input-focused {
+    border-color: var(--billadm-color-primary);
+    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+  }
+}
+
+// 表格
+.ant-table {
+  .ant-table-thead > tr > th {
+    background-color: var(--billadm-color-minor-background);
+    color: var(--billadm-color-text-minor);
+    font-weight: var(--billadm-weight-medium);
+    border-bottom: 1px solid var(--billadm-color-window-border);
+  }
+
+  .ant-table-tbody > tr > td {
+    border-bottom: 1px solid var(--billadm-color-window-border);
+  }
+
+  .ant-table-tbody > tr:hover > td {
+    background-color: var(--billadm-color-icon-hover-bg);
+  }
+}
+
+// 标签
+.ant-tag {
+  border-radius: var(--billadm-radius-sm);
+}
+
+// 分页
+.ant-pagination {
+  .ant-pagination-item-active {
+    border-color: var(--billadm-color-primary);
+
+    a {
+      color: var(--billadm-color-primary);
+    }
+  }
+}
+
+// 标签页
+.ant-tabs {
+  &-nav {
+    margin-bottom: var(--billadm-space-lg);
+  }
+
+  &-tab {
+    color: var(--billadm-color-text-minor);
+
+    &:hover {
+      color: var(--billadm-color-primary);
+    }
+
+    &-active .ant-tabs-tab-btn {
+      color: var(--billadm-color-primary);
+    }
+  }
+
+  &-ink-bar {
+    background-color: var(--billadm-color-primary);
+  }
+}
+
+// 浮层
+.ant-popover {
+  .ant-popover-inner {
+    border-radius: var(--billadm-radius-md);
+  }
+}
+
+// 消息提示
+.ant-message {
+  &-notice-content {
+    border-radius: var(--billadm-radius-md);
+  }
+}
+
+// 通知
+.ant-notification {
+  &-notice {
+    border-radius: var(--billadm-radius-md);
+  }
+}
+
+// ============================================
+// Utility Classes
+// ============================================
+
+// 文字
+.text {
+  &-primary {
+    color: var(--billadm-color-positive);
+  }
+  &-danger {
+    color: var(--billadm-color-negative);
+  }
+  &-secondary {
+    color: var(--billadm-color-text-minor);
+  }
+  &-success {
+    color: var(--billadm-color-success);
+  }
+}
+
+// 背景
+.bg {
+  &-major {
+    background-color: var(--billadm-color-major-background);
+  }
+  &-minor {
+    background-color: var(--billadm-color-minor-background);
+  }
+}
+
+// 间距
+.m {
+  &-0 { margin: 0; }
+  &-auto { margin: auto; }
+  &t-sm { margin-top: var(--billadm-space-sm); }
+  &b-sm { margin-bottom: var(--billadm-space-sm); }
+  &l-sm { margin-left: var(--billadm-space-sm); }
+  &r-sm { margin-right: var(--billadm-space-sm); }
+  &t-md { margin-top: var(--billadm-space-md); }
+  &b-md { margin-bottom: var(--billadm-space-md); }
+  &l-md { margin-left: var(--billadm-space-md); }
+  &r-md { margin-right: var(--billadm-space-md); }
+}
+
+.p {
+  &-0 { padding: 0; }
+  &-sm { padding: var(--billadm-space-sm); }
+  &-md { padding: var(--billadm-space-md); }
+  &t-sm { padding-top: var(--billadm-space-sm); }
+  &b-sm { padding-bottom: var(--billadm-space-sm); }
+  &l-sm { padding-left: var(--billadm-space-sm); }
+  &r-sm { padding-right: var(--billadm-space-sm); }
+}

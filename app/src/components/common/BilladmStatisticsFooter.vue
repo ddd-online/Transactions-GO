@@ -1,23 +1,29 @@
 <template>
-  <div class="container">
-    <a-typography-text type="secondary">
-      收入
-    </a-typography-text>
-    <a-typography-text>
-      {{ centsToYuan(appDataStore.income) }}
-    </a-typography-text>
-    <a-typography-text type="secondary">
-      支出
-    </a-typography-text>
-    <a-typography-text>
-      {{ centsToYuan(appDataStore.expense) }}
-    </a-typography-text>
-    <a-typography-text type="secondary">
-      转账
-    </a-typography-text>
-    <a-typography-text>
-      {{ centsToYuan(appDataStore.transfer) }}
-    </a-typography-text>
+  <div class="statistics-footer">
+    <div class="statistics-footer-item">
+      <a-typography-text class="statistics-footer-item-label">
+        收入
+      </a-typography-text>
+      <a-typography-text class="statistics-footer-item-value income">
+        {{ centsToYuan(appDataStore.income) }}
+      </a-typography-text>
+    </div>
+    <div class="statistics-footer-item">
+      <a-typography-text class="statistics-footer-item-label">
+        支出
+      </a-typography-text>
+      <a-typography-text class="statistics-footer-item-value expense">
+        {{ centsToYuan(appDataStore.expense) }}
+      </a-typography-text>
+    </div>
+    <div class="statistics-footer-item">
+      <a-typography-text class="statistics-footer-item-label">
+        转账
+      </a-typography-text>
+      <a-typography-text class="statistics-footer-item-value transfer">
+        {{ centsToYuan(appDataStore.transfer) }}
+      </a-typography-text>
+    </div>
   </div>
 </template>
 
@@ -29,7 +35,41 @@ const appDataStore = useAppDataStore();
 </script>
 
 <style scoped>
-.container {
+.statistics-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+}
+
+.statistics-footer-item {
+  display: flex;
+  align-items: center;
   gap: 8px;
+}
+
+.statistics-footer-item-label {
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-minor);
+  margin: 0;
+}
+
+.statistics-footer-item-value {
+  font-size: var(--billadm-size-text-body);
+  font-weight: 600;
+  font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+  margin: 0;
+}
+
+.statistics-footer-item-value.income {
+  color: var(--billadm-color-positive);
+}
+
+.statistics-footer-item-value.expense {
+  color: var(--billadm-color-negative);
+}
+
+.statistics-footer-item-value.transfer {
+  color: var(--billadm-color-text-major);
 }
 </style>

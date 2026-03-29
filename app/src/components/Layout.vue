@@ -4,7 +4,7 @@
                          title="新建工作目录或打开已存在的工作目录"
                          @confirm="handleOpenWorkspace"
     />
-    <a-layout-header class="headerStyle">
+    <a-layout-header class="layout-header">
       <app-top-bar/>
     </a-layout-header>
     <a-layout style="height: 100%">
@@ -17,7 +17,7 @@
             <router-view/>
           </a-card>
         </a-layout-content>
-        <a-layout-footer v-if="route.path==='/tr_view'" class="footerStyle">
+        <a-layout-footer v-if="route.path==='/tr_view'" class="layout-footer">
           <billadm-statistics-footer/>
         </a-layout-footer>
       </a-layout>
@@ -76,13 +76,13 @@ onMounted(initWorkspace)
 </script>
 
 <style scoped>
-.headerStyle {
+.layout-header {
   height: var(--billadm-size-header-height);
   background-color: var(--billadm-color-minor-background);
   padding: 0;
 }
 
-.footerStyle {
+.layout-footer {
   height: var(--billadm-size-header-height);
   background-color: var(--billadm-color-minor-background);
   padding: 0 16px;

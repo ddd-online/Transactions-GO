@@ -9,7 +9,7 @@ import {GridComponent, LegendComponent, TitleComponent, TooltipComponent} from '
 import {BarChart, LineChart, PieChart} from 'echarts/charts';
 import Antd, {ConfigProvider} from 'ant-design-vue';
 import 'ant-design-vue/dist/reset.css';
-import '@/style.css';
+import '@/styles/index.scss';
 
 // dayjs 中文支持
 import dayjs from 'dayjs';

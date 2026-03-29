@@ -1,15 +1,17 @@
 <template>
   <div class="menu-bar">
-    <div class="avatar">
+    <div class="menu-bar-avatar">
       <a-avatar shape="square" :src="IconBilladm"/>
     </div>
-    <div class="left-groups">
+    <div class="menu-bar-left">
       <billadm-ledger-select v-if="route.path!='/ledger_view'"/>
     </div>
-    <div class="center-groups">
-      Billadm-{{ route.name }}
+    <div class="menu-bar-center">
+      <a-typography-text class="typography-section">
+        Billadm-{{ route.name }}
+      </a-typography-text>
     </div>
-    <div class="right-groups">
+    <div class="menu-bar-right">
       <a-button type="text" @click="onMinimize">
         <template #icon>
           <LineOutlined/>
@@ -20,7 +22,7 @@
           <BorderOutlined/>
         </template>
       </a-button>
-      <a-button class="closeButton" type="text" @click="onClose">
+      <a-button class="close-button" type="text" @click="onClose">
         <template #icon>
           <CloseOutlined/>
         </template>
@@ -34,10 +36,8 @@ import {useRoute} from 'vue-router'
 import {BorderOutlined, CloseOutlined, LineOutlined} from "@ant-design/icons-vue";
 import IconBilladm from '@/assets/icons/billadm.svg';
 
-// 当前视图
 const route = useRoute()
 
-// 窗口控制
 const onMinimize = () => {
   window.electronAPI.minimizeWindow();
 }
@@ -65,38 +65,31 @@ const onClose = () => {
   -webkit-app-region: no-drag;
 }
 
-.avatar {
+.menu-bar-avatar {
   width: var(--billadm-size-sider-width);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* 左边按钮 将它与后面的元素隔开 */
-.left-groups {
+.menu-bar-left {
   margin-right: auto;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.center-groups {
+.menu-bar-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
 }
 
-/* 右边按钮组 */
-.right-groups {
+.menu-bar-right {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   margin-right: 8px;
-}
-
-.closeButton.ant-btn:hover {
-  background-color: #f5222d;
-  color: white;
 }
 </style>

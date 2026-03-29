@@ -1,0 +1,114 @@
+// ============================================
+// Billadm Mixins
+// 可复用的样式片段
+// ============================================
+
+// Flexbox 工具
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-start {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// 文字截断
+@mixin text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin text-ellipsis-lines($lines: 2) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+// 滚动条样式
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.25);
+    }
+  }
+}
+
+// 拖拽区域
+@mixin drag-region {
+  -webkit-app-region: drag;
+}
+
+@mixin no-drag-region {
+  -webkit-app-region: no-drag;
+}
+
+// 卡片基础样式
+@mixin card-base {
+  background-color: var(--billadm-color-major-background);
+  border-radius: var(--billadm-radius-md);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+  }
+}
+
+// 按钮基础样式
+@mixin button-reset {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+}
+
+// 输入框聚焦样式
+@mixin input-focus {
+  &:focus-within {
+    border-color: var(--billadm-color-primary);
+    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+  }
+}
+
+// 页面容器
+@mixin page-container {
+  height: 100%;
+  background-color: var(--billadm-color-major-background);
+  overflow-y: auto;
+  @include custom-scrollbar;
+}
+
+// 区块间距
+@mixin section-gap {
+  margin-bottom: var(--billadm-space-lg);
+}

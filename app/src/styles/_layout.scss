@@ -1,0 +1,230 @@
+// ============================================
+// Billadm Layout
+// 通用布局样式
+// ============================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// ============================================
+// 页面区块布局
+// ============================================
+
+// 内容区域
+.layout-content {
+  background-color: var(--billadm-color-major-background);
+  overflow-y: auto;
+  margin-bottom: auto;
+  @include custom-scrollbar;
+}
+
+// 头部区域
+.layout-header {
+  height: auto;
+  background-color: var(--billadm-color-major-background);
+  padding: 0 0 var(--billadm-space-lg) 0;
+  @include flex-start;
+  flex-wrap: wrap;
+  gap: var(--billadm-space-sm);
+}
+
+// 底部区域
+.layout-footer {
+  height: auto;
+  background-color: var(--billadm-color-major-background);
+  padding: var(--billadm-space-lg) 0 0 0;
+  display: flex;
+  justify-content: flex-end;
+}
+
+// 侧边栏区域
+.layout-sider {
+  background-color: var(--billadm-color-minor-background) !important;
+
+  .ant-layout-sider-children {
+    @include flex-column;
+    justify-content: center;
+    height: 100%;
+  }
+}
+
+// ============================================
+// 工具条布局 (LedgerView, TransactionRecordView等头部)
+// ============================================
+
+.toolbar {
+  &-left {
+    margin-right: auto;
+    @include flex-start;
+    gap: var(--billadm-space-sm);
+  }
+
+  &-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    @include flex-start;
+    gap: var(--billadm-space-sm);
+  }
+
+  &-right {
+    @include flex-start;
+    gap: var(--billadm-space-sm);
+  }
+}
+
+// ============================================
+// 卡片网格
+// ============================================
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: var(--billadm-space-lg);
+  padding: var(--billadm-space-lg);
+}
+
+// ============================================
+// 菜单栏 (AppTopBar)
+// ============================================
+
+.menu-bar {
+  @include flex-center;
+  height: 100%;
+  position: relative;
+
+  > * {
+    @include no-drag-region;
+  }
+
+  &-avatar {
+    width: var(--billadm-size-sider-width);
+    @include flex-center;
+  }
+
+  &-left {
+    margin-right: auto;
+    @include flex-center;
+  }
+
+  &-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: var(--billadm-size-text-section);
+    font-weight: var(--billadm-weight-medium);
+    color: var(--billadm-color-text-major);
+  }
+
+  &-right {
+    @include flex-center;
+    gap: var(--billadm-space-sm);
+    margin-right: var(--billadm-space-sm);
+  }
+}
+
+// ============================================
+// 侧边图标导航 (AppLeftBar)
+// ============================================
+
+.icon-nav {
+  @include flex-column;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: var(--billadm-space-sm) 0;
+  gap: var(--billadm-space-sm);
+
+  &-top {
+    @include flex-column;
+    gap: var(--billadm-space-sm);
+    margin-bottom: auto;
+  }
+
+  &-bottom {
+    @include flex-column;
+    gap: var(--billadm-space-sm);
+  }
+}
+
+// ============================================
+// 统计页脚 (BilladmStatisticsFooter)
+// ============================================
+
+.statistics-footer {
+  @include flex-start;
+  gap: var(--billadm-space-lg);
+
+  &-item {
+    @include flex-start;
+    gap: var(--billadm-space-sm);
+
+    &-label {
+      font-size: var(--billadm-size-text-caption);
+      color: var(--billadm-color-text-minor);
+      margin: 0;
+    }
+
+    &-value {
+      font-size: var(--billadm-size-text-body);
+      font-weight: var(--billadm-weight-medium);
+      font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+      margin: 0;
+
+      &.income {
+        color: var(--billadm-color-positive);
+      }
+
+      &.expense {
+        color: var(--billadm-color-negative);
+      }
+
+      &.transfer {
+        color: var(--billadm-color-text-major);
+      }
+    }
+  }
+}
+
+// ============================================
+// 模态框内表单
+// ============================================
+
+.modal-form {
+  &-item {
+    margin-bottom: var(--billadm-space-md);
+  }
+
+  &-label {
+    font-size: var(--billadm-size-text-section);
+    font-weight: var(--billadm-weight-medium);
+    color: var(--billadm-color-text-major);
+    margin: 0 0 var(--billadm-space-xs) 0;
+  }
+}
+
+// ============================================
+// 浮动按钮位置
+// ============================================
+
+.float-actions {
+  &-primary {
+    right: 50px;
+    bottom: 80px;
+  }
+
+  &-secondary {
+    right: 110px;
+    bottom: 80px;
+  }
+}
+
+// ============================================
+// 分页器
+// ============================================
+
+.pagination-wrapper {
+  @include flex-center;
+  padding-top: var(--billadm-space-lg);
+}

@@ -94,27 +94,31 @@
       </a-form-item>
 
       <!-- 已添加条件列表 -->
-      <a-divider orientation="left">已添加条件 ({{ trQueryConditionItems.length }})</a-divider>
-      <div v-if="trQueryConditionItems.length === 0" style="color: #999; padding: 12px 0;">
-        暂无筛选条件
+      <a-divider orientation="left">
+        <a-typography-text type="secondary">
+          已添加条件 ({{ trQueryConditionItems.length }})
+        </a-typography-text>
+      </a-divider>
+      <div v-if="trQueryConditionItems.length === 0" class="empty-state">
+        <a-typography-text type="secondary">暂无筛选条件</a-typography-text>
       </div>
       <a-space direction="vertical" style="width: 100%">
         <a-card
             v-for="(item, index) in trQueryConditionItems"
             :key="index"
             size="small"
-            style="border: 1px solid #ddd; border-radius: 4px"
+            class="filter-card"
         >
           <template #title>
-            <span style="font-weight: normal">
+            <a-typography-text class="typography-body">
               {{ TransactionTypeToLabel.get(item.transactionType) || item.transactionType }}
               {{ item.category ? ` · ${item.category}` : '' }}
               {{ item.tags && item.tags.length ? ` · 标签(${item.tags.join(', ')})` : '' }}
               {{ item.description ? ` · "${item.description}"` : '' }}
-            </span>
+            </a-typography-text>
           </template>
           <template #extra>
-            <a-button type="text" danger @click="deleteCondition(index)">删除</a-button>
+            <a-button type="text" class="btn-danger" @click="deleteCondition(index)">删除</a-button>
           </template>
           <div>
             <a-tag color="blue" v-if="item.tagPolicy === 'all'">全部标签匹配</a-tag>
@@ -242,3 +246,18 @@ function onCategoryChange() {
   tempTags.value = [];
 }
 </script>
+
+<style scoped>
+.filter-card {
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-sm);
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 0;
+  color: var(--billadm-color-text-minor);
+}
+</style>

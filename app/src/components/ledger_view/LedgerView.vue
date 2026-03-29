@@ -1,7 +1,7 @@
 <template>
   <a-float-button
       type="primary"
-      style="right: 50px;bottom: 80px"
+      class="float-actions-primary"
       @click="openLedgerModal">
     <template #icon>
       <PlusOutlined/>
@@ -20,12 +20,12 @@
     <a-input v-model:value.lazy="ledgerName" placeholder="输入账本名称"/>
   </a-modal>
   <a-layout style="height: 100%">
-    <a-layout-header class="headerStyle">
-      <div class="left-groups">
+    <a-layout-header class="layout-header">
+      <div class="toolbar-left">
       </div>
-      <div class="center-groups">
+      <div class="toolbar-center">
       </div>
-      <div class="right-groups">
+      <div class="toolbar-right">
       </div>
     </a-layout-header>
     <a-layout-content :style="contentStyle">
@@ -36,10 +36,7 @@
         >
           <a-descriptions :title="ledger.name" layout="vertical">
             <template #extra>
-              <a-button
-                  type="text"
-                  :style="editButtonStyle"
-                  @click="modifyLedgerName(ledger.id,ledger.name)">
+              <a-button type="text" class="btn-primary" @click="modifyLedgerName(ledger.id,ledger.name)">
                 编辑
               </a-button>
               <a-popconfirm
@@ -48,13 +45,13 @@
                   :showCancel="false"
                   @confirm="ledgerStore.deleteLedger(ledger.id)"
               >
-                <a-button type="text" :style="deleteButtonStyle">删除</a-button>
+                <a-button type="text" class="btn-danger">删除</a-button>
               </a-popconfirm>
             </template>
-            <a-descriptions-item label="创建时间">
+            <a-descriptions-item :label="createTimeLabel">
               {{ formatTimestamp(ledger.createdAt, 'YYYY-MM-DD HH:mm:ss') }}
             </a-descriptions-item>
-            <a-descriptions-item label="更新时间">
+            <a-descriptions-item :label="updateTimeLabel">
               {{ formatTimestamp(ledger.updatedAt, 'YYYY-MM-DD HH:mm:ss') }}
             </a-descriptions-item>
           </a-descriptions>
@@ -72,15 +69,7 @@ import {formatTimestamp} from "@/backend/functions";
 import {useCssVariables} from "@/backend/css";
 import {PlusOutlined} from "@ant-design/icons-vue";
 
-const {majorBgColor, positiveColor, negativeColor} = useCssVariables();
-
-const editButtonStyle: CSSProperties = {
-  color: positiveColor.value,
-};
-
-const deleteButtonStyle: CSSProperties = {
-  color: negativeColor.value,
-};
+const {majorBgColor} = useCssVariables();
 
 const contentStyle: CSSProperties = {
   backgroundColor: majorBgColor.value,
@@ -94,6 +83,9 @@ const ledgerModal = ref<boolean>(false);
 const modalTitle = ref<string>("");
 const ledgerId = ref<string>("");
 const ledgerName = ref<string>("");
+
+const createTimeLabel = '创建时间';
+const updateTimeLabel = '更新时间';
 
 const openLedgerModal = () => {
   modalTitle.value = "创建账本";
@@ -120,7 +112,7 @@ const confirmLedgerModal = async () => {
 </script>
 
 <style scoped>
-.headerStyle {
+.layout-header {
   height: auto;
   background-color: var(--billadm-color-major-background);
   padding: 0 0 16px 0;
@@ -129,24 +121,21 @@ const confirmLedgerModal = async () => {
   justify-content: center;
 }
 
-/* 左边按钮 将它与后面的元素隔开 */
-.left-groups {
+.toolbar-left {
   margin-right: auto;
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-/* 中间按钮 */
-.center-groups {
+.toolbar-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   gap: 8px;
 }
 
-/* 右边按钮组 */
-.right-groups {
+.toolbar-right {
   display: flex;
   gap: 8px;
 }
@@ -156,5 +145,10 @@ const confirmLedgerModal = async () => {
   grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
   gap: 16px;
   padding: 16px;
+}
+
+.float-actions-primary {
+  right: 50px;
+  bottom: 80px;
 }
 </style>

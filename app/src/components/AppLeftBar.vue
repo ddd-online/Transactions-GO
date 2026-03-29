@@ -1,6 +1,6 @@
 <template>
-  <div class="menu-bar">
-    <div class="top-groups">
+  <div class="icon-nav">
+    <div class="icon-nav-top">
       <a-button :type="route.path==='/ledger_view' ? 'primary': 'text'" @click="navigate('ledger_view')">
         <template #icon>
           <BookOutlined style="display: flex;justify-content: center;align-items: center;font-size: medium"/>
@@ -17,7 +17,7 @@
         </template>
       </a-button>
     </div>
-    <div class="bottom-groups">
+    <div class="icon-nav-bottom">
       <a-button :type="route.path==='/settings_view' ? 'primary': 'text'" @click="navigate('settings_view')">
         <template #icon>
           <SettingOutlined style="display: flex;justify-content: center;align-items: center;font-size: medium"/>
@@ -31,7 +31,6 @@
 import {useRoute, useRouter} from 'vue-router';
 import {BookOutlined, LineChartOutlined, SettingOutlined, TransactionOutlined} from "@ant-design/icons-vue";
 
-
 const router = useRouter()
 const route = useRoute()
 
@@ -41,7 +40,7 @@ const navigate = (path: string) => {
 </script>
 
 <style scoped>
-.menu-bar {
+.icon-nav {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -51,14 +50,14 @@ const navigate = (path: string) => {
   padding: 8px 0;
 }
 
-.top-groups {
+.icon-nav-top {
   margin-bottom: auto;
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.bottom-groups {
+.icon-nav-bottom {
   display: flex;
   flex-direction: column;
   gap: 8px;

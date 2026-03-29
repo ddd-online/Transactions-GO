@@ -1,0 +1,243 @@
+// ============================================
+// Billadm Components
+// 组件特定样式
+// ============================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// ============================================
+// 按钮样式
+// ============================================
+
+// 主要操作按钮
+.btn-primary {
+  color: var(--billadm-color-positive);
+}
+
+// 危险操作按钮
+.btn-danger {
+  color: var(--billadm-color-negative);
+}
+
+// 关闭按钮悬停效果
+.close-button {
+  &.ant-btn:hover {
+    background-color: var(--billadm-color-negative);
+    color: white;
+    border-color: var(--billadm-color-negative);
+  }
+}
+
+// ============================================
+// 卡片样式
+// ============================================
+
+.card {
+  @include card-base;
+  height: 100%;
+  padding: var(--billadm-space-lg);
+
+  &-title {
+    font-size: var(--billadm-size-text-title);
+    font-weight: var(--billadm-weight-medium);
+    color: var(--billadm-color-text-major);
+    margin: 0 0 var(--billadm-space-md) 0;
+  }
+
+  &-subtitle {
+    font-size: var(--billadm-size-text-caption);
+    color: var(--billadm-color-text-minor);
+    margin: 0 0 var(--billadm-space-sm) 0;
+  }
+
+  &-content {
+    font-size: var(--billadm-size-text-body);
+    color: var(--billadm-color-text-major);
+  }
+
+  &-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: var(--billadm-space-lg);
+    padding: var(--billadm-space-lg);
+  }
+}
+
+// ============================================
+// 标签样式
+// ============================================
+
+.tag {
+  &-income {
+    background-color: rgba(22, 119, 255, 0.1);
+    color: var(--billadm-color-positive);
+  }
+
+  &-expense {
+    background-color: rgba(245, 34, 45, 0.1);
+    color: var(--billadm-color-negative);
+  }
+
+  &-transfer {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: var(--billadm-color-text-major);
+  }
+
+  &-outlier {
+    background-color: rgba(250, 173, 20, 0.1);
+    color: var(--billadm-color-warning);
+  }
+}
+
+// ============================================
+// 表格增强
+// ============================================
+
+.table-wrapper {
+  .ant-table {
+    // 标题行
+    .ant-table-thead > tr > th {
+      font-size: var(--billadm-size-text-caption);
+      font-weight: var(--billadm-weight-medium);
+      background-color: var(--billadm-color-minor-background);
+    }
+
+    // 内容行
+    .ant-table-tbody > tr > td {
+      font-size: var(--billadm-size-text-body);
+    }
+
+    // 悬停效果
+    .ant-table-tbody > tr:hover > td {
+      background-color: var(--billadm-color-icon-hover-bg);
+    }
+  }
+}
+
+// ============================================
+// 表单增强
+// ============================================
+
+.form-wrapper {
+  .ant-form-item {
+    margin-bottom: var(--billadm-space-lg);
+  }
+
+  .ant-form-item-label > label {
+    font-size: var(--billadm-size-text-section);
+    font-weight: var(--billadm-weight-medium);
+    color: var(--billadm-color-text-major);
+    height: auto;
+  }
+
+  .ant-input,
+  .ant-select-selector,
+  .ant-picker {
+    border-radius: var(--billadm-radius-sm);
+
+    &:hover {
+      border-color: var(--billadm-color-primary);
+    }
+
+    &:focus,
+    &.ant-input-focused {
+      border-color: var(--billadm-color-primary);
+      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+    }
+  }
+}
+
+// ============================================
+// 模态框增强
+// ============================================
+
+.modal-wrapper {
+  .ant-modal-header {
+    border-bottom: 1px solid var(--billadm-color-window-border);
+    padding: var(--billadm-space-lg);
+  }
+
+  .ant-modal-title {
+    font-size: var(--billadm-size-text-title);
+    font-weight: var(--billadm-weight-medium);
+    color: var(--billadm-color-text-major);
+  }
+
+  .ant-modal-body {
+    padding: var(--billadm-space-lg);
+  }
+
+  .ant-modal-footer {
+    border-top: 1px solid var(--billadm-color-window-border);
+    padding: var(--billadm-space-md) var(--billadm-space-lg);
+  }
+}
+
+// ============================================
+// 筛选条件卡片
+// ============================================
+
+.filter-card {
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-sm);
+
+  .ant-card-head {
+    font-size: var(--billadm-size-text-body);
+    min-height: auto;
+    padding: var(--billadm-space-sm) var(--billadm-space-md);
+    border-bottom: 1px solid var(--billadm-color-window-border);
+  }
+
+  .ant-card-body {
+    padding: var(--billadm-space-md);
+  }
+}
+
+// ============================================
+// 空状态
+// ============================================
+
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  padding: var(--billadm-space-xxl);
+  color: var(--billadm-color-text-minor);
+
+  &-icon {
+    font-size: 48px;
+    margin-bottom: var(--billadm-space-lg);
+    opacity: 0.5;
+  }
+
+  &-text {
+    font-size: var(--billadm-size-text-caption);
+    color: var(--billadm-color-text-minor);
+  }
+}
+
+// ============================================
+// 加载状态
+// ============================================
+
+.loading-state {
+  @include flex-center;
+  padding: var(--billadm-space-xxl);
+}
+
+// ============================================
+// 标签页样式
+// ============================================
+
+.tabs-wrapper {
+  height: 100%;
+
+  .ant-tabs-content-holder {
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+
+  .ant-tabs-nav {
+    margin-bottom: 0;
+  }
+}

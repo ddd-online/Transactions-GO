@@ -2,7 +2,9 @@
   <a-table :columns="columns" :data-source="items" :pagination="false" :sticky="true" size="small">
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex==='transactionAt'">
-        {{ formatTimestamp(record.transactionAt, 'YYYY-MM-DD') }}
+        <a-typography-text class="typography-caption">
+          {{ formatTimestamp(record.transactionAt, 'YYYY-MM-DD') }}
+        </a-typography-text>
       </template>
 
       <template v-else-if="column.dataIndex==='transactionType'">
@@ -24,16 +26,18 @@
       </template>
 
       <template v-else-if="column.dataIndex === 'price'">
-        {{ centsToYuan(record.price) }}
+        <a-typography-text class="typography-amount">
+          {{ centsToYuan(record.price) }}
+        </a-typography-text>
       </template>
 
       <template v-else-if="column.dataIndex === 'action'">
-        <a-button type="text" @click="handleEdit(record as TransactionRecord)" :style="editButtonStyle">编辑</a-button>
+        <a-button type="text" class="btn-primary" @click="handleEdit(record as TransactionRecord)">编辑</a-button>
         <a-popconfirm title="确认删除吗"
                       ok-text="确认"
                       @confirm="handleDelete(record as TransactionRecord)"
                       :showCancel="false">
-          <a-button type="text" :style="deleteButtonStyle">删除</a-button>
+          <a-button type="text" class="btn-danger">删除</a-button>
         </a-popconfirm>
       </template>
     </template>
@@ -43,7 +47,6 @@
 <script setup lang="ts">
 import type {TransactionRecord} from '@/types/billadm';
 import {centsToYuan, formatTimestamp} from "@/backend/functions";
-import {editButtonStyle, deleteButtonStyle} from "@/backend/styles";
 import {TransactionTypeToColor, TransactionTypeToLabel} from "@/backend/constant";
 import type {ColumnsType} from "ant-design-vue/es/table";
 

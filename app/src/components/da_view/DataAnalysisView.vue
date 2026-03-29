@@ -1,15 +1,15 @@
 <template>
   <a-layout style="height: 100%">
-    <a-layout-header class="headerStyle">
-      <div class="left-groups">
+    <a-layout-header class="layout-header">
+      <div class="toolbar-left">
         <BilladmTimeRangePicker
             v-model:time-range="trQueryConditionStore.timeRange"
             v-model:time-range-type="trQueryConditionStore.timeRangeType"
         />
       </div>
-      <div class="center-groups">
+      <div class="toolbar-center">
       </div>
-      <div class="right-groups">
+      <div class="toolbar-right">
       </div>
     </a-layout-header>
     <a-layout-content :style="contentStyle">
@@ -36,7 +36,7 @@ const trQueryConditionStore = useTrQueryConditionStore();
 </script>
 
 <style scoped>
-.headerStyle {
+.layout-header {
   height: auto;
   background-color: var(--billadm-color-major-background);
   padding: 0 0 16px 0;
@@ -45,24 +45,21 @@ const trQueryConditionStore = useTrQueryConditionStore();
   justify-content: center;
 }
 
-/* 左边按钮 将它与后面的元素隔开 */
-.left-groups {
+.toolbar-left {
   margin-right: auto;
   display: flex;
   gap: 8px;
   align-items: center;
 }
 
-/* 中间按钮 */
-.center-groups {
+.toolbar-center {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   gap: 8px;
 }
 
-/* 右边按钮组 */
-.right-groups {
+.toolbar-right {
   display: flex;
   gap: 8px;
 }
