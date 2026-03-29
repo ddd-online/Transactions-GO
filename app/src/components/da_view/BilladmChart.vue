@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, onUnmounted, ref, watch} from 'vue'
+import {onMounted, onUnmounted, ref, watch, nextTick} from 'vue'
 import {Chart} from '@antv/g2'
 import type {TimeSeriesData} from '@/backend/chart'
 import {TransactionTypeToColor} from '@/backend/constant'
@@ -33,10 +33,14 @@ const initChart = () => {
   // 获取时间轴标题
   const xAxisTitle = props.xField === 'time' ? (props.title.includes('月度') ? '月份' : '年份') : props.xField
 
+  // 计算16:9的高度
+  const width = containerRef.value.clientWidth
+  const height = width * 9 / 16
+
   chart = new Chart({
     container: containerRef.value,
     autoFit: true,
-    height: 300,
+    height: height,
     data: props.data,
   })
 
@@ -79,7 +83,8 @@ const initChart = () => {
   chart.render()
 }
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick()
   initChart()
 })
 
@@ -99,6 +104,5 @@ watch(() => props.data, () => {
 .billadm-chart {
   width: 100%;
   height: 100%;
-  min-height: 300px;
 }
 </style>

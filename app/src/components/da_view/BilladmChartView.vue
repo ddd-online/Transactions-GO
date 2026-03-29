@@ -12,15 +12,19 @@
 
     <!-- 图表内容 -->
     <div class="chart-view-content">
-      <BilladmChart
-          v-if="data.length > 0"
-          :data="data"
-          x-field="time"
-          y-field="amount"
-          series-field="type"
-          :title="title"
-      />
-      <a-empty v-else description="暂无数据" />
+      <div class="chart-wrapper">
+        <div class="chart-container">
+          <BilladmChart
+              v-if="data.length > 0"
+              :data="data"
+              x-field="time"
+              y-field="amount"
+              series-field="type"
+              :title="title"
+          />
+          <a-empty v-else description="暂无数据" />
+        </div>
+      </div>
     </div>
 
     <!-- 放大图表弹窗 -->
@@ -37,15 +41,19 @@
               </a-button>
             </div>
             <div class="chart-enlarge-content">
-              <BilladmChart
-                  v-if="data.length > 0"
-                  :data="data"
-                  x-field="time"
-                  y-field="amount"
-                  series-field="type"
-                  :title="title"
-              />
-              <a-empty v-else description="暂无数据" />
+              <div class="chart-wrapper">
+                <div class="chart-container">
+                  <BilladmChart
+                      v-if="data.length > 0"
+                      :data="data"
+                      x-field="time"
+                      y-field="amount"
+                      series-field="type"
+                      :title="title"
+                  />
+                  <a-empty v-else description="暂无数据" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -100,6 +108,24 @@ const showEnlarged = ref(false)
   flex: 1;
   padding: 16px;
   min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 80%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+}
+
+.chart-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
 /* 放大弹窗样式 */
@@ -147,6 +173,9 @@ const showEnlarged = ref(false)
   flex: 1;
   padding: 20px;
   min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 过渡动画 */
