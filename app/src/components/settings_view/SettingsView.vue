@@ -1,7 +1,7 @@
 <template>
   <div class="settings-view">
-    <!-- 主内容区：左侧边栏 + 右侧内容显示 -->
-    <div class="settings-main">
+    <!-- 主内容区 -->
+    <a-card class="settings-main" :body-style="{padding: '0', display: 'flex', height: '100%'}">
       <!-- 左侧设置列表 -->
       <div class="settings-sidebar">
         <a-menu
@@ -32,7 +32,7 @@
           <a-empty description="工作空间功能开发中"/>
         </div>
       </div>
-    </div>
+    </a-card>
   </div>
 </template>
 
@@ -51,19 +51,14 @@ const activeComponent = ref('category-tag');
 }
 
 .settings-main {
-  flex: 1;
-  display: flex;
-  gap: 12px;
-  min-height: 0;
+  height: 100%;
   overflow: hidden;
 }
 
 .settings-sidebar {
-  width: 200px;
-  flex-shrink: 0;
+  flex: 0 0 200px;
   background-color: var(--billadm-color-minor-background, #f5f5f5);
-  border: 1px solid var(--billadm-color-border, #e8e8e8);
-  border-radius: 8px;
+  border-right: 1px solid var(--billadm-color-window-border);
   overflow-y: auto;
   padding: 12px;
 }
@@ -76,11 +71,7 @@ const activeComponent = ref('category-tag');
 .settings-content {
   flex: 1;
   min-width: 0;
-  background-color: var(--billadm-color-major-background, #fff);
-  border: 1px solid var(--billadm-color-border, #e8e8e8);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  overflow-y: auto;
 }
 
 .placeholder {
