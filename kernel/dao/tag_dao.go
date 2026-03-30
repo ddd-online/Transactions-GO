@@ -37,7 +37,7 @@ func (t *TagDaoImpl) QueryTags(ws *workspace.Workspace, categoryTransactionType 
 	if categoryTransactionType != constant.All {
 		db = db.Where("category_transaction_type = ?", categoryTransactionType)
 	}
-	if err := db.Find(&tags).Error; err != nil {
+	if err := db.Order("name ASC").Find(&tags).Error; err != nil {
 		return nil, err
 	}
 
