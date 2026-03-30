@@ -94,6 +94,10 @@ $border-radius: (
   --billadm-color-text-minor: #{map.get($text-colors, 'secondary')};
   --billadm-color-text-disabled: #{map.get($text-colors, 'disabled')};
 
+  // 图标颜色
+  --billadm-color-icon: #7b7b7b;
+  --billadm-color-icon-active: #1677ff;
+
   // 字号
   --billadm-size-text-display: #{map.get($font-sizes, 'display')};
   --billadm-size-text-title: #{map.get($font-sizes, 'title')};
@@ -131,16 +135,31 @@ $border-radius: (
 // ============================================
 
 [data-theme='dark'] {
-  --billadm-color-major-background: #141414;
-  --billadm-color-minor-background: #1f1f1f;
-  --billadm-color-window-border: #434343;
+  // 背景色 - 柔和的深灰色调，避免纯黑
+  --billadm-color-major-background: #1a1a2e;
+  --billadm-color-minor-background: #252538;
+  --billadm-color-window-border: #3a3a52;
 
-  --billadm-color-icon-hover-bg: #303030;
+  // 悬停效果
+  --billadm-color-icon-hover-bg: #323248;
 
-  --billadm-color-text-major: #e8e8e8;
-  --billadm-color-text-minor: #a6a6a6;
-  --billadm-color-text-disabled: #595959;
+  // 文字色 - 柔和的高对比度
+  --billadm-color-text-major: #e8e8f0;
+  --billadm-color-text-minor: #a0a0b8;
+  --billadm-color-text-disabled: #606078;
 
-  --billadm-color-positive: #1668dc;
-  --billadm-color-negative: #dc4444;
+  // 主题色 - 柔和的蓝色
+  --billadm-color-primary: #7c9cff;
+  --billadm-color-positive: #6bc77b;
+  --billadm-color-negative: #e06c75;
+  --billadm-color-warning: #e5b95d;
+  --billadm-color-success: #6bc77b;
+
+  // 边框和分割线
+  --billadm-color-border: #3a3a52;
+  --billadm-color-divider: #2e2e42;
+
+  // 图标颜色
+  --billadm-color-icon: #9090a8;
+  --billadm-color-icon-active: #7c9cff;
 }

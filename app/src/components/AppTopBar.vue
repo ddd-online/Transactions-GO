@@ -6,6 +6,13 @@
       </a-typography-text>
     </div>
     <div class="menu-bar-right">
+      <a-switch
+          v-model:checked="isDark"
+          size="small"
+          checked-children="暗"
+          un-checked-children="亮"
+          @change="toggleTheme"
+      />
       <a-button type="text" @click="onMinimize">
         <template #icon>
           <LineOutlined/>
@@ -26,7 +33,17 @@
 </template>
 
 <script setup lang="ts">
+import {computed} from 'vue';
 import {BorderOutlined, CloseOutlined, LineOutlined} from "@ant-design/icons-vue";
+import {useThemeStore} from "@/stores/themeStore.ts";
+
+const themeStore = useThemeStore();
+
+const isDark = computed(() => themeStore.mode === 'dark');
+
+const toggleTheme = () => {
+  themeStore.toggleTheme();
+};
 
 const onMinimize = () => {
   window.electronAPI.minimizeWindow();

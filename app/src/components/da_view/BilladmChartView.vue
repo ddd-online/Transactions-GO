@@ -88,7 +88,7 @@ const showEnlarged = ref(false)
   margin: 0;
   font-size: 16px;
   font-weight: 500;
-  color: var(--billadm-color-text, #333);
+  color: var(--billadm-color-text-major);
 }
 
 .chart-view-content {
@@ -133,7 +133,7 @@ const showEnlarged = ref(false)
 .chart-enlarge-modal {
   width: 66vw;
   height: 80vh;
-  background-color: #fff;
+  background-color: var(--billadm-color-major-background);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -146,7 +146,7 @@ const showEnlarged = ref(false)
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid var(--billadm-color-border);
   flex-shrink: 0;
 }
 
@@ -154,7 +154,7 @@ const showEnlarged = ref(false)
   margin: 0;
   font-size: 18px;
   font-weight: 500;
-  color: #333;
+  color: var(--billadm-color-text-major);
 }
 
 .chart-enlarge-content {

@@ -10,6 +10,7 @@ import {BarChart, LineChart, PieChart} from 'echarts/charts';
 import Antd, {ConfigProvider} from 'ant-design-vue';
 import 'ant-design-vue/dist/reset.css';
 import '@/styles/index.scss';
+import {useThemeStore} from '@/stores/themeStore';
 
 // dayjs 中文支持
 import dayjs from 'dayjs';
@@ -35,4 +36,9 @@ echarts.use([
 );
 app.component('ConfigProvider', ConfigProvider);
 app.component('v-chart', VueECharts);
+
+// Load saved theme
+const themeStore = useThemeStore();
+themeStore.loadSavedTheme();
+
 app.mount('#app');

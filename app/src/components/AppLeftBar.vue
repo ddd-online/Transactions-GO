@@ -1,24 +1,24 @@
 <template>
   <div class="app-left-bar">
     <div class="app-left-bar-top">
-      <a-button :type="route.path==='/ledger_view' ? 'primary': 'text'" @click="navigate('ledger_view')">
+      <a-button type="text" :class="{'nav-btn-active': route.path==='/ledger_view'}" @click="navigate('ledger_view')">
         <template #icon>
           <BookOutlined style="font-size: 18px"/>
         </template>
       </a-button>
-      <a-button :type="route.path==='/tr_view' ? 'primary': 'text'" @click="navigate('tr_view')">
+      <a-button type="text" :class="{'nav-btn-active': route.path==='/tr_view'}" @click="navigate('tr_view')">
         <template #icon>
           <TransactionOutlined style="font-size: 18px"/>
         </template>
       </a-button>
-      <a-button :type="route.path==='/da_view' ? 'primary': 'text'" @click="navigate('da_view')">
+      <a-button type="text" :class="{'nav-btn-active': route.path==='/da_view'}" @click="navigate('da_view')">
         <template #icon>
           <LineChartOutlined style="font-size: 18px"/>
         </template>
       </a-button>
     </div>
     <div class="app-left-bar-bottom">
-      <a-button :type="route.path==='/settings_view' ? 'primary': 'text'" @click="navigate('settings_view')">
+      <a-button type="text" :class="{'nav-btn-active': route.path==='/settings_view'}" @click="navigate('settings_view')">
         <template #icon>
           <SettingOutlined style="font-size: 18px"/>
         </template>
@@ -62,5 +62,19 @@ const navigate = (path: string) => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
+}
+
+:deep(.ant-btn-text) {
+  color: var(--billadm-color-icon);
+}
+
+:deep(.ant-btn-text:hover) {
+  color: var(--billadm-color-icon-active);
+  background-color: var(--billadm-color-icon-hover-bg);
+}
+
+:deep(.nav-btn-active) {
+  color: var(--billadm-color-icon-active) !important;
+  background-color: var(--billadm-color-icon-hover-bg);
 }
 </style>
