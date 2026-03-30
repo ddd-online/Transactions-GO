@@ -1,7 +1,7 @@
 <!-- @/components/BilladmFileSelect.vue -->
 <template>
   <a-modal v-model:open="open" :title="title" ok-text="确认" cancel-text="取消" @ok="handleOk" @cancel="handleCancel"
-    :closable="false" :esc-to-close="false" :mask-closable="false" style="top: 250px">
+    :closable="false" :esc-to-close="false" :mask-closable="false" centered>
     <a-input-search v-model:value="inputPath" :placeholder="placeholder" enter-button="打开目录" @search="handleBrowse" />
   </a-modal>
 </template>
