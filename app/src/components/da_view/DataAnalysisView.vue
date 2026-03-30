@@ -11,8 +11,8 @@
       </div>
     </div>
 
-    <!-- 主内容区：左侧边栏 + 右侧图表显示 -->
-    <div class="da-main">
+    <!-- 主内容区 -->
+    <a-card class="da-main" :body-style="{padding: '0', display: 'flex', height: '100%'}">
       <!-- 左侧图表列表 -->
       <div class="da-sidebar">
         <billadm-chart-list :chart-configs="KEEP_CHART_CONFIGS" @select="onChartSelect" />
@@ -23,7 +23,7 @@
         <billadm-chart-view v-if="selectedChart" :title="selectedChart.title" :data="selectedChart.data" />
         <a-empty v-else description="请选择图表" />
       </div>
-    </div>
+    </a-card>
   </div>
 </template>
 
@@ -144,28 +144,20 @@ watch(
 
 .da-main {
   flex: 1;
-  display: flex;
-  gap: 12px;
   min-height: 0;
   overflow: hidden;
 }
 
 .da-sidebar {
-  width: 200px;
-  flex-shrink: 0;
+  flex: 0 0 200px;
   background-color: var(--billadm-color-minor-background, #f5f5f5);
-  border: 1px solid var(--billadm-color-border, #e8e8e8);
-  border-radius: 8px;
+  border-right: 1px solid var(--billadm-color-window-border);
   overflow-y: auto;
 }
 
 .da-content {
   flex: 1;
   min-width: 0;
-  background-color: var(--billadm-color-major-background, #fff);
-  border: 1px solid var(--billadm-color-border, #e8e8e8);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  overflow-y: auto;
 }
 </style>
