@@ -75,6 +75,29 @@ body {
   &-primary {
     background-color: var(--billadm-color-primary);
     border-color: var(--billadm-color-primary);
+    color: #fff;
+  }
+}
+
+// 暗黑模式按钮
+[data-theme='dark'] {
+  .ant-btn {
+    &-primary {
+      background-color: #4a5a8a;
+      border-color: #4a5a8a;
+      color: rgba(255, 255, 255, 0.9);
+
+      &:hover {
+        background-color: #5a6a9a;
+        border-color: #5a6a9a;
+      }
+
+      &:disabled {
+        background-color: #3a3a52;
+        border-color: #3a3a52;
+        color: rgba(255, 255, 255, 0.3);
+      }
+    }
   }
 }
 
@@ -127,6 +150,26 @@ body {
   &.ant-input-focused {
     border-color: var(--billadm-color-primary);
     box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+  }
+}
+
+// 输入框占位符 - 暗黑模式
+[data-theme='dark'] {
+  .ant-input,
+  .ant-select-selector,
+  .ant-picker {
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.45) !important;
+      opacity: 1;
+    }
+
+    &::-webkit-input-placeholder {
+      color: rgba(255, 255, 255, 0.45) !important;
+    }
+
+    .ant-select-selection-placeholder {
+      color: rgba(255, 255, 255, 0.45) !important;
+    }
   }
 }
 
