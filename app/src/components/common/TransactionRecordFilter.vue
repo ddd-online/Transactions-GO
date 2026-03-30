@@ -1,102 +1,97 @@
 <template>
-  <a-modal title="筛选消费记录" v-model:open="open" width="800px" @cancel="confirmFilterModal" centered :closable="false">
+  <a-modal title="筛选消费记录" v-model:open="open" width="600px" @cancel="confirmFilterModal" centered :closable="false">
     <template #footer>
       <a-button key="clear" @click="clearAllConditions">清除条件</a-button>
       <a-button key="confirm" type="primary" @click="confirmFilterModal">确认</a-button>
     </template>
 
-    <!-- 输入区域 -->
-    <a-form layout="vertical">
-      <a-row :gutter="16">
-        <!-- 交易类型 -->
-        <a-col :span="4">
-          <a-form-item label="交易类型">
-            <a-select v-model:value="tempTransactionType" placeholder="请选择交易类型" allow-clear>
-              <a-select-option v-for="opt in transactionTypeOptions" :key="opt.value" :value="opt.value">
-                {{ opt.label }}
-              </a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
+    <div class="filter-form">
+      <!-- 交易类型 -->
+      <div class="form-item">
+        <div class="form-label">交易类型</div>
+        <a-select v-model:value="tempTransactionType" placeholder="请选择交易类型" allow-clear class="form-select">
+          <a-select-option v-for="opt in transactionTypeOptions" :key="opt.value" :value="opt.value">
+            {{ opt.label }}
+          </a-select-option>
+        </a-select>
+      </div>
 
-        <!-- 分类 -->
-        <a-col :span="4">
-          <a-form-item label="分类">
-            <a-select v-model:value="tempCategory" placeholder="请选择分类" :options="categories" allow-clear
-              @change="onCategoryChange" />
-          </a-form-item>
-        </a-col>
+      <!-- 分类 -->
+      <div class="form-item">
+        <div class="form-label">分类</div>
+        <a-select v-model:value="tempCategory" placeholder="请选择分类" :options="categories" allow-clear
+          @change="onCategoryChange" class="form-select" />
+      </div>
 
-        <!-- 标签 -->
-        <a-col :span="8">
-          <a-form-item label="标签">
-            <a-select v-model:value="tempTags" mode="multiple" placeholder="请选择标签" :options="tags" allow-clear />
-          </a-form-item>
-        </a-col>
+      <!-- 标签 -->
+      <div class="form-item">
+        <div class="form-label">标签</div>
+        <a-select v-model:value="tempTags" mode="multiple" placeholder="请选择标签" :options="tags" allow-clear class="form-select" />
+      </div>
 
-        <!-- 标签策略 -->
-        <a-col :span="4">
-          <a-form-item label="标签匹配策略">
-            <a-select v-model:value="tempTagPolicy" placeholder="策略">
-              <a-select-option value="any">任意</a-select-option>
-              <a-select-option value="all">全部</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-
-        <!-- 标签取反 -->
-        <a-col :span="4">
-          <a-form-item label="是否取反">
-            <a-select v-model:value="tempTagNot" placeholder="策略">
-              <a-select-option value="yes">是</a-select-option>
-              <a-select-option value="no">否</a-select-option>
-            </a-select>
-          </a-form-item>
-        </a-col>
-      </a-row>
+      <!-- 标签匹配策略和取反 -->
+      <div class="form-row">
+        <div class="form-item-half">
+          <div class="form-label">标签匹配</div>
+          <a-select v-model:value="tempTagPolicy" class="form-select">
+            <a-select-option value="any">任意</a-select-option>
+            <a-select-option value="all">全部</a-select-option>
+          </a-select>
+        </div>
+        <div class="form-item-half">
+          <div class="form-label">标签取反</div>
+          <a-select v-model:value="tempTagNot" class="form-select">
+            <a-select-option value="no">否</a-select-option>
+            <a-select-option value="yes">是</a-select-option>
+          </a-select>
+        </div>
+      </div>
 
       <!-- 描述关键词 -->
-      <a-form-item label="描述包含">
-        <a-input v-model:value="tempDescription" placeholder="输入关键词" />
-      </a-form-item>
+      <div class="form-item">
+        <div class="form-label">描述包含</div>
+        <a-input v-model:value="tempDescription" placeholder="输入关键词" class="form-input" />
+      </div>
 
       <!-- 添加按钮 -->
-      <a-form-item>
-        <a-button type="dashed" @click="addCondition" block>
-          + 添加筛选条件
-        </a-button>
-      </a-form-item>
+      <a-button type="dashed" @click="addCondition" block class="add-btn">
+        + 添加筛选条件
+      </a-button>
 
       <!-- 已添加条件列表 -->
-      <a-divider orientation="left">
-        <a-typography-text type="secondary">
-          已添加条件 ({{ trQueryConditionItems.length }})
-        </a-typography-text>
-      </a-divider>
-      <div v-if="trQueryConditionItems.length === 0" class="empty-state">
-        <a-typography-text type="secondary">暂无筛选条件</a-typography-text>
+      <div class="conditions-section" v-if="trQueryConditionItems.length > 0">
+        <a-list :data-source="trQueryConditionItems" size="small" bordered>
+          <template #renderItem="{ item, index }">
+            <a-list-item>
+              <template #actions>
+                <a-button type="text" danger size="small" @click="deleteCondition(index)">删除</a-button>
+              </template>
+              <div class="condition-item">
+                <a-tag :color="getTypeColor(item.transactionType)">
+                  {{ TransactionTypeToLabel.get(item.transactionType) || item.transactionType }}
+                </a-tag>
+                <template v-if="item.category">
+                  <span class="condition-separator">/</span>
+                  <span>{{ item.category }}</span>
+                </template>
+                <template v-if="item.tags && item.tags.length > 0">
+                  <span class="condition-separator">/</span>
+                  <a-tag>{{ item.tags.join(', ') }}</a-tag>
+                </template>
+                <template v-if="item.description">
+                  <span class="condition-separator">/</span>
+                  <span class="condition-desc">"{{ item.description }}"</span>
+                </template>
+                <template v-if="item.tagNot">
+                  <span class="condition-separator">/</span>
+                  <a-tag color="red">取反</a-tag>
+                </template>
+              </div>
+            </a-list-item>
+          </template>
+        </a-list>
       </div>
-      <a-space direction="vertical" style="width: 100%">
-        <a-card v-for="(item, index) in trQueryConditionItems" :key="index" size="small" class="filter-card">
-          <template #title>
-            <a-typography-text class="typography-body">
-              {{ TransactionTypeToLabel.get(item.transactionType) || item.transactionType }}
-              {{ item.category ? ` · ${item.category}` : '' }}
-              {{ item.tags && item.tags.length ? ` · 标签(${item.tags.join(', ')})` : '' }}
-              {{ item.description ? ` · "${item.description}"` : '' }}
-            </a-typography-text>
-          </template>
-          <template #extra>
-            <a-button type="text" class="btn-danger" @click="deleteCondition(index)">删除</a-button>
-          </template>
-          <div>
-            <a-tag color="blue" v-if="item.tagPolicy === 'all'">全部标签匹配</a-tag>
-            <a-tag color="green" v-else>任意标签匹配</a-tag>
-            <a-tag color="red" v-if="item.tagNot">标签取反</a-tag>
-          </div>
-        </a-card>
-      </a-space>
-    </a-form>
+    </div>
   </a-modal>
 </template>
 
@@ -183,7 +178,6 @@ function addCondition() {
     tempTags.value.length === 0 &&
     !tempDescription.value.trim()
   ) {
-    // 可选：提示用户
     return;
   }
 
@@ -216,19 +210,85 @@ function confirmFilterModal() {
 function onCategoryChange() {
   tempTags.value = [];
 }
+
+function getTypeColor(type: string): string {
+  const colorMap: Record<string, string> = {
+    income: 'green',
+    expense: 'red',
+    transfer: 'orange',
+  };
+  return colorMap[type] || 'blue';
+}
 </script>
 
 <style scoped>
-.filter-card {
-  border: 1px solid var(--billadm-color-window-border);
-  border-radius: var(--billadm-radius-sm);
+.filter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.empty-state {
+.form-item {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 12px 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-item-half {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-size: 13px;
   color: var(--billadm-color-text-minor);
+}
+
+.form-select {
+  width: 100%;
+}
+
+.form-input {
+  width: 100%;
+}
+
+.add-btn {
+  margin-top: 8px;
+}
+
+.conditions-section {
+  margin-top: 8px;
+}
+
+.condition-item {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.condition-separator {
+  color: var(--billadm-color-text-disabled);
+}
+
+.condition-desc {
+  color: var(--billadm-color-text-secondary);
+  font-style: italic;
+}
+
+:deep(.ant-list-item) {
+  padding: 12px 16px;
+}
+
+:deep(.ant-list-bordered) {
+  border-radius: var(--billadm-radius-md);
 }
 </style>
