@@ -71,7 +71,6 @@ const showEnlarged = ref(false)
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--billadm-color-major-background, #fff);
   border-radius: 8px;
   overflow: hidden;
 }
@@ -80,7 +79,7 @@ const showEnlarged = ref(false)
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px;
+  padding: 8px 12px;
   border-bottom: 1px solid var(--billadm-color-border, #f0f0f0);
   flex-shrink: 0;
 }
@@ -99,11 +98,12 @@ const showEnlarged = ref(false)
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: var(--billadm-color-minor-background);
 }
 
 .chart-wrapper {
   position: relative;
-  width: 80%;
+  width: 90%;
   aspect-ratio: 16 / 9;
   overflow: hidden;
 }
