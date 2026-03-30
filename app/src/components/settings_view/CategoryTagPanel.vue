@@ -25,13 +25,11 @@
         </span>
       </div>
       <div class="tag-list" v-if="selectedTags.length > 0">
-        <a-card class="tag-card">
-          <div class="tag-grid">
-            <div v-for="tag in selectedTags" :key="tag.name" class="tag-item">
-              {{ tag.name }}
-            </div>
+        <div class="tag-grid">
+          <div v-for="tag in selectedTags" :key="tag.name" class="tag-item">
+            {{ tag.name }}
           </div>
-        </a-card>
+        </div>
       </div>
       <div class="empty-state" v-else>
         <a-empty description="暂无标签"/>
@@ -176,10 +174,6 @@ watch(
   flex: 1;
   overflow-y: auto;
   min-height: 0;
-}
-
-.tag-card {
-  height: 100%;
 }
 
 .tag-grid {
