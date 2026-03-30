@@ -65,5 +65,6 @@ declare module 'vue' {
     TransactionRecordFilter: typeof import('./../components/common/TransactionRecordFilter.vue')['default']
     TransactionRecordTable: typeof import('./../components/tr_view/TransactionRecordTable.vue')['default']
     TransactionRecordView: typeof import('./../components/tr_view/TransactionRecordView.vue')['default']
+    WorkspaceSetting: typeof import('./../components/settings_view/WorkspaceSetting.vue')['default']
   }
 }

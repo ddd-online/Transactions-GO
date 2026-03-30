@@ -1,28 +1,13 @@
 <!-- @/components/BilladmFileSelect.vue -->
 <template>
-  <a-modal
-      v-model:open="open"
-      :title="title"
-      ok-text="确认"
-      cancel-text="取消"
-      @ok="handleOk"
-      @cancel="handleCancel"
-      :closable="false"
-      :esc-to-close="false"
-      :mask-closable="false"
-      style="top: 250px"
-  >
-    <a-input-search
-        v-model:value="inputPath"
-        :placeholder="placeholder"
-        enter-button="打开目录"
-        @search="handleBrowse"
-    />
+  <a-modal v-model:open="open" :title="title" ok-text="确认" cancel-text="取消" @ok="handleOk" @cancel="handleCancel"
+    :closable="false" :esc-to-close="false" :mask-closable="false" style="top: 250px">
+    <a-input-search v-model:value="inputPath" :placeholder="placeholder" enter-button="打开目录" @search="handleBrowse" />
   </a-modal>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue'
+import { ref, watch } from 'vue'
 import NotificationUtil from '@/backend/notification.ts'
 
 // 定义 props
@@ -54,6 +39,13 @@ const open = defineModel<boolean>()
 // 输入框路径
 const inputPath = ref('')
 
+// 监听打开状态，重置输入框
+watch(open, (newVal) => {
+  if (newVal) {
+    inputPath.value = ''
+  }
+})
+
 // 浏览目录
 const handleBrowse = async () => {
   try {
@@ -76,6 +68,7 @@ const handleOk = () => {
     return
   }
   emit('confirm', inputPath.value)
+  open.value = false
 }
 
 // 取消回调

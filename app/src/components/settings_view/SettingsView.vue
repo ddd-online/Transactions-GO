@@ -25,9 +25,7 @@
     <!-- 右侧内容显示 -->
     <div class="settings-content">
       <billadm-category-tag-setting v-if="activeComponent === 'category-tag'"/>
-      <div v-else-if="activeComponent === 'workspace'" class="placeholder">
-        <a-empty description="工作空间功能开发中"/>
-      </div>
+      <workspace-setting v-else-if="activeComponent === 'workspace'"/>
     </div>
   </div>
 </template>
@@ -35,6 +33,7 @@
 <script lang="ts" setup>
 import {ref} from 'vue';
 import {FolderOpenOutlined, TagOutlined} from "@ant-design/icons-vue";
+import WorkspaceSetting from './WorkspaceSetting.vue';
 
 const activeComponent = ref('category-tag');
 </script>
@@ -101,12 +100,5 @@ const activeComponent = ref('category-tag');
   min-width: 0;
   padding: 20px;
   overflow-y: auto;
-}
-
-.placeholder {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
 }
 </style>

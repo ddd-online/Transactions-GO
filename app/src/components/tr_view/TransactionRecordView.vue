@@ -3,63 +3,48 @@
     <!-- 工具栏 -->
     <div class="tr-toolbar">
       <div class="tr-toolbar-left">
-        <BilladmTimeRangePicker
-            v-model:time-range="trQueryConditionStore.timeRange"
-            v-model:time-range-type="trQueryConditionStore.timeRangeType"
-        />
+        <BilladmTimeRangePicker v-model:time-range="trQueryConditionStore.timeRange"
+          v-model:time-range-type="trQueryConditionStore.timeRangeType" />
       </div>
       <div class="tr-toolbar-right">
-        <billadm-ledger-select/>
+        <billadm-ledger-select />
       </div>
     </div>
 
     <!-- 主内容区 -->
     <div class="tr-content">
-      <transaction-record-table :items="tableData" @edit="updateTr" @delete="deleteTr"/>
+      <transaction-record-table :items="tableData" @edit="updateTr" @delete="deleteTr" />
     </div>
 
     <!-- 底部分页 -->
     <div class="tr-footer">
-      <a-pagination
-          v-model:current="currentPage"
-          v-model:pageSize="pageSize"
-          :total="trTotal"
-          :show-total="total => `共${total}记录`"
-          :pageSizeOptions="['15','30','50','100']"
-          show-size-changer
-      />
+      <a-pagination v-model:current="currentPage" v-model:pageSize="pageSize" :total="trTotal"
+        :show-total="total => `共${total}记录`" :pageSizeOptions="['15', '30', '50', '100']" show-size-changer />
     </div>
 
     <!-- 悬浮按钮 -->
     <a-float-button type="primary" class="float-primary" @click="createTr">
       <template #icon>
-        <PlusOutlined/>
+        <PlusOutlined />
       </template>
     </a-float-button>
-    <a-float-button class="float-secondary" @click="openTrFilterModal=true"
-                     :badge="{ count: trQueryConditionStore.conditionLen, color: 'blue' }">
+    <a-float-button class="float-secondary" @click="openTrFilterModal = true"
+      :badge="{ count: trQueryConditionStore.conditionLen, color: 'blue' }">
       <template #icon>
-        <FilterOutlined/>
+        <FilterOutlined />
       </template>
     </a-float-button>
 
     <!-- 筛选弹窗 -->
-    <TransactionRecordFilter v-model="openTrFilterModal"/>
+    <TransactionRecordFilter v-model="openTrFilterModal" />
 
     <!-- 编辑/新建弹窗 -->
-    <a-modal
-        :title="trModalTitle"
-        :open="openTrModal"
-        width="800px"
-        @ok="confirmTrModal"
-        ok-text="确认"
-        @cancel="closeTrModal"
-        cancel-text="取消"
-        centered
-    >
+    <a-modal :title="trModalTitle" :open="openTrModal" width="800px" @ok="confirmTrModal" ok-text="确认"
+      @cancel="closeTrModal" cancel-text="取消" centered>
+
       <a-form :model="trForm" :rules="rules">
         <a-form-item label="时间" name="time">
-          <a-date-picker v-model:value="trForm.time" style="width: 100%"/>
+          <a-date-picker v-model:value="trForm.time" style="width: 100%" />
         </a-form-item>
 
         <a-form-item label="类型" name="type">
@@ -71,23 +56,23 @@
         </a-form-item>
 
         <a-form-item label="分类" name="category">
-          <a-select v-model:value="trForm.category" :options="categories"/>
+          <a-select v-model:value="trForm.category" :options="categories" />
         </a-form-item>
 
         <a-form-item label="标签" name="tags">
-          <a-select v-model:value="trForm.tags" :options="tags" mode="multiple" placeholder="选择一个或多个标签"/>
+          <a-select v-model:value="trForm.tags" :options="tags" mode="multiple" placeholder="选择一个或多个标签" />
         </a-form-item>
 
         <a-form-item label="标记" name="flags">
-          <a-checkbox-group v-model:value="trForm.flags" :options="flagOptions"/>
+          <a-checkbox-group v-model:value="trForm.flags" :options="flagOptions" />
         </a-form-item>
 
         <a-form-item label="描述" name="description">
-          <a-input v-model:value="trForm.description" placeholder="描述消费内容" allowClear/>
+          <a-input v-model:value="trForm.description" placeholder="描述消费内容" allowClear />
         </a-form-item>
 
         <a-form-item label="金额" name="price">
-          <a-input v-model:value="trForm.price" prefix="￥" style="width: 100%"/>
+          <a-input v-model:value="trForm.price" prefix="￥" style="width: 100%" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -95,10 +80,10 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from 'vue';
+import { ref, watch } from 'vue';
 import TransactionRecordTable from '@/components/tr_view/TransactionRecordTable.vue';
-import type {TransactionRecord, TrForm, TrQueryCondition} from "@/types/billadm";
-import {convertToUnixTimeRange} from "@/backend/timerange.ts";
+import type { TransactionRecord, TrForm, TrQueryCondition } from "@/types/billadm";
+import { convertToUnixTimeRange } from "@/backend/timerange.ts";
 import {
   createTransactionRecord,
   deleteTransactionRecord,
@@ -107,14 +92,14 @@ import {
   getTrOnCondition,
   updateTransactionRecord
 } from "@/backend/functions.ts";
-import {useLedgerStore} from "@/stores/ledgerStore.ts";
-import {useTrQueryConditionStore} from "@/stores/trQueryConditionStore.ts";
-import {useAppDataStore} from "@/stores/appDataStore.ts";
+import { useLedgerStore } from "@/stores/ledgerStore.ts";
+import { useTrQueryConditionStore } from "@/stores/trQueryConditionStore.ts";
+import { useAppDataStore } from "@/stores/appDataStore.ts";
 import dayjs from "dayjs";
-import {trDtoToTrForm, trFormToTrDto} from "@/backend/dto-utils.ts";
-import type {DefaultOptionType} from "ant-design-vue/es/vc-cascader";
-import type {Rule} from "ant-design-vue/es/form";
-import {FilterOutlined, PlusOutlined} from "@ant-design/icons-vue";
+import { trDtoToTrForm, trFormToTrDto } from "@/backend/dto-utils.ts";
+import type { DefaultOptionType } from "ant-design-vue/es/vc-cascader";
+import type { Rule } from "ant-design-vue/es/form";
+import { FilterOutlined, PlusOutlined } from "@ant-design/icons-vue";
 
 const ledgerStore = useLedgerStore();
 const trQueryConditionStore = useTrQueryConditionStore();
@@ -123,7 +108,7 @@ const appDataStore = useAppDataStore();
 // 表单校验规则
 const rules: Record<string, Rule[]> = {
   price: [
-    {trigger: 'blur'},
+    { trigger: 'blur' },
     {
       validator: (_: any, value: string) => {
         if (!value) return Promise.reject(new Error('请输入价格'));
@@ -151,7 +136,7 @@ const trForm = ref<TrForm>({
 });
 const categories = ref<DefaultOptionType[]>([]);
 const tags = ref<DefaultOptionType[]>([]);
-const flagOptions = [{label: '离群值', value: 'outlier'}];
+const flagOptions = [{ label: '离群值', value: 'outlier' }];
 
 const createTr = () => {
   trForm.value.type = 'expense';
@@ -174,7 +159,7 @@ const deleteTr = async (tr: TransactionRecord) => {
 };
 
 const closeTrModal = () => {
-  trForm.value = {id: '', price: '', type: '', category: '', description: '', tags: [], flags: [], time: dayjs()};
+  trForm.value = { id: '', price: '', type: '', category: '', description: '', tags: [], flags: [], time: dayjs() };
   openTrModal.value = false;
 };
 
@@ -218,7 +203,7 @@ watch(() => [ledgerStore.currentLedgerId, trQueryConditionStore.timeRange, trQue
     }
     await refreshTable();
   },
-  {immediate: true}
+  { immediate: true }
 );
 
 watch(() => [currentPage.value, pageSize.value], async () => {
@@ -228,7 +213,7 @@ watch(() => [currentPage.value, pageSize.value], async () => {
 watch(() => trForm.value.type, async () => {
   if (trForm.value.type === '') return;
   const categoryList = await getCategoryByType(trForm.value.type);
-  categories.value = categoryList.map(c => ({value: c.name}));
+  categories.value = categoryList.map(c => ({ value: c.name }));
   const categoryNames = categoryList.map(c => c.name);
   if (categoryNames.length > 0) {
     if (!trForm.value.category || !categoryNames.includes(trForm.value.category)) {
@@ -244,7 +229,7 @@ watch(() => trForm.value.category, async () => {
   // 组合分类和交易类型，格式为"分类:交易类型"
   const categoryTransactionType = `${trForm.value.category}:${trForm.value.type}`;
   const tagList = await getTagsByCategory(categoryTransactionType);
-  tags.value = tagList.map(t => ({value: t.name}));
+  tags.value = tagList.map(t => ({ value: t.name }));
   const tagNames = tagList.map(t => t.name);
   if (tagNames.length > 0 && trForm.value.tags) {
     trForm.value.tags = trForm.value.tags.filter(tag => tagNames.includes(tag));

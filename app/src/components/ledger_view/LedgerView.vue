@@ -3,7 +3,7 @@
     <!-- 悬浮按钮 -->
     <a-float-button type="primary" class="float-primary" @click="openLedgerModal">
       <template #icon>
-        <PlusOutlined/>
+        <PlusOutlined />
       </template>
     </a-float-button>
 
@@ -15,12 +15,7 @@
             <a-button type="text" class="btn-primary" @click="modifyLedgerName(ledger.id, ledger.name)">
               编辑
             </a-button>
-            <a-popconfirm
-                title="确认删除吗"
-                ok-text="确认"
-                :showCancel="false"
-                @confirm="ledgerStore.deleteLedger(ledger.id)"
-            >
+            <a-popconfirm title="确认删除吗" ok-text="确认" :showCancel="false" @confirm="ledgerStore.deleteLedger(ledger.id)">
               <a-button type="text" class="btn-danger">删除</a-button>
             </a-popconfirm>
           </template>
@@ -35,26 +30,18 @@
     </div>
 
     <!-- 编辑/新建弹窗 -->
-    <a-modal
-        :title="modalTitle"
-        :open="ledgerModal"
-        width="800px"
-        @ok="confirmLedgerModal"
-        ok-text="确认"
-        @cancel="ledgerModal=false"
-        cancel-text="取消"
-        centered
-    >
-      <a-input v-model:value.lazy="ledgerName" placeholder="输入账本名称"/>
+    <a-modal :title="modalTitle" :open="ledgerModal" width="800px" @ok="confirmLedgerModal" ok-text="确认"
+      @cancel="ledgerModal = false" cancel-text="取消" centered>
+      <a-input v-model:value.lazy="ledgerName" placeholder="输入账本名称" />
     </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import {ref} from 'vue';
-import {useLedgerStore} from "@/stores/ledgerStore";
-import {formatTimestamp} from "@/backend/functions";
-import {PlusOutlined} from "@ant-design/icons-vue";
+import { ref } from 'vue';
+import { useLedgerStore } from "@/stores/ledgerStore";
+import { formatTimestamp } from "@/backend/functions";
+import { PlusOutlined } from "@ant-design/icons-vue";
 
 const ledgerStore = useLedgerStore();
 

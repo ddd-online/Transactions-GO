@@ -38,7 +38,7 @@ func (c *categoryDaoImpl) QueryCategory(ws *workspace.Workspace, trType string) 
 		db = db.Where("transaction_type = ?", trType)
 	}
 
-	if err := db.Order("name ASC").Find(&categories).Error; err != nil {
+	if err := db.Order("name DESC").Find(&categories).Error; err != nil {
 		return nil, err
 	}
 	return categories, nil

@@ -1,12 +1,5 @@
 <template>
-  <a-modal
-      title="筛选消费记录"
-      v-model:open="open"
-      width="800px"
-      @cancel="confirmFilterModal"
-      centered
-      :closable="false"
-  >
+  <a-modal title="筛选消费记录" v-model:open="open" width="800px" @cancel="confirmFilterModal" centered :closable="false">
     <template #footer>
       <a-button key="clear" @click="clearAllConditions">清除条件</a-button>
       <a-button key="confirm" type="primary" @click="confirmFilterModal">确认</a-button>
@@ -18,16 +11,8 @@
         <!-- 交易类型 -->
         <a-col :span="4">
           <a-form-item label="交易类型">
-            <a-select
-                v-model:value="tempTransactionType"
-                placeholder="请选择交易类型"
-                allow-clear
-            >
-              <a-select-option
-                  v-for="opt in transactionTypeOptions"
-                  :key="opt.value"
-                  :value="opt.value"
-              >
+            <a-select v-model:value="tempTransactionType" placeholder="请选择交易类型" allow-clear>
+              <a-select-option v-for="opt in transactionTypeOptions" :key="opt.value" :value="opt.value">
                 {{ opt.label }}
               </a-select-option>
             </a-select>
@@ -37,26 +22,15 @@
         <!-- 分类 -->
         <a-col :span="4">
           <a-form-item label="分类">
-            <a-select
-                v-model:value="tempCategory"
-                placeholder="请选择分类"
-                :options="categories"
-                allow-clear
-                @change="onCategoryChange"
-            />
+            <a-select v-model:value="tempCategory" placeholder="请选择分类" :options="categories" allow-clear
+              @change="onCategoryChange" />
           </a-form-item>
         </a-col>
 
         <!-- 标签 -->
         <a-col :span="8">
           <a-form-item label="标签">
-            <a-select
-                v-model:value="tempTags"
-                mode="multiple"
-                placeholder="请选择标签"
-                :options="tags"
-                allow-clear
-            />
+            <a-select v-model:value="tempTags" mode="multiple" placeholder="请选择标签" :options="tags" allow-clear />
           </a-form-item>
         </a-col>
 
@@ -83,7 +57,7 @@
 
       <!-- 描述关键词 -->
       <a-form-item label="描述包含">
-        <a-input v-model:value="tempDescription" placeholder="输入关键词"/>
+        <a-input v-model:value="tempDescription" placeholder="输入关键词" />
       </a-form-item>
 
       <!-- 添加按钮 -->
@@ -103,12 +77,7 @@
         <a-typography-text type="secondary">暂无筛选条件</a-typography-text>
       </div>
       <a-space direction="vertical" style="width: 100%">
-        <a-card
-            v-for="(item, index) in trQueryConditionItems"
-            :key="index"
-            size="small"
-            class="filter-card"
-        >
+        <a-card v-for="(item, index) in trQueryConditionItems" :key="index" size="small" class="filter-card">
           <template #title>
             <a-typography-text class="typography-body">
               {{ TransactionTypeToLabel.get(item.transactionType) || item.transactionType }}
@@ -132,12 +101,12 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch} from 'vue';
-import type {Category, TrQueryConditionItem} from '@/types/billadm';
-import type {DefaultOptionType} from 'ant-design-vue/es/vc-cascader';
-import {getCategoryByType, getTagsByCategory} from '@/backend/functions';
-import {useTrQueryConditionStore} from '@/stores/trQueryConditionStore';
-import {TransactionTypeToLabel} from '@/backend/constant';
+import { ref, watch } from 'vue';
+import type { Category, TrQueryConditionItem } from '@/types/billadm';
+import type { DefaultOptionType } from 'ant-design-vue/es/vc-cascader';
+import { getCategoryByType, getTagsByCategory } from '@/backend/functions';
+import { useTrQueryConditionStore } from '@/stores/trQueryConditionStore';
+import { TransactionTypeToLabel } from '@/backend/constant';
 
 // 双向绑定 modal 开关
 const open = defineModel<boolean>();
@@ -155,9 +124,9 @@ const tempDescription = ref<string>('');
 
 // 交易类型选项
 const transactionTypeOptions = [
-  {label: '收入', value: 'income'},
-  {label: '支出', value: 'expense'},
-  {label: '转账', value: 'transfer'},
+  { label: '收入', value: 'income' },
+  { label: '支出', value: 'expense' },
+  { label: '转账', value: 'transfer' },
 ];
 
 // 分类 & 标签选项
@@ -172,7 +141,7 @@ watch(() => tempTransactionType.value, async (newVal) => {
     return;
   }
   const categoryList: Category[] = await getCategoryByType(newVal);
-  categories.value = categoryList.map((c) => ({value: c.name}));
+  categories.value = categoryList.map((c) => ({ value: c.name }));
 });
 
 // 分类变化 → 刷新标签
@@ -185,7 +154,7 @@ watch(() => tempCategory.value, async (newVal) => {
   // 组合分类和交易类型，格式为"分类:交易类型"
   const categoryTransactionType = `${newVal}:${tempTransactionType.value}`;
   const tagList = await getTagsByCategory(categoryTransactionType);
-  tags.value = tagList.map((t) => ({value: t.name}));
+  tags.value = tagList.map((t) => ({ value: t.name }));
 });
 
 // 打开时加载 store 中的条件
@@ -209,10 +178,10 @@ function resetTempInputs() {
 function addCondition() {
   // 至少需要一个有效字段
   if (
-      !tempTransactionType.value &&
-      !tempCategory.value &&
-      tempTags.value.length === 0 &&
-      !tempDescription.value.trim()
+    !tempTransactionType.value &&
+    !tempCategory.value &&
+    tempTags.value.length === 0 &&
+    !tempDescription.value.trim()
   ) {
     // 可选：提示用户
     return;
