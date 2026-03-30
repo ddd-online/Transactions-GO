@@ -2,25 +2,24 @@
   <div class="settings-view">
     <!-- 左侧设置列表 -->
     <div class="settings-sidebar">
-      <a-menu
-          v-model:selectedKeys="selectedKeys"
-          mode="inline"
-          theme="light"
-          class="settings-menu"
-      >
-        <a-menu-item key="category-tag" @click="activeComponent = 'category-tag'">
-          <template #icon>
-            <TagOutlined/>
-          </template>
-          <span>分类与标签</span>
-        </a-menu-item>
-        <a-menu-item key="workspace" @click="activeComponent = 'workspace'">
-          <template #icon>
-            <FolderOpenOutlined/>
-          </template>
-          <span>工作空间</span>
-        </a-menu-item>
-      </a-menu>
+      <div class="settings-list">
+        <div
+            class="settings-list-item"
+            :class="{ active: activeComponent === 'category-tag' }"
+            @click="activeComponent = 'category-tag'"
+        >
+          <TagOutlined class="settings-list-item-icon"/>
+          <span class="settings-list-item-title">分类与标签</span>
+        </div>
+        <div
+            class="settings-list-item"
+            :class="{ active: activeComponent === 'workspace' }"
+            @click="activeComponent = 'workspace'"
+        >
+          <FolderOpenOutlined class="settings-list-item-icon"/>
+          <span class="settings-list-item-title">工作空间</span>
+        </div>
+      </div>
     </div>
 
     <!-- 右侧内容显示 -->
@@ -37,7 +36,6 @@
 import {ref} from 'vue';
 import {FolderOpenOutlined, TagOutlined} from "@ant-design/icons-vue";
 
-const selectedKeys = ref(['category-tag']);
 const activeComponent = ref('category-tag');
 </script>
 
@@ -53,12 +51,49 @@ const activeComponent = ref('category-tag');
   background-color: var(--billadm-color-minor-background);
   border-right: 1px solid var(--billadm-color-window-border);
   overflow-y: auto;
-  padding: 12px;
+  padding: 12px 8px;
 }
 
-.settings-menu {
-  background: transparent;
-  border-inline-end: none !important;
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.settings-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: var(--billadm-color-text-secondary);
+}
+
+.settings-list-item:hover {
+  background-color: var(--billadm-color-icon-hover-bg);
+}
+
+.settings-list-item.active {
+  background-color: #ffffff;
+  color: var(--billadm-color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-list-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.settings-list-item-title {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .settings-content {
