@@ -1,102 +1,73 @@
 <template>
-  <a-row :gutter="16" style="width: 100%">
-    <a-col :span="12">
-      <a-space direction="vertical" style="width: 100%">
-        <a-card title="收入" :head-style="incomeCss" :body-style="{padding:'0px'}">
-          <a-collapse :bordered="false" ghost>
-            <a-collapse-panel v-for="category in incomeCategory" :key="category.name" :header="category.name">
-              <a-card>
-                <a-card-grid v-for="tag in category.tags" :key="tag.name" style="width: 25%; text-align: center">
-                  {{ tag.name }}
-                </a-card-grid>
-              </a-card>
-            </a-collapse-panel>
-          </a-collapse>
-        </a-card>
-        <a-card title="转账" :head-style="transferCss" :body-style="{padding:'0px'}">
-          <a-collapse :bordered="false" ghost>
-            <a-collapse-panel v-for="category in transferCategory" :key="category.name" :header="category.name">
-              <a-card>
-                <a-card-grid v-for="tag in category.tags" :key="tag.name" style="width: 25%; text-align: center">
-                  {{ tag.name }}
-                </a-card-grid>
-              </a-card>
-            </a-collapse-panel>
-          </a-collapse>
-        </a-card>
-      </a-space>
-    </a-col>
-    <a-col :span="12">
-      <a-card title="支出" :head-style="expenseCss" :body-style="{padding:'0px'}">
-        <a-collapse :bordered="false" ghost>
-          <a-collapse-panel v-for="category in expenseCategory" :key="category.name" :header="category.name">
-            <a-card>
-              <a-card-grid v-for="tag in category.tags" :key="tag.name" style="width: 25%; text-align: center">
-                {{ tag.name }}
-              </a-card-grid>
-            </a-card>
-          </a-collapse-panel>
-        </a-collapse>
-      </a-card>
-    </a-col>
-  </a-row>
+  <div class="category-tag-setting">
+    <!-- Tab切换：收入、支出、转账 -->
+    <a-tabs v-model:activeKey="activeTab" class="setting-tabs">
+      <a-tab-pane key="expense">
+        <template #tab>
+          <span :style="{ color: expenseColor }">支出</span>
+        </template>
+        <div class="tab-content">
+          <category-tag-panel transaction-type="expense" :active-color="expenseColor"/>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="income">
+        <template #tab>
+          <span :style="{ color: incomeColor }">收入</span>
+        </template>
+        <div class="tab-content">
+          <category-tag-panel transaction-type="income" :active-color="incomeColor"/>
+        </div>
+      </a-tab-pane>
+      <a-tab-pane key="transfer">
+        <template #tab>
+          <span :style="{ color: transferColor }">转账</span>
+        </template>
+        <div class="tab-content">
+          <category-tag-panel transaction-type="transfer" :active-color="transferColor"/>
+        </div>
+      </a-tab-pane>
+    </a-tabs>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import {type CSSProperties, ref, watch} from 'vue';
-import type {Category, Tag, TransactionType} from '@/types/billadm';
-import {useLedgerStore} from '@/stores/ledgerStore.ts';
-import {getCategoryByType, getTagsByCategory} from '@/backend/functions.ts';
+import {ref} from 'vue';
 import {TransactionTypeToColor} from "@/backend/constant.ts";
+import CategoryTagPanel from './CategoryTagPanel.vue';
 
-
-const incomeCss: CSSProperties = {
-  color: TransactionTypeToColor.get('income')
-}
-
-const expenseCss: CSSProperties = {
-  color: TransactionTypeToColor.get('expense')
-}
-
-const transferCss: CSSProperties = {
-  color: TransactionTypeToColor.get('transfer')
-}
-
-const ledgerStore = useLedgerStore();
-
-// 扩展 Category 类型，加入 tags 字段（或使用接口继承）
-interface CategoryWithTags extends Category {
-  tags: Tag[];
-}
-
-const incomeCategory = ref<CategoryWithTags[]>([]);
-const expenseCategory = ref<CategoryWithTags[]>([]);
-const transferCategory = ref<CategoryWithTags[]>([]);
-
-const refreshDataWithType = async (trType: TransactionType) => {
-  const categories = await getCategoryByType(trType);
-  // 为每个 category 并行加载其 tags，组合为"分类:交易类型"格式
-  return await Promise.all(
-      categories.map(async (category) => {
-        const categoryTransactionType = `${category.name}:${trType}`;
-        const tags = await getTagsByCategory(categoryTransactionType);
-        return {...category, tags};
-      })
-  );
-}
-
-const refreshData = async () => {
-  incomeCategory.value = await refreshDataWithType('income');
-  expenseCategory.value = await refreshDataWithType('expense');
-  transferCategory.value = await refreshDataWithType('transfer');
-};
-
-// 监听 currentLedgerId 变化，并立即执行一次
-watch(
-    () => ledgerStore.currentLedgerId,
-    async () => {
-      await refreshData();
-    },
-    {immediate: true}
-);
+const activeTab = ref('expense');
+const incomeColor = TransactionTypeToColor.get('income') || '#52c41a';
+const expenseColor = TransactionTypeToColor.get('expense') || '#f5222d';
+const transferColor = TransactionTypeToColor.get('transfer') || '#faad14';
 </script>
+
+<style scoped>
+.category-tag-setting {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-tabs {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.setting-tabs :deep(.ant-tabs-content-holder) {
+  flex: 1;
+  overflow: hidden;
+}
+
+.setting-tabs :deep(.ant-tabs-content) {
+  height: 100%;
+}
+
+.setting-tabs :deep(.ant-tabs-tabpane) {
+  height: 100%;
+}
+
+.tab-content {
+  height: 100%;
+}
+</style>
