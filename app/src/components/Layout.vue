@@ -26,6 +26,11 @@
           <router-view/>
         </main>
       </div>
+
+      <!-- 底部状态栏 -->
+      <footer class="app-footer">
+        <app-bottom-bar/>
+      </footer>
     </div>
   </div>
 </template>
@@ -111,5 +116,13 @@ onMounted(initWorkspace);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+/* 底部状态栏 - 次要背景色 */
+.app-footer {
+  height: var(--billadm-size-header-height);
+  background-color: var(--billadm-color-minor-background);
+  flex-shrink: 0;
+  border-top: 1px solid var(--billadm-color-window-border);
 }
 </style>
