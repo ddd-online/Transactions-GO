@@ -1,9 +1,23 @@
 <template>
   <div class="bottom-bar">
     <div class="bottom-bar-left"></div>
-    <div class="bottom-bar-right"></div>
+    <div class="bottom-bar-right">
+      <billadm-statistics-footer v-if="showStatistics" />
+    </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+import BilladmStatisticsFooter from '@/components/common/BilladmStatisticsFooter.vue'
+
+const route = useRoute()
+
+const showStatistics = computed(() => {
+  return route.path === '/tr_view' || route.path === '/da_view'
+})
+</script>
 
 <style scoped>
 .bottom-bar {
