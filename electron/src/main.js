@@ -191,6 +191,7 @@ const createWindow = () => {
 
     ipcMain.on('workspace:set', (event, workspaceDir) => {
         transactionsCfg.workspaceDir = workspaceDir;
+        saveTransactionsCfg();
     });
 
     ipcMain.handle('app', async (event, field) => {
