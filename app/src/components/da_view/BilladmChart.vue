@@ -56,9 +56,15 @@ const initChart = () => {
 
   chart.axis('x', {
     title: xAxisTitle,
+    labelFill: '#000000',
+    labelFontSize: 15,
+    titleFontSize: 16
   })
   chart.axis('y', {
     title: '金额（元）',
+    labelFill: '#000000',
+    labelFontSize: 15,
+    titleFontSize: 16
   })
 
   chart
@@ -66,7 +72,6 @@ const initChart = () => {
     .encode('x', props.xField)
     .encode('y', props.yField)
     .encode('color', props.seriesField)
-    .encode('shape', 'smooth')
     .style('lineWidth', 2)
 
   chart
