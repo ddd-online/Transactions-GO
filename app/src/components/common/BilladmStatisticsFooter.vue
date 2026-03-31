@@ -62,14 +62,14 @@ const appDataStore = useAppDataStore();
 }
 
 .statistics-footer-item-value.income {
-  color: var(--billadm-color-positive);
+  color: #52c41a;
 }
 
 .statistics-footer-item-value.expense {
-  color: var(--billadm-color-negative);
+  color: #f5222d;
 }
 
 .statistics-footer-item-value.transfer {
-  color: var(--billadm-color-text-major);
+  color: #1677ff;
 }
 </style>
