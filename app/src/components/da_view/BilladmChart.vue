@@ -58,7 +58,8 @@ const initChart = () => {
     title: xAxisTitle,
     labelFill: '#000000',
     labelFontSize: 15,
-    titleFontSize: 16
+    titleFontSize: 16,
+    line: { style: { stroke: '#000000', lineWidth: 1 } }
   })
   chart.axis('y', {
     title: '金额（元）',
@@ -66,7 +67,8 @@ const initChart = () => {
     labelFontSize: 15,
     titleFontSize: 16,
     domainMin: 0,
-    nice: true
+    nice: true,
+    line: { style: { stroke: '#000000', lineWidth: 1 } }
   })
 
   chart
