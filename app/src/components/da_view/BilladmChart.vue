@@ -64,7 +64,9 @@ const initChart = () => {
     title: '金额（元）',
     labelFill: '#000000',
     labelFontSize: 15,
-    titleFontSize: 16
+    titleFontSize: 16,
+    domainMin: 0,
+    nice: true
   })
 
   chart
