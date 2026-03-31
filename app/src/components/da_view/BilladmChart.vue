@@ -54,7 +54,7 @@ const initChart = () => {
     range: colorRange,
   })
 
-  chart.scale(props.yField, {
+  chart.scale('y', {
     domainMin: 0,
     nice: true
   })
