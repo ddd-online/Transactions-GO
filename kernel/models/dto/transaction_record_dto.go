@@ -20,6 +20,16 @@ func JsonTransactionRecordDto(c *gin.Context, result *models.Result) (*Transacti
 	return ret, true
 }
 
+func JsonTransactionRecordDtoBatch(c *gin.Context, result *models.Result) ([]*TransactionRecordDto, bool) {
+	var ret []*TransactionRecordDto
+	if err := c.BindJSON(&ret); nil != err {
+		result.Code = -1
+		result.Msg = fmt.Sprintf("parses request failed: %v", err)
+		return nil, false
+	}
+	return ret, true
+}
+
 type TransactionRecordDto struct {
 	LedgerID        string   `json:"ledgerId"`
 	TransactionID   string   `json:"transactionId"`

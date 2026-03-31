@@ -35,6 +35,7 @@ func GetTrService() TransactionRecordService {
 
 type TransactionRecordService interface {
 	CreateTr(ws *workspace.Workspace, dto *dto.TransactionRecordDto) (string, error)
+	BatchCreateTr(ws *workspace.Workspace, dtos []*dto.TransactionRecordDto) (int, error)
 	QueryTrsOnCondition(ws *workspace.Workspace, condition *dto.TrQueryCondition) (*dto.TrQueryResult, error)
 	DeleteTrById(ws *workspace.Workspace, trId string) error
 }
@@ -83,6 +84,57 @@ func (t *transactionRecordServiceImpl) CreateTr(ws *workspace.Workspace, trDto *
 
 	logrus.Infof("create transaction record success, ledger id: %s, description: %s", trDto.LedgerID, trDto.Description)
 	return transactionID, nil
+}
+
+// BatchCreateTr creates multiple transaction records in a single transaction.
+func (t *transactionRecordServiceImpl) BatchCreateTr(ws *workspace.Workspace, dtos []*dto.TransactionRecordDto) (int, error) {
+	logrus.Infof("start to batch create %d transaction records", len(dtos))
+
+	if len(dtos) == 0 {
+		return 0, nil
+	}
+
+	successCount := 0
+
+	// Use transaction for atomicity
+	err := ws.Transaction(func(tx *workspace.Workspace) error {
+		for _, trDto := range dtos {
+			transactionID := util.GetUUID()
+
+			record := trDto.ToTransactionRecord()
+			record.TransactionID = transactionID
+
+			if err := t.trDao.CreateTr(tx, record); err != nil {
+				logrus.Errorf("batch create: create transaction record failed: %v", err)
+				return fmt.Errorf("create transaction record: %w", err)
+			}
+
+			trTags := make([]*models.TrTag, 0, len(trDto.Tags))
+			for _, tag := range trDto.Tags {
+				trTag := &models.TrTag{
+					LedgerID:      trDto.LedgerID,
+					TransactionID: transactionID,
+					Tag:           tag,
+				}
+				trTags = append(trTags, trTag)
+			}
+			if err := t.trTagDao.CreateTrTags(tx, trTags); err != nil {
+				logrus.Errorf("batch create: create tr tags failed: %v", err)
+				return fmt.Errorf("create tr tags: %w", err)
+			}
+
+			successCount++
+		}
+		return nil
+	})
+
+	if err != nil {
+		logrus.Errorf("batch create transaction records failed: %v", err)
+		return successCount, err
+	}
+
+	logrus.Infof("batch create transaction records success, count: %d", successCount)
+	return successCount, nil
 }
 
 func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspace, condition *dto.TrQueryCondition) (*dto.TrQueryResult, error) {

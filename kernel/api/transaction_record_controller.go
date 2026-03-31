@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -71,6 +72,44 @@ func createTransaction(c *gin.Context) {
 	}
 
 	ret.Data = trId
+}
+
+// POST /transactions/batch
+func batchCreateTransactions(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	dtos, ok := dto.JsonTransactionRecordDtoBatch(c, ret)
+	if !ok {
+		return
+	}
+	logrus.Debugf("batch create %d transaction records", len(dtos))
+
+	// Validate all records first
+	for i, trDto := range dtos {
+		if !trDto.Validate(ret) {
+			ret.Code = -1
+			ret.Msg = fmt.Sprintf("record %d: %s", i+1, ret.Msg)
+			logrus.Errorf("validate transaction record %d error: %v", i+1, ret.Msg)
+			return
+		}
+	}
+
+	count, err := service.GetTrService().BatchCreateTr(ws, dtos)
+	if err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ret.Data = count
 }
 
 // DELETE /transactions/:id

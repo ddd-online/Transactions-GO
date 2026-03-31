@@ -9,6 +9,10 @@ export async function createTrForLedger(data: TransactionRecord): Promise<string
     return api.post<string>('/v1/transactions', data, '创建消费记录');
 }
 
+export async function batchCreateTrForLedger(data: TransactionRecord[]): Promise<number> {
+    return api.post<number>('/v1/transactions/batch', data, '批量创建消费记录');
+}
+
 export async function deleteTrById(id: string): Promise<void> {
     return api.delete<void>(`/v1/transactions/${id}`, '删除消费记录');
 }

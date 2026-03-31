@@ -65,6 +65,7 @@ body {
 // 按钮
 .ant-btn {
   border-radius: var(--billadm-radius-sm);
+  box-shadow: none;
 
   &-text {
     &:hover {

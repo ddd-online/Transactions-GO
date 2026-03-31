@@ -19,6 +19,14 @@
           <FolderOpenOutlined class="settings-list-item-icon"/>
           <span class="settings-list-item-title">工作空间</span>
         </div>
+        <div
+            class="settings-list-item"
+            :class="{ active: activeComponent === 'data-import-export' }"
+            @click="activeComponent = 'data-import-export'"
+        >
+          <CloudUploadOutlined class="settings-list-item-icon"/>
+          <span class="settings-list-item-title">数据导入导出</span>
+        </div>
       </div>
     </div>
 
@@ -26,13 +34,14 @@
     <div class="settings-content">
       <billadm-category-tag-setting v-if="activeComponent === 'category-tag'"/>
       <workspace-setting v-else-if="activeComponent === 'workspace'"/>
+      <data-import-export-setting v-else-if="activeComponent === 'data-import-export'"/>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {ref} from 'vue';
-import {FolderOpenOutlined, TagOutlined} from "@ant-design/icons-vue";
+import {CloudUploadOutlined, FolderOpenOutlined, TagOutlined} from "@ant-design/icons-vue";
 import WorkspaceSetting from './WorkspaceSetting.vue';
 
 const activeComponent = ref('category-tag');
