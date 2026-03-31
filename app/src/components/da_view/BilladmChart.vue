@@ -54,6 +54,11 @@ const initChart = () => {
     range: colorRange,
   })
 
+  chart.scale(props.yField, {
+    domainMin: 0,
+    nice: true
+  })
+
   chart.axis('x', {
     title: xAxisTitle,
     labelFill: '#000000',
@@ -66,8 +71,6 @@ const initChart = () => {
     labelFill: '#000000',
     labelFontSize: 15,
     titleFontSize: 16,
-    domainMin: 0,
-    nice: true,
     line: { style: { stroke: '#000000', lineWidth: 1 } }
   })
 
