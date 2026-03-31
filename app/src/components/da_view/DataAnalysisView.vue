@@ -34,13 +34,15 @@ import BilladmChartList from '@/components/da_view/BilladmChartList.vue'
 import BilladmChartView from '@/components/da_view/BilladmChartView.vue'
 import { useLedgerStore } from '@/stores/ledgerStore.ts'
 import { useTrQueryConditionStore } from '@/stores/trQueryConditionStore.ts'
+import { useAppDataStore } from '@/stores/appDataStore.ts'
 import { convertToUnixTimeRange } from '@/backend/timerange.ts'
 import { getTrOnCondition } from '@/backend/functions.ts'
 import { buildLineChartData, KEEP_CHART_CONFIGS, type ChartConfig, type TimeSeriesData } from '@/backend/chart'
-import type { TransactionRecord } from '@/types/billadm'
+import type { TransactionRecord, TrStatistics } from '@/types/billadm'
 
 const ledgerStore = useLedgerStore()
 const trQueryConditionStore = useTrQueryConditionStore()
+const appDataStore = useAppDataStore()
 
 interface ChartInstance {
   title: string
@@ -50,8 +52,8 @@ interface ChartInstance {
 const selectedChart = ref<ChartInstance | null>(null)
 
 // 查询交易记录
-const queryTrs = async (): Promise<TransactionRecord[]> => {
-  if (!ledgerStore.currentLedgerId) return []
+const queryTrs = async (): Promise<{ items: TransactionRecord[], trStatistics: TrStatistics | null }> => {
+  if (!ledgerStore.currentLedgerId) return { items: [], trStatistics: null }
   const trCondition = {
     ledgerId: ledgerStore.currentLedgerId,
     tsRange: trQueryConditionStore.timeRange
@@ -59,20 +61,23 @@ const queryTrs = async (): Promise<TransactionRecord[]> => {
       : undefined,
   }
   const result = await getTrOnCondition(trCondition)
-  return result.items || []
+  return { items: result.items || [], trStatistics: result.trStatistics || null }
 }
 
 // 加载图表数据
-const loadChartData = async (config: ChartConfig): Promise<ChartInstance> => {
-  const data = await queryTrs()
-  const chartData = buildLineChartData(data, {
+const loadChartData = async (config: ChartConfig): Promise<{ chartInstance: ChartInstance, trStatistics: TrStatistics | null }> => {
+  const { items, trStatistics } = await queryTrs()
+  const chartData = buildLineChartData(items, {
     granularity: config.granularity,
     lineDisplayTypes: config.lineDisplayTypes,
     includeOutlier: config.includeOutlier,
   })
   return {
-    title: config.title,
-    data: chartData,
+    chartInstance: {
+      title: config.title,
+      data: chartData,
+    },
+    trStatistics,
   }
 }
 
@@ -80,11 +85,18 @@ const loadChartData = async (config: ChartConfig): Promise<ChartInstance> => {
 const chartDataCache = ref<Map<string, ChartInstance>>(new Map())
 
 const loadAllChartData = async () => {
+  let statistics: TrStatistics | null = null
   const promises = KEEP_CHART_CONFIGS.map(async (config) => {
-    const chartInstance = await loadChartData(config)
+    const { chartInstance, trStatistics } = await loadChartData(config)
     chartDataCache.value.set(config.title, chartInstance)
+    if (trStatistics) statistics = trStatistics
   })
   await Promise.all(promises)
+
+  // 更新底部统计信息
+  if (statistics) {
+    appDataStore.setStatistics(statistics)
+  }
 
   // 初始化选中第一个图表，或更新当前选中图表的数据
   if (!selectedChart.value && KEEP_CHART_CONFIGS.length > 0) {
