@@ -40,6 +40,7 @@ const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
   try {
     await openWorkspace(newWorkspaceDir);
     await ledgerStore.refreshWorkspaceStatus();
+    window.electronAPI.setWorkspace(newWorkspaceDir);
     workspaceDir.value = ledgerStore.workspaceStatus.workspaceDir || '';
     await ledgerStore.init();
     NotificationUtil.success('切换工作空间成功');
