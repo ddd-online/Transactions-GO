@@ -1,70 +1,117 @@
 <template>
   <div class="data-import-export">
-    <div class="section">
-      <div class="section-title">数据导出</div>
-      <div class="section-desc">将一段时间内的消费记录导出为 JSON 文件</div>
+    <a-row :gutter="16">
+      <!-- 导出区域 -->
+      <a-col :span="12">
+        <a-card title="数据导出" :bordered="false" class="section-card">
+          <p class="section-desc">将一段时间内的消费记录导出为 JSON 文件</p>
 
-      <div class="export-form">
-        <div class="form-row">
-          <div class="form-item-half">
-            <div class="form-label">开始时间</div>
-            <a-date-picker v-model:value="exportStartTime" style="width: 100%" />
+          <a-form layout="vertical">
+            <a-row :gutter="8">
+              <a-col :span="12">
+                <a-form-item label="开始时间">
+                  <a-date-picker v-model:value="exportStartTime" style="width: 100%" />
+                </a-form-item>
+              </a-col>
+              <a-col :span="12">
+                <a-form-item label="结束时间">
+                  <a-date-picker v-model:value="exportEndTime" style="width: 100%" />
+                </a-form-item>
+              </a-col>
+            </a-row>
+          </a-form>
+
+          <div class="card-footer">
+            <a-button type="primary" :loading="exportLoading" @click="handleExport">
+              <template #icon>
+                <DownloadOutlined />
+              </template>
+              导出消费记录
+            </a-button>
           </div>
-          <div class="form-item-half">
-            <div class="form-label">结束时间</div>
-            <a-date-picker v-model:value="exportEndTime" style="width: 100%" />
+        </a-card>
+      </a-col>
+
+      <!-- 导入区域 -->
+      <a-col :span="12">
+        <a-card title="数据导入" :bordered="false" class="section-card">
+          <p class="section-desc">从 JSON 文件导入消费记录到当前账本</p>
+
+          <input
+            type="file"
+            ref="fileInputRef"
+            accept=".json"
+            style="display: none"
+            @change="handleFileChange"
+          />
+
+          <div class="card-footer">
+            <a-button type="primary" @click="handleImportSelect">
+              <template #icon>
+                <UploadOutlined />
+              </template>
+              选择文件导入
+            </a-button>
           </div>
-        </div>
-        <billadm-button type="primary" @click="handleExport">
-          <template #icon>
-            <DownloadOutlined />
-          </template>
-          导出消费记录
-        </billadm-button>
-      </div>
-    </div>
+        </a-card>
+      </a-col>
+    </a-row>
 
-    <a-divider />
-
-    <div class="section">
-      <div class="section-title">数据导入</div>
-      <div class="section-desc">从 JSON 文件导入消费记录到当前账本</div>
-
-      <div class="import-form">
-        <billadm-button type="primary" @click="handleImportSelect">
-          <template #icon>
-            <UploadOutlined />
-          </template>
-          选择文件导入
-        </billadm-button>
-        <input
-          type="file"
-          ref="fileInputRef"
-          accept=".json"
-          style="display: none"
-          @change="handleFileChange"
+    <!-- 导入预览弹窗 -->
+    <a-modal
+      v-model:open="importPreviewVisible"
+      title="导入预览"
+      width="900px"
+      :footer="null"
+      centered
+    >
+      <div class="import-preview">
+        <a-alert
+          :message="`共 ${importPreview.length} 条记录待导入`"
+          type="info"
+          show-icon
+          style="margin-bottom: 16px"
         />
-      </div>
 
-      <!-- 导入预览 -->
-      <div v-if="importPreview.length > 0" class="import-preview">
-        <div class="preview-header">
-          <span class="preview-title">导入预览 (共 {{ importPreview.length }} 条记录)</span>
-          <billadm-button type="text" size="small" @click="clearImportPreview">清除</billadm-button>
-        </div>
         <a-table
           :columns="previewColumns"
           :data-source="importPreview"
           :pagination="{ pageSize: 5 }"
           size="small"
-          :scroll="{ y: 200 }"
-        />
+          :scroll="{ y: 300 }"
+          row-key="transactionAt"
+        >
+          <template #bodyCell="{ column, record }">
+            <template v-if="column.dataIndex === 'transactionAt'">
+              {{ formatTimestamp(record.transactionAt) }}
+            </template>
+            <template v-else-if="column.dataIndex === 'transactionType'">
+              <a-tag :color="getTypeColor(record.transactionType)">
+                {{ getTypeLabel(record.transactionType) }}
+              </a-tag>
+            </template>
+            <template v-else-if="column.dataIndex === 'tags'">
+              <a-tag v-for="tag in record.tags" :key="tag" color="green">{{ tag }}</a-tag>
+            </template>
+            <template v-else-if="column.dataIndex === 'flags'">
+              <a-tag v-if="record.flags.includes('outlier')" color="orange">离群值</a-tag>
+            </template>
+            <template v-else-if="column.dataIndex === 'price'">
+              {{ formatPrice(record.price) }}
+            </template>
+          </template>
+        </a-table>
+
         <div class="preview-footer">
-          <billadm-button @click="clearImportPreview">取消</billadm-button>
-          <billadm-button type="primary" @click="confirmImport">确认导入</billadm-button>
+          <a-space>
+            <a-button @click="importPreviewVisible = false">取消</a-button>
+            <a-button type="primary" :loading="importLoading" @click="confirmImport">
+              确认导入
+            </a-button>
+          </a-space>
         </div>
       </div>
-    </div>
+    </a-modal>
   </div>
 </template>
 
@@ -82,10 +129,13 @@ const ledgerStore = useLedgerStore()
 // 导出相关
 const exportStartTime = ref<dayjs.Dayjs>(dayjs().startOf('month'))
 const exportEndTime = ref<dayjs.Dayjs>(dayjs().endOf('month'))
+const exportLoading = ref(false)
 
 // 导入相关
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const importPreview = ref<ExportRecord[]>([])
+const importPreviewVisible = ref(false)
+const importLoading = ref(false)
 
 interface ExportRecord {
   transactionAt: number
@@ -102,9 +152,36 @@ const previewColumns = [
   { title: '类型', dataIndex: 'transactionType', width: 80 },
   { title: '分类', dataIndex: 'category', width: 100 },
   { title: '标签', dataIndex: 'tags', width: 150 },
+  { title: '标记', dataIndex: 'flags', width: 80 },
   { title: '描述', dataIndex: 'description', ellipsis: true },
   { title: '价格', dataIndex: 'price', width: 100 },
 ]
+
+const formatTimestamp = (ts: number) => {
+  return dayjs(ts * 1000).format('YYYY-MM-DD')
+}
+
+const formatPrice = (cents: number) => {
+  return (cents / 100).toFixed(2)
+}
+
+const getTypeColor = (type: string) => {
+  const colorMap: Record<string, string> = {
+    income: 'green',
+    expense: 'red',
+    transfer: 'orange',
+  }
+  return colorMap[type] || 'blue'
+}
+
+const getTypeLabel = (type: string) => {
+  const labelMap: Record<string, string> = {
+    income: '收入',
+    expense: '支出',
+    transfer: '转账',
+  }
+  return labelMap[type] || type
+}
 
 const handleExport = async () => {
   if (!ledgerStore.currentLedgerId) {
@@ -116,6 +193,8 @@ const handleExport = async () => {
     message.warning('请选择导出时间范围')
     return
   }
+
+  exportLoading.value = true
 
   try {
     const startTs = exportStartTime.value.startOf('day').unix()
@@ -160,12 +239,14 @@ const handleExport = async () => {
     // 写入文件
     const writeResult = await window.electronAPI.writeFile(saveResult.filePath, jsonContent)
     if (writeResult.success) {
-      message.success(`已导出 ${exportData.length} 条消费记录到 ${saveResult.filePath}`)
+      message.success(`已导出 ${exportData.length} 条消费记录`)
     } else {
       message.error(`写入文件失败: ${writeResult.error}`)
     }
   } catch (error) {
     message.error(`导出失败: ${error}`)
+  } finally {
+    exportLoading.value = false
   }
 }
 
@@ -216,17 +297,14 @@ const handleFileChange = async (event: Event) => {
     }
 
     importPreview.value = validData
-    message.info(`已加载 ${validData.length} 条记录，请确认导入`)
+    importPreviewVisible.value = true
+    message.info(`已加载 ${validData.length} 条记录`)
   } catch (error) {
     message.error(`读取文件失败: ${error}`)
   }
 
   // 清空 input 值以便重复选择同一文件
   target.value = ''
-}
-
-const clearImportPreview = () => {
-  importPreview.value = []
 }
 
 const confirmImport = async () => {
@@ -239,6 +317,8 @@ const confirmImport = async () => {
     message.warning('没有可导入的记录')
     return
   }
+
+  importLoading.value = true
 
   try {
     const trList: TransactionRecord[] = importPreview.value.map(record => ({
@@ -255,84 +335,56 @@ const confirmImport = async () => {
 
     const count = await batchCreateTrForLedger(trList)
     message.success(`成功导入 ${count} 条消费记录`)
-    clearImportPreview()
+    importPreviewVisible.value = false
+    importPreview.value = []
   } catch (error) {
     message.error(`导入失败: ${error}`)
+  } finally {
+    importLoading.value = false
   }
 }
 </script>
 
 <style scoped>
 .data-import-export {
+  width: 100%;
+}
+
+.section-card {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
 }
 
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.section-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--billadm-color-text-major);
-}
-
-.section-desc {
-  font-size: 13px;
-  color: var(--billadm-color-text-minor);
-}
-
-.export-form,
-.import-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 8px;
-}
-
-.form-row {
-  display: flex;
-  gap: 16px;
-}
-
-.form-item-half {
+.section-card :deep(.ant-card-body) {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
 }
 
-.form-label {
-  font-size: 13px;
+.section-desc {
   color: var(--billadm-color-text-minor);
+  margin-bottom: 16px;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 16px;
 }
 
 .import-preview {
-  margin-top: 16px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-}
-
-.preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.preview-title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--billadm-color-text-major);
 }
 
 .preview-footer {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--billadm-color-window-border);
 }
 </style>
