@@ -27,6 +27,14 @@
           <CloudUploadOutlined class="settings-list-item-icon"/>
           <span class="settings-list-item-title">数据导入导出</span>
         </div>
+        <div
+            class="settings-list-item"
+            :class="{ active: activeComponent === 'template' }"
+            @click="activeComponent = 'template'"
+        >
+          <FileTextOutlined class="settings-list-item-icon"/>
+          <span class="settings-list-item-title">消费模板</span>
+        </div>
       </div>
     </div>
 
@@ -35,14 +43,16 @@
       <billadm-category-tag-setting v-if="activeComponent === 'category-tag'"/>
       <workspace-setting v-else-if="activeComponent === 'workspace'"/>
       <data-import-export-setting v-else-if="activeComponent === 'data-import-export'"/>
+      <billadm-template-setting v-else-if="activeComponent === 'template'"/>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {ref} from 'vue';
-import {CloudUploadOutlined, FolderOpenOutlined, TagOutlined} from "@ant-design/icons-vue";
+import {CloudUploadOutlined, FolderOpenOutlined, TagOutlined, FileTextOutlined} from "@ant-design/icons-vue";
 import WorkspaceSetting from './WorkspaceSetting.vue';
+import BilladmTemplateSetting from './BilladmTemplateSetting.vue';
 
 const activeComponent = ref('category-tag');
 </script>

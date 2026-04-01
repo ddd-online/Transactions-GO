@@ -52,13 +52,14 @@ interface ChartInstance {
 const selectedChart = ref<ChartInstance | null>(null)
 
 // 查询交易记录
-const queryTrs = async (): Promise<{ items: TransactionRecord[], trStatistics: TrStatistics | null }> => {
+const queryTrs = async (conditions: ChartConfig['conditions'] = []): Promise<{ items: TransactionRecord[], trStatistics: TrStatistics | null }> => {
   if (!ledgerStore.currentLedgerId) return { items: [], trStatistics: null }
   const trCondition = {
     ledgerId: ledgerStore.currentLedgerId,
     tsRange: trQueryConditionStore.timeRange
       ? convertToUnixTimeRange(trQueryConditionStore.timeRange)
       : undefined,
+    items: conditions,
   }
   const result = await getTrOnCondition(trCondition)
   return { items: result.items || [], trStatistics: result.trStatistics || null }
@@ -66,7 +67,7 @@ const queryTrs = async (): Promise<{ items: TransactionRecord[], trStatistics: T
 
 // 加载图表数据
 const loadChartData = async (config: ChartConfig): Promise<{ chartInstance: ChartInstance, trStatistics: TrStatistics | null }> => {
-  const { items, trStatistics } = await queryTrs()
+  const { items, trStatistics } = await queryTrs(config.conditions)
   const chartData = buildLineChartData(items, {
     granularity: config.granularity,
     lineDisplayTypes: config.lineDisplayTypes,

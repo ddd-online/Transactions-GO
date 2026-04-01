@@ -118,3 +118,17 @@ type TimeRangeTypeValue = 'date' | 'month' | 'year';
 type TimeRangeTypeLabel = '日' | '月' | '年';
 
 type TransactionType = 'income' | 'expense' | 'transfer';
+
+/**
+ * 消费记录模板
+ */
+export interface TransactionTemplate {
+    template_id: string;
+    ledger_id: string;
+    template_name: string;
+    transaction_type: string;
+    category: string;
+    tags: string[];
+    flags: string;
+    description: string;
+}

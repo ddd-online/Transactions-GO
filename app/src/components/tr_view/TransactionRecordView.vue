@@ -43,6 +43,14 @@
       @cancel="closeTrModal" cancel-text="取消" centered>
 
       <a-form :model="trForm" :rules="rules">
+        <a-form-item label="模板">
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <a-select v-model:value="selectedTemplateId" :options="templateOptions" placeholder="选择模板自动填充"
+              style="flex: 1;" allowClear />
+            <a-button @click="saveAsTemplate" :disabled="!trForm.type || !trForm.category">保存为模板</a-button>
+          </div>
+        </a-form-item>
+
         <a-form-item label="时间" name="time">
           <a-date-picker v-model:value="trForm.time" style="width: 100%" />
         </a-form-item>
@@ -76,13 +84,23 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <!-- 保存模板弹窗 -->
+    <a-modal v-model:open="openSaveTemplateModal" title="保存为模板" @ok="confirmSaveTemplate" ok-text="保存"
+      cancel-text="取消" centered>
+      <a-form>
+        <a-form-item label="模板名称">
+          <a-input v-model:value="templateName" placeholder="请输入模板名称" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import TransactionRecordTable from '@/components/tr_view/TransactionRecordTable.vue';
-import type { TransactionRecord, TrForm, TrQueryCondition } from "@/types/billadm";
+import type { TransactionRecord, TrForm, TrQueryCondition, TransactionTemplate } from "@/types/billadm";
 import { convertToUnixTimeRange } from "@/backend/timerange.ts";
 import {
   createTransactionRecord,
@@ -90,7 +108,9 @@ import {
   getCategoryByType,
   getTagsByCategory,
   getTrOnCondition,
-  updateTransactionRecord
+  updateTransactionRecord,
+  getTemplatesByLedgerId,
+  saveTemplate
 } from "@/backend/functions.ts";
 import { useLedgerStore } from "@/stores/ledgerStore.ts";
 import { useTrQueryConditionStore } from "@/stores/trQueryConditionStore.ts";
@@ -138,18 +158,27 @@ const categories = ref<DefaultOptionType[]>([]);
 const tags = ref<DefaultOptionType[]>([]);
 const flagOptions = [{ label: '离群值', value: 'outlier' }];
 
+// 模板相关状态
+const templates = ref<TransactionTemplate[]>([]);
+const templateOptions = ref<DefaultOptionType[]>([]);
+const selectedTemplateId = ref<string | undefined>();
+const openSaveTemplateModal = ref(false);
+const templateName = ref('');
+
 const createTr = () => {
   trForm.value.type = 'expense';
   if (trQueryConditionStore.timeRange) {
     trForm.value.time = trQueryConditionStore.timeRange[1];
   }
   trModalTitle.value = '新增消费记录';
+  selectedTemplateId.value = undefined; // 清空模板选择
   openTrModal.value = true;
 };
 
 const updateTr = (tr: TransactionRecord) => {
   trModalTitle.value = '编辑消费记录';
   trForm.value = trDtoToTrForm(tr);
+  selectedTemplateId.value = undefined; // 清空模板选择（编辑时不应使用模板）
   openTrModal.value = true;
 };
 
@@ -237,6 +266,57 @@ watch(() => trForm.value.category, async () => {
     trForm.value.tags = [];
   }
 });
+
+// 加载模板列表
+const loadTemplates = async () => {
+  if (!ledgerStore.currentLedgerId) return;
+  templates.value = await getTemplatesByLedgerId(ledgerStore.currentLedgerId);
+  templateOptions.value = templates.value.map(t => ({
+    value: t.template_id,
+    label: t.template_name
+  }));
+};
+
+// 模板选择监听 - 应用模板到表单
+watch(selectedTemplateId, (newId) => {
+  if (!newId) return;
+  const template = templates.value.find(t => t.template_id === newId);
+  if (!template) return;
+  trForm.value.type = template.transaction_type;
+  trForm.value.category = template.category;
+  trForm.value.tags = [...template.tags];
+  trForm.value.flags = template.flags ? [template.flags] : [];
+  trForm.value.description = template.description;
+});
+
+// 保存为模板
+const saveAsTemplate = () => {
+  templateName.value = '';
+  openSaveTemplateModal.value = true;
+};
+
+// 确认保存模板
+const confirmSaveTemplate = async () => {
+  if (!templateName.value.trim()) return;
+  if (!ledgerStore.currentLedgerId) return;
+  const data = {
+    ledger_id: ledgerStore.currentLedgerId,
+    template_name: templateName.value.trim(),
+    transaction_type: trForm.value.type,
+    category: trForm.value.category,
+    tags: trForm.value.tags,
+    flags: trForm.value.flags.join(','),
+    description: trForm.value.description,
+  };
+  await saveTemplate(data);
+  openSaveTemplateModal.value = false;
+  await loadTemplates();
+};
+
+// 监听账本变化，加载模板
+watch(() => ledgerStore.currentLedgerId, () => {
+  loadTemplates();
+}, { immediate: true });
 </script>
 
 <style scoped>

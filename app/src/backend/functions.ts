@@ -4,6 +4,8 @@ import {createTrForLedger, deleteTrById, queryTrOnCondition} from "@/backend/api
 import NotificationUtil from "@/backend/notification.ts";
 import {queryCategory} from "@/backend/api/category.ts";
 import {queryTags} from "@/backend/api/tag.ts";
+import {createTemplate, queryTemplates, deleteTemplate} from "@/backend/api/template.ts";
+import type {TransactionTemplateDto} from "@/backend/api/template.ts";
 
 export function centsToYuan(cents: number): string {
     // 确保是整数
@@ -114,5 +116,34 @@ export async function getTagsByCategory(categoryTransactionType: string): Promis
     } catch (error) {
         NotificationUtil.error(`查询 ${categoryTransactionType} 消费标签失败`, `${error}`);
         return [];
+    }
+}
+
+/**
+ * 模板
+ */
+export async function getTemplatesByLedgerId(ledgerId: string) {
+    try {
+        return await queryTemplates(ledgerId);
+    } catch (error) {
+        NotificationUtil.error('查询模板失败', `${error}`);
+        return [];
+    }
+}
+
+export async function saveTemplate(data: TransactionTemplateDto) {
+    try {
+        return await createTemplate(data);
+    } catch (error) {
+        NotificationUtil.error('保存模板失败', `${error}`);
+        return null;
+    }
+}
+
+export async function removeTemplate(templateId: string) {
+    try {
+        await deleteTemplate(templateId);
+    } catch (error) {
+        NotificationUtil.error('删除模板失败', `${error}`);
     }
 }

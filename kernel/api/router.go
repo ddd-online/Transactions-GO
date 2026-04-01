@@ -33,6 +33,14 @@ func ServeAPI(ginServer *gin.Engine) {
 			transactions.DELETE("/:id", deleteTransaction)
 		}
 
+		// Templates
+		templates := v1.Group("/templates")
+		{
+			templates.POST("", createTemplate)
+			templates.GET("", listTemplates)
+			templates.DELETE("/:id", deleteTemplate)
+		}
+
 		// Categories: GET by type query param
 		v1.GET("/categories", listCategories)
 
