@@ -33,6 +33,7 @@ type CategoryService interface {
 	QueryCategory(ws *workspace.Workspace, trType string) ([]models.Category, error)
 	CreateCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error
 	DeleteCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error
+	UpdateCategorySort(ws *workspace.Workspace, name string, transactionType string, sortOrder int) error
 }
 
 var _ CategoryService = &categoryServiceImpl{}
@@ -55,9 +56,17 @@ func (c *categoryServiceImpl) QueryCategory(ws *workspace.Workspace, trType stri
 func (c *categoryServiceImpl) CreateCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error {
 	logrus.Infof("start to create category, ledger id: %s, name: %s, type: %s", ledgerId, name, transactionType)
 
+	// Get max sort order for this transaction type
+	maxSortOrder, err := c.categoryDao.GetMaxSortOrder(ws, transactionType)
+	if err != nil {
+		logrus.Errorf("get max sort order failed: %v", err)
+		return err
+	}
+
 	category := &models.Category{
 		Name:            name,
 		TransactionType: transactionType,
+		SortOrder:       maxSortOrder + 1,
 	}
 
 	if err := c.categoryDao.CreateCategory(ws, category); err != nil {
@@ -98,5 +107,17 @@ func (c *categoryServiceImpl) DeleteCategory(ws *workspace.Workspace, ledgerId s
 	}
 
 	logrus.Infof("delete category success, ledger id: %s, name: %s", ledgerId, name)
+	return nil
+}
+
+func (c *categoryServiceImpl) UpdateCategorySort(ws *workspace.Workspace, name string, transactionType string, sortOrder int) error {
+	logrus.Infof("start to update category sort, name: %s, type: %s, sortOrder: %d", name, transactionType, sortOrder)
+
+	if err := c.categoryDao.UpdateCategorySort(ws, name, transactionType, sortOrder); err != nil {
+		logrus.Errorf("update category sort failed: %v", err)
+		return err
+	}
+
+	logrus.Infof("update category sort success, name: %s", name)
 	return nil
 }

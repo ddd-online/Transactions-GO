@@ -94,3 +94,30 @@ func deleteTag(c *gin.Context) {
 		return
 	}
 }
+
+// PATCH /tags/:name/sort
+func updateTagSort(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	name := c.Param("name")
+	var req dto.UpdateTagSortRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ret.Code = -1
+		ret.Msg = "Invalid request: " + err.Error()
+		return
+	}
+
+	if err := service.GetTagService().UpdateTagSort(ws, name, req.CategoryTransactionType, req.SortOrder); err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+}

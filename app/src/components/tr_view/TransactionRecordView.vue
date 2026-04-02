@@ -120,6 +120,7 @@ import { trDtoToTrForm, trFormToTrDto } from "@/backend/dto-utils.ts";
 import type { DefaultOptionType } from "ant-design-vue/es/vc-cascader";
 import type { Rule } from "ant-design-vue/es/form";
 import { FilterOutlined, PlusOutlined } from "@ant-design/icons-vue";
+import { message } from "ant-design-vue";
 
 const ledgerStore = useLedgerStore();
 const trQueryConditionStore = useTrQueryConditionStore();
@@ -308,9 +309,12 @@ const confirmSaveTemplate = async () => {
     flags: trForm.value.flags.join(','),
     description: trForm.value.description,
   };
-  await saveTemplate(data);
-  openSaveTemplateModal.value = false;
-  await loadTemplates();
+  const result = await saveTemplate(data);
+  if (result) {
+    message.success('保存模板成功');
+    openSaveTemplateModal.value = false;
+    await loadTemplates();
+  }
 };
 
 // 监听账本变化，加载模板

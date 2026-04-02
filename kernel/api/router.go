@@ -45,11 +45,13 @@ func ServeAPI(ginServer *gin.Engine) {
 		v1.GET("/categories", listCategories)
 		v1.POST("/categories", createCategory)
 		v1.DELETE("/categories/:name", deleteCategory)
+		v1.PATCH("/categories/:name/sort", updateCategorySort)
 
 		// Tags: GET by category query param
 		v1.GET("/tags", listTags)
 		v1.POST("/tags", createTag)
 		v1.DELETE("/tags/:name", deleteTag)
+		v1.PATCH("/tags/:name/sort", updateTagSort)
 
 		// Workspace
 		workspace := v1.Group("/workspace")

@@ -3,6 +3,7 @@ package models
 type Category struct {
 	Name            string `gorm:"primaryKey;comment:消费类型" json:"name"`
 	TransactionType string `gorm:"not null;comment:交易类型" json:"transaction_type"`
+	SortOrder       int    `gorm:"default:0;comment:排序顺序" json:"sort_order"`
 }
 
 func (tr *Category) TableName() string {

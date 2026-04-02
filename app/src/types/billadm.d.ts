@@ -60,6 +60,7 @@ export interface TransactionRecord {
 export interface Category {
     name: string;
     transactionType: string;
+    sortOrder?: number;
 }
 
 /**
@@ -68,6 +69,7 @@ export interface Category {
 export interface Tag {
     name: string;                      // 标签名称
     categoryTransactionType: string;  // 分类:交易类型，格式如"餐饮:支出"
+    sortOrder?: number;
 }
 
 /**

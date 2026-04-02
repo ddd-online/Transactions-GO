@@ -12,3 +12,7 @@ export async function createTag(name: string, categoryTransactionType: string): 
 export async function deleteTag(name: string, categoryTransactionType: string, ledgerId: string): Promise<void> {
     await api.delete<void>(`/v1/tags/${encodeURIComponent(name)}?categoryTransactionType=${encodeURIComponent(categoryTransactionType)}&ledgerId=${encodeURIComponent(ledgerId)}`, '删除标签');
 }
+
+export async function updateTagSort(name: string, categoryTransactionType: string, sortOrder: number): Promise<void> {
+    await api.patch<void>(`/v1/tags/${encodeURIComponent(name)}/sort`, { categoryTransactionType, sortOrder }, '更新标签排序');
+}

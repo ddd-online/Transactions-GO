@@ -11,16 +11,26 @@
       </div>
       <div class="category-list">
         <div
-            v-for="category in categories"
+            v-for="(category, index) in categories"
             :key="category.name"
             class="category-item"
             :class="{ 'category-item-active': selectedCategory === category.name }"
             @click="selectCategory(category.name)"
         >
           <span class="category-name">{{ category.name }}</span>
-          <a-popconfirm title="确定要删除该分类及其所有标签吗？" @confirm="handleDeleteCategory(category.name)" ok-text="确定" cancel-text="取消">
-            <DeleteOutlined class="category-delete-btn" @click.stop />
-          </a-popconfirm>
+          <span class="category-actions">
+            <button class="action-btn" @click.stop="moveCategory(index, -1)" :class="{ 'disabled': index === 0 }" :disabled="index === 0">
+              <UpOutlined />
+            </button>
+            <button class="action-btn" @click.stop="moveCategory(index, 1)" :class="{ 'disabled': index === categories.length - 1 }" :disabled="index === categories.length - 1">
+              <DownOutlined />
+            </button>
+            <a-popconfirm title="确定要删除该分类及其所有标签吗？" @confirm="handleDeleteCategory(category.name)" ok-text="确定" cancel-text="取消">
+              <button class="action-btn delete-btn" @click.stop>
+                <DeleteOutlined />
+              </button>
+            </a-popconfirm>
+          </span>
         </div>
       </div>
     </div>
@@ -38,11 +48,21 @@
         </a-button>
       </div>
       <div class="tag-list" v-if="selectedTags.length > 0">
-        <div class="tag-grid">
-          <div v-for="tag in selectedTags" :key="tag.name" class="tag-item">
-            {{ tag.name }}
-            <CloseOutlined class="tag-delete-btn" @click="handleDeleteTag(tag.name)" />
-          </div>
+        <div v-for="(tag, index) in selectedTags" :key="tag.name" class="tag-row">
+          <span class="tag-name">{{ tag.name }}</span>
+          <span class="tag-actions">
+            <button class="action-btn" @click="moveTag(index, -1)" :class="{ 'disabled': index === 0 }" :disabled="index === 0">
+              <UpOutlined />
+            </button>
+            <button class="action-btn" @click="moveTag(index, 1)" :class="{ 'disabled': index === selectedTags.length - 1 }" :disabled="index === selectedTags.length - 1">
+              <DownOutlined />
+            </button>
+            <a-popconfirm title="确定要删除该标签吗？" @confirm="handleDeleteTag(tag.name)" ok-text="确定" cancel-text="取消">
+              <button class="action-btn delete-btn" @click.stop>
+                <DeleteOutlined />
+              </button>
+            </a-popconfirm>
+          </span>
         </div>
       </div>
       <div class="empty-state" v-else>
@@ -72,10 +92,10 @@
 
 <script lang="ts" setup>
 import {ref, watch} from 'vue';
-import type {TransactionType} from '@/types/billadm';
+import type {TransactionType, Category, Tag} from '@/types/billadm';
 import {useLedgerStore} from '@/stores/ledgerStore';
-import {getCategoryByType, getTagsByCategory, addCategory, removeCategory, addTag, removeTag} from '@/backend/functions';
-import {PlusOutlined, DeleteOutlined, CloseOutlined} from "@ant-design/icons-vue";
+import {getCategoryByType, getTagsByCategory, addCategory, removeCategory, addTag, removeTag, reorderCategory, reorderTag} from '@/backend/functions';
+import {PlusOutlined, DeleteOutlined, UpOutlined, DownOutlined} from "@ant-design/icons-vue";
 import {message} from "ant-design-vue";
 import type {Rule} from "ant-design-vue/es/form";
 
@@ -88,14 +108,13 @@ const props = defineProps<Props>();
 
 const ledgerStore = useLedgerStore();
 
-interface CategoryWithTags {
-  name: string;
-  tags: { name: string }[];
+interface CategoryWithTags extends Category {
+  tags: Tag[];
 }
 
 const categories = ref<CategoryWithTags[]>([]);
 const selectedCategory = ref<string>('');
-const selectedTags = ref<{ name: string }[]>([]);
+const selectedTags = ref<Tag[]>([]);
 
 // 添加分类弹窗
 const openCategoryModal = ref(false);
@@ -171,6 +190,27 @@ const handleDeleteCategory = async (name: string) => {
   }
 };
 
+// 移动分类
+const moveCategory = async (index: number, direction: number) => {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= categories.value.length) return;
+
+  const category = categories.value[index];
+  const targetCategory = categories.value[newIndex];
+  if (!category || !targetCategory) return;
+
+  const categorySortOrder = category.sortOrder || 0;
+  const targetSortOrder = targetCategory.sortOrder || 0;
+
+  try {
+    await reorderCategory(category.name, props.transactionType, targetSortOrder);
+    await reorderCategory(targetCategory.name, props.transactionType, categorySortOrder);
+    await loadCategories();
+  } catch {
+    // error already shown in reorderCategory
+  }
+};
+
 // 打开添加标签弹窗
 const openAddTagModal = () => {
   tagForm.value.name = '';
@@ -210,10 +250,34 @@ const handleDeleteTag = async (name: string) => {
   }
 };
 
+// 移动标签
+const moveTag = async (index: number, direction: number) => {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= selectedTags.value.length) return;
+
+  const tag = selectedTags.value[index];
+  const targetTag = selectedTags.value[newIndex];
+  if (!tag || !targetTag) return;
+
+  const categoryTransactionType = `${selectedCategory.value}:${props.transactionType}`;
+
+  const tagSortOrder = tag.sortOrder || 0;
+  const targetSortOrder = targetTag.sortOrder || 0;
+
+  try {
+    await reorderTag(tag.name, categoryTransactionType, targetSortOrder);
+    await reorderTag(targetTag.name, categoryTransactionType, tagSortOrder);
+    await loadCategories();
+    selectCategory(selectedCategory.value);
+  } catch {
+    // error already shown in reorderTag
+  }
+};
+
 // 加载分类数据
 const loadCategories = async () => {
   const categoryList = await getCategoryByType(props.transactionType);
-  categories.value = categoryList.map(c => ({name: c.name, tags: []}));
+  categories.value = categoryList.map(c => ({name: c.name, transactionType: c.transactionType, sortOrder: c.sortOrder, tags: []}));
 
   // 加载所有分类的标签
   for (const category of categories.value) {
@@ -250,7 +314,7 @@ watch(
 }
 
 .panel-sidebar {
-  width: 200px;
+  width: 280px;
   flex-shrink: 0;
   background-color: var(--billadm-color-minor-background);
   border-right: 1px solid var(--billadm-color-window-border);
@@ -299,16 +363,18 @@ watch(
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-right: 8px;
 }
 
-.category-delete-btn {
+.category-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   opacity: 0;
-  color: #ff4d4f;
-  font-size: 12px;
   transition: opacity 0.2s;
 }
 
-.category-item:hover .category-delete-btn {
+.category-item:hover .category-actions {
   opacity: 1;
 }
 
@@ -344,35 +410,71 @@ watch(
   min-height: 0;
 }
 
-.tag-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
-  gap: 12px;
-}
-
-.tag-item {
-  padding: 8px 12px;
-  text-align: center;
-  background-color: var(--billadm-color-minor-background);
-  border-radius: 4px;
-  color: var(--billadm-color-text-major);
-  font-size: 14px;
+.tag-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 4px;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background-color: var(--billadm-color-minor-background);
+  border-radius: 4px;
+  margin-bottom: 8px;
 }
 
-.tag-delete-btn {
+.tag-name {
+  flex: 1;
+  font-size: 14px;
+  color: var(--billadm-color-text-major);
+}
+
+.tag-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   opacity: 0;
-  color: #ff4d4f;
-  font-size: 10px;
   transition: opacity 0.2s;
-  cursor: pointer;
 }
 
-.tag-item:hover .tag-delete-btn {
+.tag-row:hover .tag-actions {
   opacity: 1;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--billadm-color-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover:not(.disabled) {
+  color: v-bind('props.activeColor');
+  background-color: var(--billadm-color-icon-hover-bg);
+  border-color: v-bind('props.activeColor');
+}
+
+.action-btn.disabled {
+  color: var(--billadm-color-text-disabled, #ccc);
+  cursor: not-allowed;
+  border-color: transparent;
+  background: transparent;
+}
+
+.action-btn.delete-btn {
+  color: #ff4d4f;
+  border-color: transparent;
+}
+
+.action-btn.delete-btn:hover {
+  color: #fff;
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
 }
 
 .empty-state {

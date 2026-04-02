@@ -94,3 +94,30 @@ func deleteCategory(c *gin.Context) {
 		return
 	}
 }
+
+// PATCH /categories/:name/sort
+func updateCategorySort(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	name := c.Param("name")
+	var req dto.UpdateCategorySortRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ret.Code = -1
+		ret.Msg = "Invalid request: " + err.Error()
+		return
+	}
+
+	if err := service.GetCategoryService().UpdateCategorySort(ws, name, req.TransactionType, req.SortOrder); err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+}

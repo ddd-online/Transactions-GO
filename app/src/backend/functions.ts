@@ -2,8 +2,8 @@ import dayjs from "dayjs";
 import type {Category, Tag, TransactionRecord, TrQueryCondition, TrQueryResult} from "@/types/billadm";
 import {createTrForLedger, deleteTrById, queryTrOnCondition} from "@/backend/api/tr.ts";
 import NotificationUtil from "@/backend/notification.ts";
-import {queryCategory, createCategory, deleteCategory} from "@/backend/api/category.ts";
-import {queryTags, createTag, deleteTag} from "@/backend/api/tag.ts";
+import {queryCategory, createCategory, deleteCategory, updateCategorySort} from "@/backend/api/category.ts";
+import {queryTags, createTag, deleteTag, updateTagSort} from "@/backend/api/tag.ts";
 import {createTemplate, queryTemplates, deleteTemplate} from "@/backend/api/template.ts";
 import type {TransactionTemplateDto} from "@/backend/api/template.ts";
 
@@ -192,6 +192,30 @@ export async function removeTag(name: string, categoryTransactionType: string, l
         await deleteTag(name, categoryTransactionType, ledgerId);
     } catch (error) {
         NotificationUtil.error('删除标签失败', `${error}`);
+        throw error;
+    }
+}
+
+/**
+ * 更新分类排序
+ */
+export async function reorderCategory(name: string, transactionType: string, sortOrder: number) {
+    try {
+        await updateCategorySort(name, transactionType, sortOrder);
+    } catch (error) {
+        NotificationUtil.error('更新分类排序失败', `${error}`);
+        throw error;
+    }
+}
+
+/**
+ * 更新标签排序
+ */
+export async function reorderTag(name: string, categoryTransactionType: string, sortOrder: number) {
+    try {
+        await updateTagSort(name, categoryTransactionType, sortOrder);
+    } catch (error) {
+        NotificationUtil.error('更新标签排序失败', `${error}`);
         throw error;
     }
 }

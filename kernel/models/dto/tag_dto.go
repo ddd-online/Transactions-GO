@@ -3,21 +3,31 @@ package dto
 import "github.com/billadm/models"
 
 type TagDto struct {
-	Name                      string `json:"name"`
-	CategoryTransactionType   string `json:"categoryTransactionType"`
+	Name                    string `json:"name"`
+	CategoryTransactionType string `json:"categoryTransactionType"`
+	SortOrder               int    `json:"sortOrder"`
 }
 
 type CreateTagRequest struct {
 	Name                   string `json:"name"`
 	CategoryTransactionType string `json:"categoryTransactionType"`
+	SortOrder              int    `json:"sortOrder"`
+}
+
+type UpdateTagSortRequest struct {
+	LedgerID               string `json:"ledgerId"`
+	Name                   string `json:"name"`
+	CategoryTransactionType string `json:"categoryTransactionType"`
+	SortOrder              int    `json:"sortOrder"`
 }
 
 // ToTag 将 TagDto 转换为 Tag
 // 用于将前端传入的数据保存到数据库
 func (dto *TagDto) ToTag() *models.Tag {
 	return &models.Tag{
-		Name:                      dto.Name,
-		CategoryTransactionType:   dto.CategoryTransactionType,
+		Name:                    dto.Name,
+		CategoryTransactionType: dto.CategoryTransactionType,
+		SortOrder:               dto.SortOrder,
 	}
 }
 
@@ -26,4 +36,5 @@ func (dto *TagDto) ToTag() *models.Tag {
 func (dto *TagDto) FromTag(tag *models.Tag) {
 	dto.Name = tag.Name
 	dto.CategoryTransactionType = tag.CategoryTransactionType
+	dto.SortOrder = tag.SortOrder
 }

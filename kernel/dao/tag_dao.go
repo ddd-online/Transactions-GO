@@ -28,6 +28,8 @@ type TagDao interface {
 	CreateTag(ws *workspace.Workspace, tag *models.Tag) error
 	DeleteTag(ws *workspace.Workspace, name string, categoryTransactionType string) error
 	DeleteTagsByCategory(ws *workspace.Workspace, categoryTransactionType string) error
+	UpdateTagSort(ws *workspace.Workspace, name string, categoryTransactionType string, sortOrder int) error
+	GetMaxSortOrder(ws *workspace.Workspace, categoryTransactionType string) (int, error)
 }
 
 var _ TagDao = &TagDaoImpl{}
@@ -40,7 +42,7 @@ func (t *TagDaoImpl) QueryTags(ws *workspace.Workspace, categoryTransactionType 
 	if categoryTransactionType != constant.All {
 		db = db.Where("category_transaction_type = ?", categoryTransactionType)
 	}
-	if err := db.Order("name DESC").Find(&tags).Error; err != nil {
+	if err := db.Order("sort_order ASC, name DESC").Find(&tags).Error; err != nil {
 		return nil, err
 	}
 
@@ -70,4 +72,26 @@ func (t *TagDaoImpl) DeleteTagsByCategory(ws *workspace.Workspace, categoryTrans
 		return err
 	}
 	return nil
+}
+
+func (t *TagDaoImpl) UpdateTagSort(ws *workspace.Workspace, name string, categoryTransactionType string, sortOrder int) error {
+	if err := ws.GetDb().
+		Model(&models.Tag{}).
+		Where("name = ? AND category_transaction_type = ?", name, categoryTransactionType).
+		Update("sort_order", sortOrder).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (t *TagDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, categoryTransactionType string) (int, error) {
+	var maxSortOrder int
+	err := ws.GetDb().Model(&models.Tag{}).
+		Where("category_transaction_type = ?", categoryTransactionType).
+		Select("COALESCE(MAX(sort_order), 0)").
+		Scan(&maxSortOrder).Error
+	if err != nil {
+		return 0, err
+	}
+	return maxSortOrder, nil
 }

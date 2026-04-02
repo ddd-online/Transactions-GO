@@ -28,6 +28,8 @@ type CategoryDao interface {
 	CreateCategory(ws *workspace.Workspace, category *models.Category) error
 	DeleteCategory(ws *workspace.Workspace, name string, transactionType string) error
 	IsCategoryInUse(ws *workspace.Workspace, ledgerId string, category string) (bool, error)
+	UpdateCategorySort(ws *workspace.Workspace, name string, transactionType string, sortOrder int) error
+	GetMaxSortOrder(ws *workspace.Workspace, transactionType string) (int, error)
 }
 
 var _ CategoryDao = &categoryDaoImpl{}
@@ -41,7 +43,7 @@ func (c *categoryDaoImpl) QueryCategory(ws *workspace.Workspace, trType string) 
 		db = db.Where("transaction_type = ?", trType)
 	}
 
-	if err := db.Order("name DESC").Find(&categories).Error; err != nil {
+	if err := db.Order("sort_order ASC, name DESC").Find(&categories).Error; err != nil {
 		return nil, err
 	}
 	return categories, nil
@@ -72,4 +74,26 @@ func (c *categoryDaoImpl) IsCategoryInUse(ws *workspace.Workspace, ledgerId stri
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func (c *categoryDaoImpl) UpdateCategorySort(ws *workspace.Workspace, name string, transactionType string, sortOrder int) error {
+	if err := ws.GetDb().
+		Model(&models.Category{}).
+		Where("name = ? AND transaction_type = ?", name, transactionType).
+		Update("sort_order", sortOrder).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (c *categoryDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, transactionType string) (int, error) {
+	var maxSortOrder int
+	err := ws.GetDb().Model(&models.Category{}).
+		Where("transaction_type = ?", transactionType).
+		Select("COALESCE(MAX(sort_order), 0)").
+		Scan(&maxSortOrder).Error
+	if err != nil {
+		return 0, err
+	}
+	return maxSortOrder, nil
 }

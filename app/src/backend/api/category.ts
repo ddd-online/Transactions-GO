@@ -12,3 +12,7 @@ export async function createCategory(ledgerId: string, name: string, transaction
 export async function deleteCategory(name: string, transactionType: string, ledgerId: string): Promise<void> {
     await api.delete<void>(`/v1/categories/${encodeURIComponent(name)}?type=${encodeURIComponent(transactionType)}&ledgerId=${encodeURIComponent(ledgerId)}`, '删除分类');
 }
+
+export async function updateCategorySort(name: string, transactionType: string, sortOrder: number): Promise<void> {
+    await api.patch<void>(`/v1/categories/${encodeURIComponent(name)}/sort`, { transactionType, sortOrder }, '更新分类排序');
+}
