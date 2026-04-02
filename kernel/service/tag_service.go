@@ -30,6 +30,8 @@ func GetTagService() TagService {
 
 type TagService interface {
 	QueryTags(ws *workspace.Workspace, categoryTransactionType string) ([]models.Tag, error)
+	CreateTag(ws *workspace.Workspace, name string, categoryTransactionType string) error
+	DeleteTag(ws *workspace.Workspace, ledgerId string, name string, categoryTransactionType string) error
 }
 
 var _ TagService = &tagServiceImpl{}
@@ -47,4 +49,41 @@ func (t *tagServiceImpl) QueryTags(ws *workspace.Workspace, categoryTransactionT
 
 	logrus.Infof("query tag success, length: %v", tags)
 	return tags, nil
+}
+
+func (t *tagServiceImpl) CreateTag(ws *workspace.Workspace, name string, categoryTransactionType string) error {
+	logrus.Infof("start to create tag, name: %s, category: %s", name, categoryTransactionType)
+
+	tag := &models.Tag{
+		Name:                   name,
+		CategoryTransactionType: categoryTransactionType,
+	}
+
+	if err := t.tagDao.CreateTag(ws, tag); err != nil {
+		logrus.Errorf("create tag failed: %v", err)
+		return err
+	}
+
+	logrus.Infof("create tag success, name: %s", name)
+	return nil
+}
+
+func (t *tagServiceImpl) DeleteTag(ws *workspace.Workspace, ledgerId string, name string, categoryTransactionType string) error {
+	logrus.Infof("start to delete tag, ledger id: %s, name: %s", ledgerId, name)
+
+	// Delete TrTag entries that use this tag
+	trTagDao := dao.GetTrTagDao()
+	if err := trTagDao.DeleteTrTagByTag(ws, ledgerId, name); err != nil {
+		logrus.Errorf("delete tr tags failed: %v", err)
+		return err
+	}
+
+	// Delete the tag
+	if err := t.tagDao.DeleteTag(ws, name, categoryTransactionType); err != nil {
+		logrus.Errorf("delete tag failed: %v", err)
+		return err
+	}
+
+	logrus.Infof("delete tag success, ledger id: %s, name: %s", ledgerId, name)
+	return nil
 }

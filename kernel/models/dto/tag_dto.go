@@ -7,6 +7,11 @@ type TagDto struct {
 	CategoryTransactionType   string `json:"categoryTransactionType"`
 }
 
+type CreateTagRequest struct {
+	Name                   string `json:"name"`
+	CategoryTransactionType string `json:"categoryTransactionType"`
+}
+
 // ToTag 将 TagDto 转换为 Tag
 // 用于将前端传入的数据保存到数据库
 func (dto *TagDto) ToTag() *models.Tag {

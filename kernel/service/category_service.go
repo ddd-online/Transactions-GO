@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/billadm/dao"
@@ -30,6 +31,8 @@ func GetCategoryService() CategoryService {
 
 type CategoryService interface {
 	QueryCategory(ws *workspace.Workspace, trType string) ([]models.Category, error)
+	CreateCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error
+	DeleteCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error
 }
 
 var _ CategoryService = &categoryServiceImpl{}
@@ -47,4 +50,53 @@ func (c *categoryServiceImpl) QueryCategory(ws *workspace.Workspace, trType stri
 
 	logrus.Infof("query category success, length: %v", categories)
 	return categories, nil
+}
+
+func (c *categoryServiceImpl) CreateCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error {
+	logrus.Infof("start to create category, ledger id: %s, name: %s, type: %s", ledgerId, name, transactionType)
+
+	category := &models.Category{
+		Name:            name,
+		TransactionType: transactionType,
+	}
+
+	if err := c.categoryDao.CreateCategory(ws, category); err != nil {
+		logrus.Errorf("create category failed: %v", err)
+		return err
+	}
+
+	logrus.Infof("create category success, ledger id: %s, name: %s", ledgerId, name)
+	return nil
+}
+
+func (c *categoryServiceImpl) DeleteCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error {
+	logrus.Infof("start to delete category, ledger id: %s, name: %s", ledgerId, name)
+
+	// Check if category is in use
+	inUse, err := c.categoryDao.IsCategoryInUse(ws, ledgerId, name)
+	if err != nil {
+		logrus.Errorf("check category usage failed: %v", err)
+		return err
+	}
+	if inUse {
+		logrus.Warnf("category is in use, cannot delete: %s", name)
+		return fmt.Errorf("分类已被使用，无法删除")
+	}
+
+	// Delete all tags under this category
+	categoryTransactionType := fmt.Sprintf("%s:%s", name, transactionType)
+	tagDao := dao.GetTagDao()
+	if err := tagDao.DeleteTagsByCategory(ws, categoryTransactionType); err != nil {
+		logrus.Errorf("delete category tags failed: %v", err)
+		return err
+	}
+
+	// Delete the category
+	if err := c.categoryDao.DeleteCategory(ws, name, transactionType); err != nil {
+		logrus.Errorf("delete category failed: %v", err)
+		return err
+	}
+
+	logrus.Infof("delete category success, ledger id: %s, name: %s", ledgerId, name)
+	return nil
 }

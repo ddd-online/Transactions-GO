@@ -7,6 +7,12 @@ type CategoryDto struct {
 	TransactionType string `json:"transactionType"`
 }
 
+type CreateCategoryRequest struct {
+	LedgerID        string `json:"ledgerId"`
+	Name            string `json:"name"`
+	TransactionType string `json:"transactionType"`
+}
+
 // ToCategory 将 CategoryDto 转换为 Category
 func (dto *CategoryDto) ToCategory() *models.Category {
 	return &models.Category{

@@ -40,3 +40,57 @@ func listCategories(c *gin.Context) {
 
 	ret.Data = categoryDtos
 }
+
+// POST /categories
+func createCategory(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	var req dto.CreateCategoryRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ret.Code = -1
+		ret.Msg = "Invalid request: " + err.Error()
+		return
+	}
+
+	if err := service.GetCategoryService().CreateCategory(ws, req.LedgerID, req.Name, req.TransactionType); err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+}
+
+// DELETE /categories/:name
+func deleteCategory(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	name := c.Param("name")
+	transactionType := c.Query("type")
+	ledgerID := c.Query("ledgerId")
+	if name == "" || transactionType == "" || ledgerID == "" {
+		ret.Code = -1
+		ret.Msg = "Missing required parameters"
+		return
+	}
+
+	if err := service.GetCategoryService().DeleteCategory(ws, ledgerID, name, transactionType); err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+}

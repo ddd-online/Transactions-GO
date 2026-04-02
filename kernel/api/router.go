@@ -43,9 +43,13 @@ func ServeAPI(ginServer *gin.Engine) {
 
 		// Categories: GET by type query param
 		v1.GET("/categories", listCategories)
+		v1.POST("/categories", createCategory)
+		v1.DELETE("/categories/:name", deleteCategory)
 
 		// Tags: GET by category query param
 		v1.GET("/tags", listTags)
+		v1.POST("/tags", createTag)
+		v1.DELETE("/tags/:name", deleteTag)
 
 		// Workspace
 		workspace := v1.Group("/workspace")

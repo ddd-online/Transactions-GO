@@ -2,8 +2,8 @@ import dayjs from "dayjs";
 import type {Category, Tag, TransactionRecord, TrQueryCondition, TrQueryResult} from "@/types/billadm";
 import {createTrForLedger, deleteTrById, queryTrOnCondition} from "@/backend/api/tr.ts";
 import NotificationUtil from "@/backend/notification.ts";
-import {queryCategory} from "@/backend/api/category.ts";
-import {queryTags} from "@/backend/api/tag.ts";
+import {queryCategory, createCategory, deleteCategory} from "@/backend/api/category.ts";
+import {queryTags, createTag, deleteTag} from "@/backend/api/tag.ts";
 import {createTemplate, queryTemplates, deleteTemplate} from "@/backend/api/template.ts";
 import type {TransactionTemplateDto} from "@/backend/api/template.ts";
 
@@ -145,5 +145,53 @@ export async function removeTemplate(templateId: string) {
         await deleteTemplate(templateId);
     } catch (error) {
         NotificationUtil.error('删除模板失败', `${error}`);
+    }
+}
+
+/**
+ * 创建分类
+ */
+export async function addCategory(ledgerId: string, name: string, transactionType: string) {
+    try {
+        await createCategory(ledgerId, name, transactionType);
+    } catch (error) {
+        NotificationUtil.error('创建分类失败', `${error}`);
+        throw error;
+    }
+}
+
+/**
+ * 删除分类
+ */
+export async function removeCategory(name: string, transactionType: string, ledgerId: string) {
+    try {
+        await deleteCategory(name, transactionType, ledgerId);
+    } catch (error) {
+        NotificationUtil.error('删除分类失败', `${error}`);
+        throw error;
+    }
+}
+
+/**
+ * 创建标签
+ */
+export async function addTag(name: string, categoryTransactionType: string) {
+    try {
+        await createTag(name, categoryTransactionType);
+    } catch (error) {
+        NotificationUtil.error('创建标签失败', `${error}`);
+        throw error;
+    }
+}
+
+/**
+ * 删除标签
+ */
+export async function removeTag(name: string, categoryTransactionType: string, ledgerId: string) {
+    try {
+        await deleteTag(name, categoryTransactionType, ledgerId);
+    } catch (error) {
+        NotificationUtil.error('删除标签失败', `${error}`);
+        throw error;
     }
 }
