@@ -85,38 +85,36 @@
       margin-bottom: 12px;
       font-weight: 500;
     }
-    .workspace-input-wrapper {
-      display: flex;
-      gap: 12px;
-    }
-    .workspace-input {
-      flex: 1;
-    }
-    .confirm-btn {
-      margin-top: 16px;
-      height: 44px;
-      font-size: 16px;
-      font-weight: 500;
+    .workspace-box {
+      padding: 16px 24px;
+      border: 1px dashed #d9d9d9;
       border-radius: 8px;
-      background: #1890ff;
-      border-color: #1890ff;
+      cursor: pointer;
       transition: all 0.3s;
     }
-    .confirm-btn:hover:not(:disabled) {
-      background: #40a9ff;
-      border-color: #40a9ff;
-      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+    .workspace-box:hover {
+      border-color: #1890ff;
+      background: #f0f5ff;
     }
-    .confirm-btn:disabled {
-      background: #d9d9d9;
-      border-color: #d9d9d9;
+    .workspace-box-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
-    .select-btn {
-      border-radius: 8px;
+    .workspace-box-text {
+      font-size: 14px;
+      color: #666;
     }
-    .select-btn:hover {
-      border-color: #40a9ff;
-      color: #40a9ff;
+    .workspace-box:hover .workspace-box-text {
+      color: #1890ff;
+    }
+    .workspace-path {
+      font-size: 13px;
+      color: #999;
+      margin-top: 8px;
+      text-align: center;
+      word-break: break-all;
     }
     .intro-text {
       font-size: 13px;
@@ -171,24 +169,15 @@
 
       <div class="workspace-section">
         <div class="workspace-label">请选择工作目录</div>
-        <div class="workspace-input-wrapper">
-          <a-input
-            class="workspace-input"
-            v-model:value="workspacePath"
-            placeholder="点击下方按钮选择工作目录"
-            read-only
-          />
-          <a-button class="select-btn" @click="selectWorkspace">选择目录</a-button>
+        <div class="workspace-box" @click="selectWorkspace">
+          <div class="workspace-box-inner">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M2 4.5C2 3.67 2.67 3 3.5 3H7.5L9 5H16.5C17.33 5 18 5.67 18 6.5V14.5C18 15.33 17.33 16 16.5 16H3.5C2.67 16 2 15.33 2 14.5V4.5Z" stroke="#666" stroke-width="1.5" fill="none"/>
+            </svg>
+            <span class="workspace-box-text">点击选择工作目录</span>
+          </div>
+          <div v-if="workspacePath" class="workspace-path">{{ workspacePath }}</div>
         </div>
-        <a-button
-          class="confirm-btn"
-          size="large"
-          block
-          :disabled="!workspacePath"
-          @click="handleConfirm"
-        >
-          开始使用
-        </a-button>
       </div>
 
       <p class="intro-text">
@@ -200,7 +189,6 @@
 
   <script>
     const { createApp, ref } = Vue;
-    const { message } = antd;
 
     createApp({
       setup() {
@@ -215,24 +203,16 @@
 
             if (!result.canceled && result.filePaths && result.filePaths.length > 0) {
               workspacePath.value = result.filePaths[0];
+              window.electronAPI.initWorkspace(result.filePaths[0]);
             }
           } catch (error) {
-            message.error('选择目录失败: ' + error);
+            console.error('选择目录失败:', error);
           }
-        };
-
-        const handleConfirm = () => {
-          if (!workspacePath.value) {
-            message.warning('请先选择工作目录');
-            return;
-          }
-          window.electronAPI.initWorkspace(workspacePath.value);
         };
 
         return {
           workspacePath,
-          selectWorkspace,
-          handleConfirm
+          selectWorkspace
         };
       }
     }).mount('#app');
