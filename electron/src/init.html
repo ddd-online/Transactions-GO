@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>欢迎使用 Transactions</title>
+  <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
+  <script src="https://unpkg.com/ant-design-vue@4.2.6/dist/antd.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/ant-design-vue@4.2.6/dist/reset.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #app {
+      width: 100%;
+      max-width: 600px;
+      padding: 40px;
+    }
+    .welcome-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      padding: 48px;
+      text-align: center;
+    }
+    .logo {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 24px;
+    }
+    .welcome-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    .welcome-subtitle {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 32px;
+    }
+    .features {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+    .feature-item {
+      text-align: center;
+    }
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: #f0f5ff;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 24px;
+    }
+    .feature-text {
+      font-size: 13px;
+      color: #444;
+    }
+    .workspace-section {
+      margin-top: 32px;
+    }
+    .workspace-label {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+    .workspace-input-wrapper {
+      display: flex;
+      gap: 12px;
+    }
+    .workspace-input {
+      flex: 1;
+    }
+    .intro-text {
+      font-size: 13px;
+      color: #888;
+      margin-top: 24px;
+      line-height: 1.6;
+    }
+    .window-control {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+    }
+    .window-btn {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+    }
+    .window-btn.minimize { background: #febc2e; }
+    .window-btn.maximize { background: #28c840; }
+    .window-btn.close { background: #ff5f57; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="welcome-card">
+      <svg class="logo" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="80" height="80" rx="16" fill="#1890ff"/>
+        <path d="M24 56V24h8v32h-8zm12-16v-16h8v16h-8zm12 8V24h8v32h-8z" fill="#fff"/>
+      </svg>
+      <h1 class="welcome-title">欢迎使用 Transactions</h1>
+      <p class="welcome-subtitle">简洁高效的个人财务管理工具</p>
+
+      <div class="features">
+        <div class="feature-item">
+          <div class="feature-icon">📒</div>
+          <div class="feature-text">多账本管理</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🏷️</div>
+          <div class="feature-text">分类标签</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">📊</div>
+          <div class="feature-text">数据分析</div>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon">🔒</div>
+          <div class="feature-text">本地存储</div>
+        </div>
+      </div>
+
+      <div class="workspace-section">
+        <div class="workspace-label">请选择工作目录</div>
+        <div class="workspace-input-wrapper">
+          <a-input
+            class="workspace-input"
+            v-model:value="workspacePath"
+            placeholder="点击下方按钮选择工作目录"
+            read-only
+          />
+          <a-button type="primary" @click="selectWorkspace">选择目录</a-button>
+        </div>
+        <a-button
+          type="primary"
+          size="large"
+          block
+          :disabled="!workspacePath"
+          @click="handleConfirm"
+          style="margin-top: 16px;"
+        >
+          开始使用
+        </a-button>
+      </div>
+
+      <p class="intro-text">
+        工作目录用于存储您的账本数据<br>
+        选择一个空目录即可创建新的工作空间
+      </p>
+    </div>
+  </div>
+
+  <script>
+    const { createApp, ref } = Vue;
+    const { message } = antd;
+
+    createApp({
+      setup() {
+        const workspacePath = ref('');
+
+        const selectWorkspace = async () => {
+          try {
+            const result = await window.electronAPI.openDialog({
+              properties: ['openDirectory'],
+              title: '选择工作目录'
+            });
+
+            if (!result.canceled && result.filePaths && result.filePaths.length > 0) {
+              workspacePath.value = result.filePaths[0];
+            }
+          } catch (error) {
+            message.error('选择目录失败: ' + error);
+          }
+        };
+
+        const handleConfirm = () => {
+          if (!workspacePath.value) {
+            message.warning('请先选择工作目录');
+            return;
+          }
+          window.electronAPI.initWorkspace(workspacePath.value);
+        };
+
+        return {
+          workspacePath,
+          selectWorkspace,
+          handleConfirm
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

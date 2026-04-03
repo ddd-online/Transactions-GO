@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog, net } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, net, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -118,8 +118,10 @@ const startKernel = () => {
     });
 };
 
-const createWindow = () => {
-    const mainWindow = new BrowserWindow({
+let mainWindow = null;
+
+const createMainWindow = () => {
+    mainWindow = new BrowserWindow({
         width: transactionsCfg.width,
         height: transactionsCfg.height,
         x: transactionsCfg.x,
@@ -213,14 +215,90 @@ const createWindow = () => {
     });
 };
 
+let initWindow = null;
+
+const createInitWindow = () => {
+    const display = screen.getPrimaryDisplay();
+    const width = Math.floor(display.size.width * 0.6);
+    const height = Math.floor(display.workAreaSize.height * 0.8);
+
+    initWindow = new BrowserWindow({
+        width,
+        height,
+        frame: false,
+        webPreferences: {
+            nodeIntegration: false, contextIsolation: true, preload: path.join(__dirname, 'preload.js'),
+        },
+    });
+
+    const initHtmlPath = path.join(__dirname, 'init.html');
+    initWindow.loadFile(initHtmlPath);
+
+    log(`Init window created: ${initHtmlPath}`);
+
+    ipcMain.handle('dialog:open', async (event, options) => {
+        try {
+            return await dialog.showOpenDialog({
+                properties: ['openDirectory'], ...options,
+            });
+        } catch (err) {
+            log(`Dialog error: ${err.message}`);
+            return { canceled: true, filePaths: [], error: err.message };
+        }
+    });
+
+    ipcMain.on('workspace:set', (event, workspaceDir) => {
+        transactionsCfg.workspaceDir = workspaceDir;
+        saveTransactionsCfg();
+    });
+
+    ipcMain.handle('workspace:get', () => {
+        return transactionsCfg.workspaceDir;
+    });
+
+    ipcMain.on('init:workspace', (event, workspaceDir) => {
+        transactionsCfg.workspaceDir = workspaceDir;
+        saveTransactionsCfg();
+        if (initWindow) {
+            initWindow.close();
+            initWindow = null;
+        }
+        createMainWindow();
+    });
+
+    ipcMain.handle('app', async (event, field) => {
+        switch (field) {
+            case 'name':
+                return app.getName();
+            case 'version':
+                return app.getVersion();
+            case 'apiServer':
+                return API_SERVER;
+            default:
+                return '';
+        }
+    });
+};
+
 app.whenReady().then(() => {
     readTransactionsCfg();
     startKernel();
-    createWindow();
+
+    if (!transactionsCfg.workspaceDir) {
+        // 首次启动，显示初始化窗口
+        createInitWindow();
+    } else {
+        // 已有工作目录，创建主窗口
+        createMainWindow();
+    }
 
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow();
+            if (!transactionsCfg.workspaceDir) {
+                createInitWindow();
+            } else {
+                createMainWindow();
+            }
         }
     });
 });
