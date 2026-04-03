@@ -5,7 +5,7 @@
     </div>
 
     <a-table :columns="columns" :data-source="templates" :loading="loading" :pagination="false" row-key="template_id">
-      <template #bodyCell="{ column, record }">
+      <template #bodyCell="{ column, record, index }">
         <template v-if="column.key === 'type'">
           <a-tag :color="getTypeColor(record.transaction_type)">
             {{ getTypeLabel(record.transaction_type) }}
@@ -24,9 +24,19 @@
           <span v-else>-</span>
         </template>
         <template v-else-if="column.key === 'action'">
-          <a-popconfirm title="确定要删除该模板吗？" @confirm="handleDelete(record.template_id)" ok-text="确定" cancel-text="取消">
-            <a-button type="link" danger size="small">删除</a-button>
-          </a-popconfirm>
+          <span class="action-buttons">
+            <button class="action-btn" @click="moveTemplate(index, -1)" :disabled="index === 0">
+              <UpOutlined />
+            </button>
+            <button class="action-btn" @click="moveTemplate(index, 1)" :disabled="index === templates.length - 1">
+              <DownOutlined />
+            </button>
+            <a-popconfirm title="确定要删除该模板吗？" @confirm="handleDelete(record.template_id)" ok-text="确定" cancel-text="取消">
+              <button class="action-btn delete-btn" @click.stop>
+                <DeleteOutlined />
+              </button>
+            </a-popconfirm>
+          </span>
         </template>
       </template>
       <template #emptyText>
@@ -38,8 +48,10 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
+import { message } from 'ant-design-vue';
+import { UpOutlined, DownOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import type { TransactionTemplate } from '@/types/billadm';
-import { getTemplatesByLedgerId, removeTemplate } from '@/backend/functions.ts';
+import { getTemplatesByLedgerId, removeTemplate, reorderTemplate } from '@/backend/functions.ts';
 import { useLedgerStore } from '@/stores/ledgerStore.ts';
 import { TransactionTypeToLabel, TransactionTypeToColor } from '@/backend/constant.ts';
 
@@ -82,7 +94,7 @@ const columns = [
   {
     title: '操作',
     key: 'action',
-    width: 80,
+    width: 120,
   },
 ];
 
@@ -101,7 +113,28 @@ const loadTemplates = async () => {
 
 const handleDelete = async (templateId: string) => {
   await removeTemplate(templateId);
+  message.success('删除模板成功');
   await loadTemplates();
+};
+
+const moveTemplate = async (index: number, direction: number) => {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= templates.value.length) return;
+
+  const template = templates.value[index];
+  const targetTemplate = templates.value[newIndex];
+  if (!template || !targetTemplate) return;
+
+  const templateSortOrder = template.sort_order || 0;
+  const targetSortOrder = targetTemplate.sort_order || 0;
+
+  try {
+    await reorderTemplate(template.template_id!, ledgerStore.currentLedgerId!, targetSortOrder);
+    await reorderTemplate(targetTemplate.template_id!, ledgerStore.currentLedgerId!, templateSortOrder);
+    await loadTemplates();
+  } catch {
+    // error already shown in reorderTemplate
+  }
 };
 
 const getTypeLabel = (type: string) => {
@@ -132,5 +165,50 @@ onMounted(() => {
   font-size: 16px;
   font-weight: 500;
   color: var(--billadm-color-text-primary);
+}
+
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--billadm-color-text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.action-btn:hover:not(.disabled) {
+  color: var(--billadm-color-primary, #1890ff);
+  background-color: var(--billadm-color-icon-hover-bg);
+  border-color: var(--billadm-color-primary, #1890ff);
+}
+
+.action-btn.disabled {
+  color: var(--billadm-color-text-disabled, #ccc);
+  cursor: not-allowed;
+  border-color: transparent;
+  background: transparent;
+}
+
+.action-btn.delete-btn {
+  color: #ff4d4f;
+  border-color: transparent;
+}
+
+.action-btn.delete-btn:hover {
+  color: #fff;
+  background-color: #ff4d4f;
+  border-color: #ff4d4f;
 }
 </style>

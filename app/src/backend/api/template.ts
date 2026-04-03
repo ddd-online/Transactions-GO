@@ -10,6 +10,7 @@ export interface TransactionTemplateDto {
     tags: string[];
     flags: string;
     description: string;
+    sort_order?: number;
 }
 
 export async function createTemplate(data: TransactionTemplateDto): Promise<string> {
@@ -22,4 +23,8 @@ export async function queryTemplates(ledgerId: string): Promise<TransactionTempl
 
 export async function deleteTemplate(templateId: string): Promise<void> {
     return api.delete<void>(`/v1/templates/${encodeURIComponent(templateId)}`, '删除模板');
+}
+
+export async function updateTemplateSort(templateId: string, ledgerId: string, sortOrder: number): Promise<void> {
+    return api.patch<void>(`/v1/templates/${encodeURIComponent(templateId)}/sort`, { ledgerId, sortOrder }, '更新模板排序');
 }

@@ -100,3 +100,33 @@ func deleteTemplate(c *gin.Context) {
 		return
 	}
 }
+
+// PATCH /templates/:id/sort
+func updateTemplateSort(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	id := c.Param("id")
+	var req struct {
+		LedgerID  string `json:"ledgerId"`
+		SortOrder int    `json:"sortOrder"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ret.Code = -1
+		ret.Msg = "Invalid request: " + err.Error()
+		return
+	}
+
+	if err := service.GetTrTemplateService().UpdateSortOrder(ws, id, req.LedgerID, req.SortOrder); err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+}

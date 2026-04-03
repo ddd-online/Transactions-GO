@@ -30,6 +30,7 @@ type TagDao interface {
 	DeleteTagsByCategory(ws *workspace.Workspace, categoryTransactionType string) error
 	UpdateTagSort(ws *workspace.Workspace, name string, categoryTransactionType string, sortOrder int) error
 	GetMaxSortOrder(ws *workspace.Workspace, categoryTransactionType string) (int, error)
+	CountRecordsByTag(ws *workspace.Workspace, ledgerId string, tag string) (int64, error)
 }
 
 var _ TagDao = &TagDaoImpl{}
@@ -94,4 +95,15 @@ func (t *TagDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, categoryTransactio
 		return 0, err
 	}
 	return maxSortOrder, nil
+}
+
+func (t *TagDaoImpl) CountRecordsByTag(ws *workspace.Workspace, ledgerId string, tag string) (int64, error) {
+	var count int64
+	err := ws.GetDb().Model(&models.TrTag{}).
+		Where("ledger_id = ? AND tag = ?", ledgerId, tag).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

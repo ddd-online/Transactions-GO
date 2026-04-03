@@ -29,6 +29,7 @@ type TransactionTemplateDto struct {
 	Tags           []string `json:"tags"`
 	Flags          string   `json:"flags"`
 	Description    string   `json:"description"`
+	SortOrder      int      `json:"sort_order"`
 }
 
 func (dto *TransactionTemplateDto) Validate(result *models.Result) bool {
@@ -78,6 +79,7 @@ func (dto *TransactionTemplateDto) FromTransactionTemplate(tt *models.Transactio
 	dto.Category = tt.Category
 	dto.Flags = tt.Flags
 	dto.Description = tt.Description
+	dto.SortOrder = tt.SortOrder
 	if err := json.Unmarshal([]byte(tt.Tags), &dto.Tags); err != nil {
 		dto.Tags = make([]string, 0)
 	}

@@ -4,7 +4,7 @@ import {createTrForLedger, deleteTrById, queryTrOnCondition} from "@/backend/api
 import NotificationUtil from "@/backend/notification.ts";
 import {queryCategory, createCategory, deleteCategory, updateCategorySort} from "@/backend/api/category.ts";
 import {queryTags, createTag, deleteTag, updateTagSort} from "@/backend/api/tag.ts";
-import {createTemplate, queryTemplates, deleteTemplate} from "@/backend/api/template.ts";
+import {createTemplate, queryTemplates, deleteTemplate, updateTemplateSort} from "@/backend/api/template.ts";
 import type {TransactionTemplateDto} from "@/backend/api/template.ts";
 
 export function centsToYuan(cents: number): string {
@@ -101,18 +101,18 @@ export async function updateTransactionRecord(tr: TransactionRecord) {
 /**
  * 分类与标签
  */
-export async function getCategoryByType(trType: string): Promise<Category[]> {
+export async function getCategoryByType(trType: string, ledgerId?: string): Promise<Category[]> {
     try {
-        return await queryCategory(trType);
+        return await queryCategory(trType, ledgerId);
     } catch (error) {
         NotificationUtil.error(`查询 ${trType} 消费类型失败`, `${error}`);
         return [];
     }
 }
 
-export async function getTagsByCategory(categoryTransactionType: string): Promise<Tag[]> {
+export async function getTagsByCategory(categoryTransactionType: string, ledgerId?: string): Promise<Tag[]> {
     try {
-        return await queryTags(categoryTransactionType);
+        return await queryTags(categoryTransactionType, ledgerId);
     } catch (error) {
         NotificationUtil.error(`查询 ${categoryTransactionType} 消费标签失败`, `${error}`);
         return [];
@@ -145,6 +145,15 @@ export async function removeTemplate(templateId: string) {
         await deleteTemplate(templateId);
     } catch (error) {
         NotificationUtil.error('删除模板失败', `${error}`);
+    }
+}
+
+export async function reorderTemplate(templateId: string, ledgerId: string, sortOrder: number) {
+    try {
+        await updateTemplateSort(templateId, ledgerId, sortOrder);
+    } catch (error) {
+        NotificationUtil.error('更新模板排序失败', `${error}`);
+        throw error;
     }
 }
 

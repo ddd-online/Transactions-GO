@@ -17,7 +17,7 @@
             :class="{ 'category-item-active': selectedCategory === category.name }"
             @click="selectCategory(category.name)"
         >
-          <span class="category-name">{{ category.name }}</span>
+          <span class="category-name">{{ category.name }}<span class="record-count" v-if="category.recordCount">({{ category.recordCount }})</span></span>
           <span class="category-actions">
             <button class="action-btn" @click.stop="moveCategory(index, -1)" :class="{ 'disabled': index === 0 }" :disabled="index === 0">
               <UpOutlined />
@@ -49,7 +49,7 @@
       </div>
       <div class="tag-list" v-if="selectedTags.length > 0">
         <div v-for="(tag, index) in selectedTags" :key="tag.name" class="tag-row">
-          <span class="tag-name">{{ tag.name }}</span>
+          <span class="tag-name">{{ tag.name }}<span class="record-count" v-if="tag.recordCount">({{ tag.recordCount }})</span></span>
           <span class="tag-actions">
             <button class="action-btn" @click="moveTag(index, -1)" :class="{ 'disabled': index === 0 }" :disabled="index === 0">
               <UpOutlined />
@@ -276,14 +276,14 @@ const moveTag = async (index: number, direction: number) => {
 
 // 加载分类数据
 const loadCategories = async () => {
-  const categoryList = await getCategoryByType(props.transactionType);
-  categories.value = categoryList.map(c => ({name: c.name, transactionType: c.transactionType, sortOrder: c.sortOrder, tags: []}));
+  const categoryList = await getCategoryByType(props.transactionType, ledgerStore.currentLedgerId!);
+  categories.value = categoryList.map(c => ({name: c.name, transactionType: c.transactionType, sortOrder: c.sortOrder, recordCount: c.recordCount, tags: []}));
 
   // 加载所有分类的标签
   for (const category of categories.value) {
     const categoryTransactionType = `${category.name}:${props.transactionType}`;
-    const tags = await getTagsByCategory(categoryTransactionType);
-    category.tags = tags;
+    const tags = await getTagsByCategory(categoryTransactionType, ledgerStore.currentLedgerId!);
+    category.tags = tags.map(t => ({name: t.name, categoryTransactionType: t.categoryTransactionType, sortOrder: t.sortOrder, recordCount: t.recordCount}));
   }
 };
 
@@ -364,6 +364,12 @@ watch(
   text-overflow: ellipsis;
   white-space: nowrap;
   margin-right: 8px;
+}
+
+.record-count {
+  color: var(--billadm-color-text-minor);
+  font-size: 12px;
+  margin-left: 4px;
 }
 
 .category-actions {

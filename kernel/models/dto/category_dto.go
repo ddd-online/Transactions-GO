@@ -6,6 +6,7 @@ type CategoryDto struct {
 	Name            string `json:"name"`
 	TransactionType string `json:"transactionType"`
 	SortOrder       int    `json:"sortOrder"`
+	RecordCount     int    `json:"recordCount"`
 }
 
 type CreateCategoryRequest struct {

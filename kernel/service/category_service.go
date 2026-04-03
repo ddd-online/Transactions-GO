@@ -34,6 +34,7 @@ type CategoryService interface {
 	CreateCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error
 	DeleteCategory(ws *workspace.Workspace, ledgerId string, name string, transactionType string) error
 	UpdateCategorySort(ws *workspace.Workspace, name string, transactionType string, sortOrder int) error
+	CountRecordsByCategory(ws *workspace.Workspace, ledgerId string, category string) (int64, error)
 }
 
 var _ CategoryService = &categoryServiceImpl{}
@@ -131,4 +132,8 @@ func (c *categoryServiceImpl) UpdateCategorySort(ws *workspace.Workspace, name s
 
 	logrus.Infof("update category sort success, name: %s", name)
 	return nil
+}
+
+func (c *categoryServiceImpl) CountRecordsByCategory(ws *workspace.Workspace, ledgerId string, category string) (int64, error) {
+	return c.categoryDao.CountRecordsByCategory(ws, ledgerId, category)
 }

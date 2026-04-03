@@ -6,6 +6,7 @@ type TagDto struct {
 	Name                    string `json:"name"`
 	CategoryTransactionType string `json:"categoryTransactionType"`
 	SortOrder               int    `json:"sortOrder"`
+	RecordCount             int    `json:"recordCount"`
 }
 
 type CreateTagRequest struct {

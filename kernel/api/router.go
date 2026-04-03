@@ -39,6 +39,7 @@ func ServeAPI(ginServer *gin.Engine) {
 			templates.POST("", createTemplate)
 			templates.GET("", listTemplates)
 			templates.DELETE("/:id", deleteTemplate)
+			templates.PATCH("/:id/sort", updateTemplateSort)
 		}
 
 		// Categories: GET by type query param

@@ -10,6 +10,7 @@ type TransactionTemplate struct {
 	Tags            string `gorm:"comment:标签集，JSON数组格式" json:"tags"`
 	Flags           string `gorm:"comment:标记集" json:"flags"`
 	Description     string `gorm:"comment:交易描述" json:"description"`
+	SortOrder       int    `gorm:"default:0;comment:排序顺序" json:"sort_order"`
 	CreatedAt       int64  `gorm:"autoCreateTime:unix;not null;comment:创建时间" json:"created_at"`
 	UpdatedAt       int64  `gorm:"autoUpdateTime:unix;not null;comment:更新时间" json:"updated_at"`
 }

@@ -1,8 +1,12 @@
 import api from "@/backend/api/api-client";
 import type { Category } from "@/types/billadm";
 
-export async function queryCategory(trType: string): Promise<Category[]> {
-    return api.get<Category[]>(`/v1/categories?type=${encodeURIComponent(trType)}`, '查询分类');
+export async function queryCategory(trType: string, ledgerId?: string): Promise<Category[]> {
+    let url = `/v1/categories?type=${encodeURIComponent(trType)}`;
+    if (ledgerId) {
+        url += `&ledgerId=${encodeURIComponent(ledgerId)}`;
+    }
+    return api.get<Category[]>(url, '查询分类');
 }
 
 export async function createCategory(ledgerId: string, name: string, transactionType: string): Promise<void> {

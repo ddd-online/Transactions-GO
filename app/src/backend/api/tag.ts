@@ -1,8 +1,12 @@
 import api from "@/backend/api/api-client";
 import type { Tag } from "@/types/billadm";
 
-export async function queryTags(categoryTransactionType: string): Promise<Tag[]> {
-    return api.get<Tag[]>(`/v1/tags?categoryTransactionType=${encodeURIComponent(categoryTransactionType)}`, '查询标签');
+export async function queryTags(categoryTransactionType: string, ledgerId?: string): Promise<Tag[]> {
+    let url = `/v1/tags?categoryTransactionType=${encodeURIComponent(categoryTransactionType)}`;
+    if (ledgerId) {
+        url += `&ledgerId=${encodeURIComponent(ledgerId)}`;
+    }
+    return api.get<Tag[]>(url, '查询标签');
 }
 
 export async function createTag(name: string, categoryTransactionType: string): Promise<void> {

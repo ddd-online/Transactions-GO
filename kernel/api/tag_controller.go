@@ -11,7 +11,7 @@ import (
 	"github.com/billadm/workspace"
 )
 
-// GET /tags?categoryTransactionType=xxx
+// GET /tags?categoryTransactionType=xxx&ledgerId=xxx
 func listTags(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -24,6 +24,7 @@ func listTags(c *gin.Context) {
 	}
 
 	categoryTransactionType := c.Query("categoryTransactionType")
+	ledgerId := c.Query("ledgerId")
 	tags, err := service.GetTagService().QueryTags(ws, categoryTransactionType)
 	if err != nil {
 		ret.Code = -1
@@ -35,6 +36,13 @@ func listTags(c *gin.Context) {
 	for _, tag := range tags {
 		tagDto := dto.TagDto{}
 		tagDto.FromTag(&tag)
+		// Count records for this tag if ledgerId is provided
+		if ledgerId != "" {
+			count, err := service.GetTagService().CountRecordsByTag(ws, ledgerId, tag.Name)
+			if err == nil {
+				tagDto.RecordCount = int(count)
+			}
+		}
 		tagDtos = append(tagDtos, tagDto)
 	}
 

@@ -33,6 +33,7 @@ type TransactionTemplateService interface {
 	Create(ws *workspace.Workspace, dto *dto.TransactionTemplateDto) (string, error)
 	DeleteById(ws *workspace.Workspace, templateId string) error
 	ListByLedgerId(ws *workspace.Workspace, ledgerId string) ([]*dto.TransactionTemplateDto, error)
+	UpdateSortOrder(ws *workspace.Workspace, templateId string, ledgerId string, sortOrder int) error
 }
 
 var _ TransactionTemplateService = &transactionTemplateServiceImpl{}
@@ -46,8 +47,16 @@ func (t *transactionTemplateServiceImpl) Create(ws *workspace.Workspace, dto *dt
 
 	templateID := util.GetUUID()
 
+	// Get max sort order for this ledger
+	maxSortOrder, err := t.trTemplateDao.GetMaxSortOrder(ws, dto.LedgerID)
+	if err != nil {
+		logrus.Errorf("get max sort order failed: %v", err)
+		return "", err
+	}
+
 	record := dto.ToTransactionTemplate()
 	record.TemplateID = templateID
+	record.SortOrder = maxSortOrder + 1
 
 	if err := t.trTemplateDao.Create(ws, record); err != nil {
 		logrus.Errorf("create transaction template failed: %v", err)
@@ -87,4 +96,33 @@ func (t *transactionTemplateServiceImpl) ListByLedgerId(ws *workspace.Workspace,
 
 	logrus.Infof("list transaction templates success, ledger id: %s, count: %d", ledgerId, len(dtos))
 	return dtos, nil
+}
+
+func (t *transactionTemplateServiceImpl) UpdateSortOrder(ws *workspace.Workspace, templateId string, ledgerId string, sortOrder int) error {
+	logrus.Infof("start to update template sort, templateId: %s, sortOrder: %d", templateId, sortOrder)
+
+	// Reindex all templates for this ledger to ensure sequential sort_order values
+	templates, err := t.trTemplateDao.ListByLedgerId(ws, ledgerId)
+	if err != nil {
+		logrus.Errorf("list templates failed: %v", err)
+		return err
+	}
+
+	// Reassign sort_order from 0 based on current order
+	for i, template := range templates {
+		if template.SortOrder != i {
+			if err := t.trTemplateDao.UpdateSortOrder(ws, template.TemplateID, i); err != nil {
+				logrus.Errorf("reindex template sort failed: %v", err)
+				return err
+			}
+		}
+	}
+
+	if err := t.trTemplateDao.UpdateSortOrder(ws, templateId, sortOrder); err != nil {
+		logrus.Errorf("update template sort failed: %v", err)
+		return err
+	}
+
+	logrus.Infof("update template sort success, templateId: %s", templateId)
+	return nil
 }

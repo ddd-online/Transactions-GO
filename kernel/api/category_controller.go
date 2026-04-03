@@ -11,7 +11,7 @@ import (
 	"github.com/billadm/workspace"
 )
 
-// GET /categories?type=all|income|expense|transfer
+// GET /categories?type=all|income|expense|transfer&ledgerId=xxx
 func listCategories(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -24,6 +24,7 @@ func listCategories(c *gin.Context) {
 	}
 
 	trType := c.Query("type")
+	ledgerId := c.Query("ledgerId")
 	categories, err := service.GetCategoryService().QueryCategory(ws, trType)
 	if err != nil {
 		ret.Code = -1
@@ -35,6 +36,13 @@ func listCategories(c *gin.Context) {
 	for _, category := range categories {
 		categoryDto := dto.CategoryDto{}
 		categoryDto.FromCategory(&category)
+		// Count records for this category if ledgerId is provided
+		if ledgerId != "" {
+			count, err := service.GetCategoryService().CountRecordsByCategory(ws, ledgerId, category.Name)
+			if err == nil {
+				categoryDto.RecordCount = int(count)
+			}
+		}
 		categoryDtos = append(categoryDtos, categoryDto)
 	}
 

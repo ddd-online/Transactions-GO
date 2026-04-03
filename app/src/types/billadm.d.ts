@@ -61,6 +61,7 @@ export interface Category {
     name: string;
     transactionType: string;
     sortOrder?: number;
+    recordCount?: number;
 }
 
 /**
@@ -70,6 +71,7 @@ export interface Tag {
     name: string;                      // 标签名称
     categoryTransactionType: string;  // 分类:交易类型，格式如"餐饮:支出"
     sortOrder?: number;
+    recordCount?: number;
 }
 
 /**
@@ -133,4 +135,5 @@ export interface TransactionTemplate {
     tags: string[];
     flags: string;
     description: string;
+    sort_order?: number;
 }

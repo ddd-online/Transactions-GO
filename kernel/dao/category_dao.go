@@ -30,6 +30,7 @@ type CategoryDao interface {
 	IsCategoryInUse(ws *workspace.Workspace, ledgerId string, category string) (bool, error)
 	UpdateCategorySort(ws *workspace.Workspace, name string, transactionType string, sortOrder int) error
 	GetMaxSortOrder(ws *workspace.Workspace, transactionType string) (int, error)
+	CountRecordsByCategory(ws *workspace.Workspace, ledgerId string, category string) (int64, error)
 }
 
 var _ CategoryDao = &categoryDaoImpl{}
@@ -96,4 +97,15 @@ func (c *categoryDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, transactionTy
 		return 0, err
 	}
 	return maxSortOrder, nil
+}
+
+func (c *categoryDaoImpl) CountRecordsByCategory(ws *workspace.Workspace, ledgerId string, category string) (int64, error) {
+	var count int64
+	err := ws.GetDb().Model(&models.TransactionRecord{}).
+		Where("ledger_id = ? AND category = ?", ledgerId, category).
+		Count(&count).Error
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

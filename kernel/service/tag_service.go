@@ -33,6 +33,7 @@ type TagService interface {
 	CreateTag(ws *workspace.Workspace, name string, categoryTransactionType string) error
 	DeleteTag(ws *workspace.Workspace, ledgerId string, name string, categoryTransactionType string) error
 	UpdateTagSort(ws *workspace.Workspace, name string, categoryTransactionType string, sortOrder int) error
+	CountRecordsByTag(ws *workspace.Workspace, ledgerId string, tag string) (int64, error)
 }
 
 var _ TagService = &tagServiceImpl{}
@@ -118,4 +119,8 @@ func (t *tagServiceImpl) UpdateTagSort(ws *workspace.Workspace, name string, cat
 
 	logrus.Infof("update tag sort success, name: %s", name)
 	return nil
+}
+
+func (t *tagServiceImpl) CountRecordsByTag(ws *workspace.Workspace, ledgerId string, tag string) (int64, error) {
+	return t.tagDao.CountRecordsByTag(ws, ledgerId, tag)
 }
