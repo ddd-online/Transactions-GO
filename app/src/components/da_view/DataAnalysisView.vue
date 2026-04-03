@@ -163,7 +163,7 @@ watch(
 
 .da-sidebar {
   flex: 0 0 200px;
-  background-color: var(--billadm-color-minor-background, #f5f5f5);
+  background-color: var(--billadm-color-minor-background);
   border-right: 1px solid var(--billadm-color-window-border);
   overflow-y: auto;
 }
@@ -172,5 +172,6 @@ watch(
   flex: 1;
   min-width: 0;
   overflow-y: auto;
+  background-color: var(--billadm-color-major-background);
 }
 </style>

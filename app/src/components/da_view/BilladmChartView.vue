@@ -44,7 +44,7 @@ defineProps<Props>()
   align-items: center;
   justify-content: space-between;
   padding: 8px 12px;
-  border-bottom: 1px solid var(--billadm-color-border, #f0f0f0);
+  border-bottom: 1px solid var(--billadm-color-window-border);
   flex-shrink: 0;
 }
 
@@ -62,7 +62,7 @@ defineProps<Props>()
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--billadm-color-minor-background);
+  background-color: var(--billadm-color-major-background);
 }
 
 .chart-wrapper {

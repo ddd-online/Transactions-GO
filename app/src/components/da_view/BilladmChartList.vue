@@ -49,17 +49,20 @@ const selectChart = (config: ChartConfig) => {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s;
-  color: var(--billadm-color-text-secondary, #666);
+  color: var(--billadm-color-text-minor);
 }
 
 .chart-list-item:hover {
-  background-color: var(--billadm-color-hover-background, #f5f5f5);
+  background-color: var(--billadm-color-hover-bg, #e4e4e4);
 }
 
 .chart-list-item.active {
-  background-color: #ffffff;
-  color: var(--billadm-color-primary, #1677ff);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  background-color: var(--billadm-color-primary);
+  color: #ffffff;
+}
+
+.chart-list-item.active .chart-list-item-icon {
+  color: #ffffff;
 }
 
 .chart-list-item-icon {
