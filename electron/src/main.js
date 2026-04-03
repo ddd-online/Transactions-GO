@@ -79,17 +79,14 @@ const startKernel = () => {
         detached: false,
     });
 
-    // 捕获标准输出
     kernelProcess.stdout.on('data', (data) => {
         log(`[Kernel STDOUT]: ${data.toString()}`);
     });
 
-    // 捕获错误输出
     kernelProcess.stderr.on('data', (data) => {
         log(`[Kernel STDERR]: ${data.toString()}`);
     });
 
-    // 进程关闭
     kernelProcess.on('close', (code) => {
         if (kernelProcess) {
             log(`[Kernel Process] kernel [pid=${kernelProcess.pid}] closed with code ${code}`);
@@ -99,7 +96,6 @@ const startKernel = () => {
         kernelProcess = null;
     });
 
-    // 进程异常退出
     kernelProcess.on('exit', (code) => {
         const pid = kernelProcess ? kernelProcess.pid : 'unknown';
         log(`[Kernel Process] kernel [pid=${pid}] exited with code ${code}`);
@@ -118,47 +114,8 @@ const startKernel = () => {
     });
 };
 
-let mainWindow = null;
-
-const createMainWindow = () => {
-    mainWindow = new BrowserWindow({
-        width: transactionsCfg.width,
-        height: transactionsCfg.height,
-        x: transactionsCfg.x,
-        y: transactionsCfg.y,
-        frame: false,
-        webPreferences: {
-            nodeIntegration: false, contextIsolation: true, preload: path.join(__dirname, 'preload.js'),
-        },
-    });
-
-    mainWindow.loadURL(getUiServer());
-
-    if (isDev) {
-        mainWindow.webContents.openDevTools();
-    }
-
-    ipcMain.on('window-control', async (event, command) => {
-        switch (command) {
-            case 'minimize':
-                mainWindow.minimize();
-                break;
-            case 'maximize':
-                mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize();
-                break;
-            case 'close':
-                try {
-                    await net.fetch(API_SERVER + "/api/v1/app/exit", { method: "POST" });
-                } catch (e) {
-                    log(`请求kernel关闭失败 ${e}`);
-                }
-                const bounds = mainWindow.getBounds();
-                transactionsCfg = { ...transactionsCfg, ...bounds }
-                mainWindow.close();
-                break;
-        }
-    });
-
+// 通用 IPC 处理器
+const registerCommonHandlers = () => {
     ipcMain.handle('dialog:open', async (event, options) => {
         try {
             return await dialog.showOpenDialog({
@@ -215,6 +172,48 @@ const createMainWindow = () => {
     });
 };
 
+let mainWindow = null;
+
+const createMainWindow = () => {
+    mainWindow = new BrowserWindow({
+        width: transactionsCfg.width,
+        height: transactionsCfg.height,
+        x: transactionsCfg.x,
+        y: transactionsCfg.y,
+        frame: false,
+        webPreferences: {
+            nodeIntegration: false, contextIsolation: true, preload: path.join(__dirname, 'preload.js'),
+        },
+    });
+
+    mainWindow.loadURL(getUiServer());
+
+    if (isDev) {
+        mainWindow.webContents.openDevTools();
+    }
+
+    ipcMain.on('window-control', async (event, command) => {
+        switch (command) {
+            case 'minimize':
+                mainWindow.minimize();
+                break;
+            case 'maximize':
+                mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize();
+                break;
+            case 'close':
+                try {
+                    await net.fetch(API_SERVER + "/api/v1/app/exit", { method: "POST" });
+                } catch (e) {
+                    log(`请求kernel关闭失败 ${e}`);
+                }
+                const bounds = mainWindow.getBounds();
+                transactionsCfg = { ...transactionsCfg, ...bounds }
+                mainWindow.close();
+                break;
+        }
+    });
+};
+
 let initWindow = null;
 
 const createInitWindow = () => {
@@ -233,26 +232,6 @@ const createInitWindow = () => {
 
     log(`Init window created: ${initHtmlPath}`);
 
-    ipcMain.handle('dialog:open', async (event, options) => {
-        try {
-            return await dialog.showOpenDialog({
-                properties: ['openDirectory'], ...options,
-            });
-        } catch (err) {
-            log(`Dialog error: ${err.message}`);
-            return { canceled: true, filePaths: [], error: err.message };
-        }
-    });
-
-    ipcMain.on('workspace:set', (event, workspaceDir) => {
-        transactionsCfg.workspaceDir = workspaceDir;
-        saveTransactionsCfg();
-    });
-
-    ipcMain.handle('workspace:get', () => {
-        return transactionsCfg.workspaceDir;
-    });
-
     ipcMain.on('workspace:init', (event, workspaceDir) => {
         transactionsCfg.workspaceDir = workspaceDir;
         saveTransactionsCfg();
@@ -262,30 +241,16 @@ const createInitWindow = () => {
         }
         createMainWindow();
     });
-
-    ipcMain.handle('app', async (event, field) => {
-        switch (field) {
-            case 'name':
-                return app.getName();
-            case 'version':
-                return app.getVersion();
-            case 'apiServer':
-                return API_SERVER;
-            default:
-                return '';
-        }
-    });
 };
 
 app.whenReady().then(() => {
     readTransactionsCfg();
     startKernel();
+    registerCommonHandlers();
 
     if (!transactionsCfg.workspaceDir) {
-        // 首次启动，显示初始化窗口
         createInitWindow();
     } else {
-        // 已有工作目录，创建主窗口
         createMainWindow();
     }
 
