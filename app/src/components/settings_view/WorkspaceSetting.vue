@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {ref, onMounted} from 'vue';
 import {FolderOpenOutlined} from "@ant-design/icons-vue";
 import {useLedgerStore} from '@/stores/ledgerStore';
 import {openWorkspace} from '@/backend/api/workspace';
@@ -33,15 +33,18 @@ import NotificationUtil from '@/backend/notification';
 const ledgerStore = useLedgerStore();
 const showFileSelect = ref(false);
 
-const workspaceDir = ref(ledgerStore.workspaceStatus.workspaceDir || '');
+const workspaceDir = ref('');
+
+onMounted(async () => {
+  workspaceDir.value = await window.electronAPI.getWorkspace() || '';
+});
 
 // 切换工作空间
 const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
   try {
     await openWorkspace(newWorkspaceDir);
-    await ledgerStore.refreshWorkspaceStatus();
     window.electronAPI.setWorkspace(newWorkspaceDir);
-    workspaceDir.value = ledgerStore.workspaceStatus.workspaceDir || '';
+    workspaceDir.value = newWorkspaceDir;
     await ledgerStore.init();
     NotificationUtil.success('切换工作空间成功');
   } catch (error) {

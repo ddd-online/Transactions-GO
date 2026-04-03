@@ -2,12 +2,10 @@ import {defineStore} from 'pinia'
 import {computed, ref} from 'vue'
 import {createLedgerByName, deleteLedgerById, modifyLedgerNameById, queryAllLedgers} from "@/backend/api/ledger.ts"
 import NotificationUtil from "@/backend/notification"
-import {hasOpenedWorkspace} from "@/backend/api/workspace.ts"
-import type {Ledger, WorkspaceStatus} from "@/types/billadm"
+import type {Ledger} from "@/types/billadm"
 
 
 export const useLedgerStore = defineStore('ledger', () => {
-    const workspaceStatus = ref({} as WorkspaceStatus)
     const ledgers = ref([] as Ledger[])
     const currentLedger = ref({} as Ledger | null)
 
@@ -95,16 +93,7 @@ export const useLedgerStore = defineStore('ledger', () => {
         }
     }
 
-    const refreshWorkspaceStatus = async () => {
-        try {
-            workspaceStatus.value = await hasOpenedWorkspace();
-        } catch (error) {
-            NotificationUtil.error('查询工作空间状态失败', `${error}`)
-        }
-    }
-
     return {
-        workspaceStatus,
         ledgers,
         currentLedger,
         currentLedgerId,
@@ -115,6 +104,5 @@ export const useLedgerStore = defineStore('ledger', () => {
         deleteLedger,
         modifyLedgerName,
         setCurrentLedger,
-        refreshWorkspaceStatus,
     }
 })

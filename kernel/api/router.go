@@ -58,7 +58,6 @@ func ServeAPI(ginServer *gin.Engine) {
 		workspace := v1.Group("/workspace")
 		{
 			workspace.POST("", openWorkspace)
-			workspace.GET("/status", getWorkspaceStatus)
 		}
 	}
 }

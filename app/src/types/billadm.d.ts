@@ -107,14 +107,6 @@ export interface TrQueryConditionItem {
 }
 
 /**
- * 工作空间状态
- */
-export interface WorkspaceStatus {
-    isOpened: boolean;
-    workspaceDir: string;
-}
-
-/**
  * 时间范围类型 时间范围标签类型 时间范围值类型
  */
 type RangeValue = [Dayjs, Dayjs] | undefined;

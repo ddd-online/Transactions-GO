@@ -33,17 +33,3 @@ func openWorkspace(c *gin.Context) {
 		return
 	}
 }
-
-// GET /workspace/status
-func getWorkspaceStatus(c *gin.Context) {
-	ret := models.NewResult()
-	defer c.JSON(http.StatusOK, ret)
-
-	if workspace.Manager.OpenedWorkspace() == nil {
-		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
-		ret.Data = ""
-		return
-	}
-
-	ret.Data = workspace.Manager.OpenedWorkspace().GetDirectory()
-}
