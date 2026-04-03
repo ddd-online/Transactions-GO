@@ -10,6 +10,7 @@ declare global {
             saveDialog: (options: any) => Promise<any>;
             writeFile: (filePath: string, content: string) => Promise<{ success: boolean; error?: string }>;
             setWorkspace: (workspaceDir: string) => void;
+            getWorkspace: () => Promise<string>;
             getAppInfo: (field: string) => Promise<any>;
             getApiServer: () => Promise<string>;
         };

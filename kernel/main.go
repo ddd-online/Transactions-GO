@@ -10,7 +10,6 @@ import (
 	"github.com/billadm/logger"
 	"github.com/billadm/server"
 	"github.com/billadm/util"
-	"github.com/billadm/workspace"
 )
 
 func main() {
@@ -25,13 +24,6 @@ func main() {
 	err = logger.Init(util.Config.LogLevel)
 	if err != nil {
 		logrus.Fatalf("初始化日志模块失败 %v", err)
-	}
-	// 如果启动时指定了工作空间则打开
-	if util.Config.Workspace != "" {
-		err = workspace.Manager.OpenWorkspace(util.Config.Workspace)
-		if err != nil {
-			logrus.Errorf("启动时打开工作空间失败 %v", err)
-		}
 	}
 	// 启动服务器
 	logrus.Info("--------- 启动Billadm ---------")

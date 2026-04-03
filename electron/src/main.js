@@ -75,7 +75,7 @@ const startKernel = () => {
     const kernelExe = path.join(appPath, 'Billadm-Kernel.exe');
     log(`Starting kernel: ${kernelExe}`);
     const cp = require("child_process");
-    kernelProcess = cp.spawn(kernelExe, ['-mode', 'release', '-port', API_PORT, '-workspace', transactionsCfg.workspaceDir], {
+    kernelProcess = cp.spawn(kernelExe, ['-mode', 'release', '-port', API_PORT], {
         detached: false,
     });
 
@@ -193,6 +193,10 @@ const createWindow = () => {
     ipcMain.on('workspace:set', (event, workspaceDir) => {
         transactionsCfg.workspaceDir = workspaceDir;
         saveTransactionsCfg();
+    });
+
+    ipcMain.handle('workspace:get', () => {
+        return transactionsCfg.workspaceDir;
     });
 
     ipcMain.handle('app', async (event, field) => {

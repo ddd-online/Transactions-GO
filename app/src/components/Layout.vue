@@ -42,12 +42,14 @@ import {openWorkspace} from "@/backend/api/workspace.ts";
 import NotificationUtil from "@/backend/notification.ts";
 
 const ledgerStore = useLedgerStore();
-const showWorkspaceSelect = ref(true);
+const showWorkspaceSelect = ref(false);
 
 const handleOpenWorkspace = async (workspaceDir: string) => {
   try {
     await openWorkspace(workspaceDir);
-    await initWorkspace();
+    window.electronAPI.setWorkspace(workspaceDir);
+    await ledgerStore.init();
+    showWorkspaceSelect.value = false;
   } catch (error) {
     NotificationUtil.error('打开工作空间失败', `${error}`);
     showWorkspaceSelect.value = true;
@@ -55,14 +57,19 @@ const handleOpenWorkspace = async (workspaceDir: string) => {
 }
 
 const initWorkspace = async () => {
-  await ledgerStore.refreshWorkspaceStatus();
-  if (!ledgerStore.workspaceStatus.isOpened) {
+  const workspaceDir = await window.electronAPI.getWorkspace();
+  if (!workspaceDir) {
     showWorkspaceSelect.value = true;
     return;
   }
-  showWorkspaceSelect.value = false;
-  window.electronAPI.setWorkspace(ledgerStore.workspaceStatus.workspaceDir);
-  await ledgerStore.init();
+  try {
+    await openWorkspace(workspaceDir);
+    showWorkspaceSelect.value = false;
+    await ledgerStore.init();
+  } catch (error) {
+    NotificationUtil.error('打开工作空间失败', `${error}`);
+    showWorkspaceSelect.value = true;
+  }
 }
 
 onMounted(initWorkspace);
