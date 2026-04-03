@@ -89,6 +89,32 @@
     .workspace-input {
       flex: 1;
     }
+    .confirm-btn {
+      margin-top: 16px;
+      height: 44px;
+      font-size: 16px;
+      font-weight: 500;
+      border-radius: 8px;
+      background: #1890ff;
+      border-color: #1890ff;
+      transition: all 0.3s;
+    }
+    .confirm-btn:hover:not(:disabled) {
+      background: #40a9ff;
+      border-color: #40a9ff;
+      box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4);
+    }
+    .confirm-btn:disabled {
+      background: #d9d9d9;
+      border-color: #d9d9d9;
+    }
+    .select-btn {
+      border-radius: 8px;
+    }
+    .select-btn:hover {
+      border-color: #40a9ff;
+      color: #40a9ff;
+    }
     .intro-text {
       font-size: 13px;
       color: #888;
@@ -117,10 +143,7 @@
 <body>
   <div id="app">
     <div class="welcome-card">
-      <svg class="logo" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="80" height="80" rx="16" fill="#1890ff"/>
-        <path d="M24 56V24h8v32h-8zm12-16v-16h8v16h-8zm12 8V24h8v32h-8z" fill="#fff"/>
-      </svg>
+      <img class="logo" src="../assets/Transactions .svg" alt="logo">
       <h1 class="welcome-title">欢迎使用 Transactions</h1>
       <p class="welcome-subtitle">简洁高效的个人财务管理工具</p>
 
@@ -152,15 +175,14 @@
             placeholder="点击下方按钮选择工作目录"
             read-only
           />
-          <a-button type="primary" @click="selectWorkspace">选择目录</a-button>
+          <a-button class="select-btn" @click="selectWorkspace">选择目录</a-button>
         </div>
         <a-button
-          type="primary"
+          class="confirm-btn"
           size="large"
           block
           :disabled="!workspacePath"
           @click="handleConfirm"
-          style="margin-top: 16px;"
         >
           开始使用
         </a-button>
