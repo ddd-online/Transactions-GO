@@ -219,8 +219,8 @@ let initWindow = null;
 
 const createInitWindow = () => {
     initWindow = new BrowserWindow({
-        width: 680,
-        height: 620,
+        width: 600,
+        height: 560,
         resizable: false,
         frame: false,
         webPreferences: {
