@@ -1,4 +1,4 @@
-const {contextBridge, ipcRenderer} = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
     minimizeWindow: () => {
@@ -26,7 +26,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
         return await ipcRenderer.invoke('workspace:get');
     },
     initWorkspace: (workspaceDir) => {
-        ipcRenderer.send('init:workspace', workspaceDir);
+        ipcRenderer.send('workspace:init', workspaceDir);
     },
     getAppInfo: async (field) => {
         return await ipcRenderer.invoke('app', field);

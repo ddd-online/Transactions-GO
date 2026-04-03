@@ -256,7 +256,7 @@ const createInitWindow = () => {
         return transactionsCfg.workspaceDir;
     });
 
-    ipcMain.on('init:workspace', (event, workspaceDir) => {
+    ipcMain.on('workspace:init', (event, workspaceDir) => {
         transactionsCfg.workspaceDir = workspaceDir;
         saveTransactionsCfg();
         if (initWindow) {
