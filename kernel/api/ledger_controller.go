@@ -92,7 +92,9 @@ func createLedger(c *gin.Context) {
 		return
 	}
 
-	ledgerId, err := service.GetLedgerService().CreateLedger(ws, ledgerName)
+	description, _ := arg["description"].(string)
+
+	ledgerId, err := service.GetLedgerService().CreateLedger(ws, ledgerName, description)
 	if err != nil {
 		ret.Code = -1
 		ret.Msg = err.Error()
@@ -164,7 +166,9 @@ func updateLedger(c *gin.Context) {
 		return
 	}
 
-	err := service.GetLedgerService().ModifyLedgerName(ws, id, ledgerName)
+	description, _ := arg["description"].(string)
+
+	err := service.GetLedgerService().ModifyLedger(ws, id, ledgerName, description)
 	if err != nil {
 		ret.Code = -1
 		ret.Msg = err.Error()

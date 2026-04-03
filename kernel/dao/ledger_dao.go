@@ -24,7 +24,7 @@ func GetLedgerDao() LedgerDao {
 
 type LedgerDao interface {
 	CreateLedger(ws *workspace.Workspace, ledger *models.Ledger) error
-	ModifyLedgerName(ws *workspace.Workspace, ledger *models.Ledger) error
+	ModifyLedger(ws *workspace.Workspace, ledger *models.Ledger) error
 	ListAllLedger(ws *workspace.Workspace) ([]models.Ledger, error)
 	QueryLedgerById(ws *workspace.Workspace, ledgerId string) (*models.Ledger, error)
 	DeleteLedgerById(ws *workspace.Workspace, ledgerId string) error
@@ -42,10 +42,13 @@ func (l *ledgerDaoImpl) CreateLedger(ws *workspace.Workspace, ledger *models.Led
 	return nil
 }
 
-func (l *ledgerDaoImpl) ModifyLedgerName(ws *workspace.Workspace, ledger *models.Ledger) error {
+func (l *ledgerDaoImpl) ModifyLedger(ws *workspace.Workspace, ledger *models.Ledger) error {
 	if err := ws.GetDb().Model(ledger).
 		Where("id = ?", ledger.ID).
-		Update("name", ledger.Name).Error; err != nil {
+		Updates(map[string]interface{}{
+			"name":        ledger.Name,
+			"description": ledger.Description,
+		}).Error; err != nil {
 		return err
 	}
 

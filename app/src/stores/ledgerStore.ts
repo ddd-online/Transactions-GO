@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import {computed, ref} from 'vue'
-import {createLedgerByName, deleteLedgerById, modifyLedgerNameById, queryAllLedgers} from "@/backend/api/ledger.ts"
+import {createLedger, deleteLedgerById, modifyLedger, queryAllLedgers} from "@/backend/api/ledger.ts"
 import NotificationUtil from "@/backend/notification"
 import type {Ledger} from "@/types/billadm"
 
@@ -47,9 +47,9 @@ export const useLedgerStore = defineStore('ledger', () => {
     }
 
     // 添加账本
-    const createLedger = async (name: string) => {
+    const createLedgerAction = async (name: string, description: string = '') => {
         try {
-            await createLedgerByName(name)
+            await createLedger(name, description)
             await refreshLedgers()
             NotificationUtil.success(`创建账本 ${name} 成功`)
         } catch (error) {
@@ -68,14 +68,14 @@ export const useLedgerStore = defineStore('ledger', () => {
         }
     }
 
-    // 修改账本名称
-    const modifyLedgerName = async (id: string, name: string) => {
+    // 修改账本
+    const modifyLedgerAction = async (id: string, name: string, description: string = '') => {
         try {
-            await modifyLedgerNameById(id, name);
+            await modifyLedger(id, name, description);
             await refreshLedgers();
-            NotificationUtil.success(`修改账本名称为 ${name} 成功`);
+            NotificationUtil.success(`修改账本成功`);
         } catch (error) {
-            NotificationUtil.error(`修改账本名称为 ${name} 失败`, `${error}`);
+            NotificationUtil.error(`修改账本失败`, `${error}`);
         }
     }
 
@@ -100,9 +100,9 @@ export const useLedgerStore = defineStore('ledger', () => {
         currentLedgerName,
         init,
         refreshLedgers,
-        createLedger,
+        createLedger: createLedgerAction,
         deleteLedger,
-        modifyLedgerName,
+        modifyLedger: modifyLedgerAction,
         setCurrentLedger,
     }
 })

@@ -35,6 +35,7 @@ export interface TrQueryResult {
 export interface Ledger {
     id: string;           // 账本UUID
     name: string;         // 账本名称
+    description: string;  // 账本描述
     createdAt: number;   // 创建时间（Unix 时间戳，单位秒）
     updatedAt: number;   // 更新时间（Unix 时间戳，单位秒）
 }

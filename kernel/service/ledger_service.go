@@ -33,8 +33,8 @@ func GetLedgerService() LedgerService {
 }
 
 type LedgerService interface {
-	CreateLedger(ws *workspace.Workspace, ledgerName string) (string, error)
-	ModifyLedgerName(ws *workspace.Workspace, ledgerId, ledgerName string) error
+	CreateLedger(ws *workspace.Workspace, ledgerName string, description string) (string, error)
+	ModifyLedger(ws *workspace.Workspace, ledgerId, ledgerName, description string) error
 	ListAllLedger(ws *workspace.Workspace) ([]models.Ledger, error)
 	QueryLedgerById(ws *workspace.Workspace, ledgerId string) (*models.Ledger, error)
 	DeleteLedgerById(ws *workspace.Workspace, ledgerId string) error
@@ -49,11 +49,12 @@ type ledgerServiceImpl struct {
 }
 
 // CreateLedger 创建成功返回创建账本id
-func (l *ledgerServiceImpl) CreateLedger(ws *workspace.Workspace, ledgerName string) (string, error) {
+func (l *ledgerServiceImpl) CreateLedger(ws *workspace.Workspace, ledgerName string, description string) (string, error) {
 	logrus.Infof("start to create ledger, name: %s", ledgerName)
 	ledger := &models.Ledger{
-		ID:   util.GetUUID(),
-		Name: ledgerName,
+		ID:          util.GetUUID(),
+		Name:        ledgerName,
+		Description: description,
 	}
 
 	if err := l.ledgerDao.CreateLedger(ws, ledger); err != nil {
@@ -65,21 +66,22 @@ func (l *ledgerServiceImpl) CreateLedger(ws *workspace.Workspace, ledgerName str
 	return ledger.ID, nil
 }
 
-// ModifyLedgerName 修改指定账本的名称
-func (l *ledgerServiceImpl) ModifyLedgerName(ws *workspace.Workspace, ledgerId, ledgerName string) error {
-	logrus.Infof("start to modify ledger name, id: %s, new name: %s", ledgerId, ledgerName)
+// ModifyLedger 修改指定账本的名称和描述
+func (l *ledgerServiceImpl) ModifyLedger(ws *workspace.Workspace, ledgerId, ledgerName, description string) error {
+	logrus.Infof("start to modify ledger, id: %s, new name: %s, description: %s", ledgerId, ledgerName, description)
 
 	ledger := &models.Ledger{
-		ID:   ledgerId,
-		Name: ledgerName,
+		ID:          ledgerId,
+		Name:        ledgerName,
+		Description: description,
 	}
 
-	if err := l.ledgerDao.ModifyLedgerName(ws, ledger); err != nil {
-		logrus.Errorf("modify ledger name failed, id: %s, err: %v", ledgerId, err)
+	if err := l.ledgerDao.ModifyLedger(ws, ledger); err != nil {
+		logrus.Errorf("modify ledger failed, id: %s, err: %v", ledgerId, err)
 		return err
 	}
 
-	logrus.Infof("modify ledger name success")
+	logrus.Infof("modify ledger success")
 	return nil
 }
 
