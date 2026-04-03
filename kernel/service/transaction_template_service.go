@@ -87,6 +87,17 @@ func (t *transactionTemplateServiceImpl) ListByLedgerId(ws *workspace.Workspace,
 		return nil, err
 	}
 
+	// Reassign sort_order from 0 based on current order
+	for i, template := range templates {
+		if template.SortOrder != i {
+			template.SortOrder=i;
+			if err := t.trTemplateDao.UpdateSortOrder(ws, template.TemplateID, i); err != nil {
+				logrus.Errorf("reindex template sort failed: %v", err)
+				return nil,err
+			}
+		}
+	}
+
 	dtos := make([]*dto.TransactionTemplateDto, 0, len(templates))
 	for _, template := range templates {
 		dto := &dto.TransactionTemplateDto{}
@@ -100,23 +111,6 @@ func (t *transactionTemplateServiceImpl) ListByLedgerId(ws *workspace.Workspace,
 
 func (t *transactionTemplateServiceImpl) UpdateSortOrder(ws *workspace.Workspace, templateId string, ledgerId string, sortOrder int) error {
 	logrus.Infof("start to update template sort, templateId: %s, sortOrder: %d", templateId, sortOrder)
-
-	// Reindex all templates for this ledger to ensure sequential sort_order values
-	templates, err := t.trTemplateDao.ListByLedgerId(ws, ledgerId)
-	if err != nil {
-		logrus.Errorf("list templates failed: %v", err)
-		return err
-	}
-
-	// Reassign sort_order from 0 based on current order
-	for i, template := range templates {
-		if template.SortOrder != i {
-			if err := t.trTemplateDao.UpdateSortOrder(ws, template.TemplateID, i); err != nil {
-				logrus.Errorf("reindex template sort failed: %v", err)
-				return err
-			}
-		}
-	}
 
 	if err := t.trTemplateDao.UpdateSortOrder(ws, templateId, sortOrder); err != nil {
 		logrus.Errorf("update template sort failed: %v", err)
