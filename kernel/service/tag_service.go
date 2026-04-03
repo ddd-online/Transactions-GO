@@ -48,6 +48,17 @@ func (t *tagServiceImpl) QueryTags(ws *workspace.Workspace, categoryTransactionT
 		return nil, err
 	}
 
+	// Reassign sort_order from 0 based on current order
+	for i, tag := range tags {
+		if tag.SortOrder != i {
+			tag.SortOrder = i
+			if err := t.tagDao.UpdateTagSort(ws, tag.Name, tag.CategoryTransactionType, i); err != nil {
+				logrus.Errorf("reindex tag sort failed: %v", err)
+				return nil, err
+			}
+		}
+	}
+
 	logrus.Infof("query tag success, length: %v", tags)
 	return tags, nil
 }
@@ -63,9 +74,9 @@ func (t *tagServiceImpl) CreateTag(ws *workspace.Workspace, name string, categor
 	}
 
 	tag := &models.Tag{
-		Name:                   name,
+		Name:                    name,
 		CategoryTransactionType: categoryTransactionType,
-		SortOrder:              maxSortOrder + 1,
+		SortOrder:               maxSortOrder + 1,
 	}
 
 	if err := t.tagDao.CreateTag(ws, tag); err != nil {

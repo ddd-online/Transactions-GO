@@ -49,6 +49,17 @@ func (c *categoryServiceImpl) QueryCategory(ws *workspace.Workspace, trType stri
 		return nil, err
 	}
 
+	// Reassign sort_order from 0 based on current order
+	for i, cat := range categories {
+		if cat.SortOrder != i {
+			cat.SortOrder = i
+			if err := c.categoryDao.UpdateCategorySort(ws, cat.Name, cat.TransactionType, i); err != nil {
+				logrus.Errorf("reindex category sort failed: %v", err)
+				return nil, err
+			}
+		}
+	}
+
 	logrus.Infof("query category success, length: %v", categories)
 	return categories, nil
 }

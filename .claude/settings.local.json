@@ -11,7 +11,8 @@
       "Bash(npm list:*)",
       "Bash(cd:*)",
       "Bash(xargs grep:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(npx vue-tsc:*)"
     ]
   }
 }
