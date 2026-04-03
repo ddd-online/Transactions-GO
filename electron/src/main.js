@@ -8,7 +8,8 @@ process.noAsar = false;
 const isDev = !app.isPackaged;
 const appPath = isDev ? path.dirname(__dirname) : app.getAppPath();
 
-const API_SERVER = 'http://127.0.0.1:31943';
+const API_PORT = isDev ? '28080' : '31943';
+const API_SERVER = `http://127.0.0.1:${API_PORT}`;
 
 const getUiServer = () => {
     if (isDev) {
@@ -74,7 +75,7 @@ const startKernel = () => {
     const kernelExe = path.join(appPath, 'Billadm-Kernel.exe');
     log(`Starting kernel: ${kernelExe}`);
     const cp = require("child_process");
-    kernelProcess = cp.spawn(kernelExe, ['-mode', 'release', '-workspace', transactionsCfg.workspaceDir], {
+    kernelProcess = cp.spawn(kernelExe, ['-mode', 'release', '-port', API_PORT, '-workspace', transactionsCfg.workspaceDir], {
         detached: false,
     });
 
@@ -200,6 +201,8 @@ const createWindow = () => {
                 return app.getName();
             case 'version':
                 return app.getVersion();
+            case 'apiServer':
+                return API_SERVER;
             default:
                 return '';
         }

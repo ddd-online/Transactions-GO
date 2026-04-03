@@ -11,6 +11,7 @@ declare global {
             writeFile: (filePath: string, content: string) => Promise<{ success: boolean; error?: string }>;
             setWorkspace: (workspaceDir: string) => void;
             getAppInfo: (field: string) => Promise<any>;
+            getApiServer: () => Promise<string>;
         };
     }
 }

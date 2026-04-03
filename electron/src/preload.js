@@ -25,4 +25,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     getAppInfo: async (field) => {
         return await ipcRenderer.invoke('app', field);
     },
+    getApiServer: async () => {
+        return await ipcRenderer.invoke('app', 'apiServer');
+    },
 });

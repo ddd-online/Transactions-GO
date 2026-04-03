@@ -1,11 +1,33 @@
 import axios, { type AxiosInstance, type AxiosResponse } from 'axios';
 import type { Result } from "@/types/billadm";
 
-const apiClient: AxiosInstance = axios.create({
-    baseURL: 'http://127.0.0.1:31943/api',
-    timeout: 10000,
-    headers: { 'Content-Type': 'application/json' },
-});
+let apiClient: AxiosInstance | null = null;
+
+async function getApiClient(): Promise<AxiosInstance> {
+    if (apiClient) {
+        return apiClient;
+    }
+
+    let baseURL = 'http://127.0.0.1:28080/api';
+
+    // In Electron, get the actual port from the main process
+    if (window.electronAPI?.getApiServer) {
+        try {
+            const server = await window.electronAPI.getApiServer();
+            baseURL = `${server}/api`;
+        } catch (e) {
+            console.warn('Failed to get API server from Electron, using default:', e);
+        }
+    }
+
+    apiClient = axios.create({
+        baseURL,
+        timeout: 10000,
+        headers: { 'Content-Type': 'application/json' },
+    });
+
+    return apiClient;
+}
 
 /**
  * Check if the response indicates an error (code !== 0).
@@ -20,7 +42,8 @@ function checkSuccess(result: Result, prefix?: string): void {
 export const api = {
     async get<T = any>(url: string, errorPrefix?: string): Promise<T> {
         try {
-            const response: AxiosResponse<Result<T>> = await apiClient.get(url);
+            const client = await getApiClient();
+            const response: AxiosResponse<Result<T>> = await client.get(url);
             checkSuccess(response.data, errorPrefix);
             return response.data.data;
         } catch (error) {
@@ -33,7 +56,8 @@ export const api = {
 
     async post<T = any>(url: string, data: object = {}, errorPrefix?: string): Promise<T> {
         try {
-            const response: AxiosResponse<Result<T>> = await apiClient.post(url, data);
+            const client = await getApiClient();
+            const response: AxiosResponse<Result<T>> = await client.post(url, data);
             checkSuccess(response.data, errorPrefix);
             return response.data.data;
         } catch (error) {
@@ -46,7 +70,8 @@ export const api = {
 
     async patch<T = any>(url: string, data: object = {}, errorPrefix?: string): Promise<T> {
         try {
-            const response: AxiosResponse<Result<T>> = await apiClient.patch(url, data);
+            const client = await getApiClient();
+            const response: AxiosResponse<Result<T>> = await client.patch(url, data);
             checkSuccess(response.data, errorPrefix);
             return response.data.data;
         } catch (error) {
@@ -59,7 +84,8 @@ export const api = {
 
     async delete<T = any>(url: string, errorPrefix?: string): Promise<T> {
         try {
-            const response: AxiosResponse<Result<T>> = await apiClient.delete(url);
+            const client = await getApiClient();
+            const response: AxiosResponse<Result<T>> = await client.delete(url);
             checkSuccess(response.data, errorPrefix);
             return response.data.data;
         } catch (error) {

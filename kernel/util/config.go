@@ -15,7 +15,7 @@ type BilladmConfig struct {
 }
 
 var Config = BilladmConfig{
-	Port:      "31943",
+	Port:      "28080",
 	LogLevel:  "debug",
 	Mode:      "debug",
 	Workspace: "",
@@ -23,7 +23,7 @@ var Config = BilladmConfig{
 
 // NewBilladmConfigFromFlags 解析命令行标志并返回一个配置对象
 func NewBilladmConfigFromFlags() error {
-	portPtr := flag.String("port", "31943", "服务器监听端口 (默认: 31943)")
+	portPtr := flag.String("port", "28080", "服务器监听端口 (默认: 28080)")
 	logLevelPtr := flag.String("log_level", "info", "日志级别 (debug, info, warn, warning, error) (默认: info)")
 	modePtr := flag.String("mode", "debug", "billadm的运行模式 (debug, release) (默认: debug)")
 	workspacePtr := flag.String("workspace", "", "billadm的工作空间目录")
