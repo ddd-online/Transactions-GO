@@ -1,6 +1,5 @@
 import type { TransactionRecord } from '@/types/billadm'
 import type { TrQueryConditionItem } from '@/types/billadm'
-import { TransactionTypeToLabel } from '@/backend/constant'
 import dayjs from 'dayjs'
 
 /**
@@ -8,55 +7,114 @@ import dayjs from 'dayjs'
  */
 export interface TimeSeriesData {
   time: string
-  type: string
+  type: string  // 存储transactionType: income/expense/transfer
+  name: string  // 曲线名称，用于图例显示
   amount: number
 }
 
 /**
- * 构建G2折线图数据
+ * 图表曲线配置
+ */
+export interface ChartLine {
+  name: string              // 曲线名称，用于图例显示
+  transactionType: string   // 交易类型：income/expense/transfer
+  includeOutlier: boolean  // 是否包含离群值
+  conditions: TrQueryConditionItem[]  // 查询条件
+}
+
+/**
+ * 图表配置项
+ */
+export interface ChartConfig {
+  title: string
+  granularity: 'year' | 'month'
+  lines: ChartLine[]
+}
+
+/**
+ * 根据条件过滤交易记录
+ */
+function filterByConditions(
+  item: TransactionRecord,
+  conditions: TrQueryConditionItem[]
+): boolean {
+  if (conditions.length === 0) {
+    return true
+  }
+  // 所有条件必须同时满足
+  return conditions.every((cond) => {
+    if (cond.transactionType && item.transactionType !== cond.transactionType) {
+      return false
+    }
+    if (cond.category && item.category !== cond.category) {
+      return false
+    }
+    if (cond.tags && cond.tags.length > 0) {
+      const hasAllTags = cond.tags.every((tag) => item.tags.includes(tag))
+      if (cond.tagNot ? hasAllTags : !hasAllTags) {
+        return false
+      }
+    }
+    if (cond.description && !item.description.includes(cond.description)) {
+      return false
+    }
+    return true
+  })
+}
+
+/**
+ * 构建G2折线图数据（支持多曲线）
  */
 export function buildLineChartData(
   trList: TransactionRecord[],
   options: {
     granularity: 'year' | 'month'
-    lineDisplayTypes: string[]
-    includeOutlier: boolean
+    lines: ChartLine[]
   }
 ): TimeSeriesData[] {
-  const { granularity, lineDisplayTypes, includeOutlier } = options
+  const { granularity, lines } = options
 
-  // 过滤非异常且类型匹配的数据
-  let filteredData = trList
-    .filter((item) => lineDisplayTypes.includes(item.transactionType))
-
-  if (!includeOutlier) {
-    filteredData = filteredData.filter((item) => !item.outlier)
-  }
-
-  if (filteredData.length === 0) {
+  if (lines.length === 0) {
     return []
   }
 
-  // 找出时间范围
+  // 收集所有曲线的时间范围
   let minYear = Infinity,
     minMonth = Infinity
   let maxYear = -Infinity,
     maxMonth = -Infinity
 
-  filteredData.forEach((item) => {
-    const date = dayjs(item.transactionAt * 1000)
-    const year = date.year()
-    const month = date.month() + 1
+  lines.forEach((line) => {
+    const filteredData = trList.filter((item) => {
+      if (item.transactionType !== line.transactionType) return false
+      if (!line.includeOutlier && item.outlier) return false
+      return filterByConditions(item, line.conditions)
+    })
 
-    if (year < minYear || (year === minYear && month < minMonth)) {
-      minYear = year
-      minMonth = month
-    }
-    if (year > maxYear || (year === maxYear && month > maxMonth)) {
-      maxYear = year
-      maxMonth = month
-    }
+    filteredData.forEach((item) => {
+      const date = dayjs(item.transactionAt * 1000)
+      const year = date.year()
+      const month = date.month() + 1
+
+      if (year < minYear || (year === minYear && month < minMonth)) {
+        minYear = year
+        minMonth = month
+      }
+      if (year > maxYear || (year === maxYear && month > maxMonth)) {
+        maxYear = year
+        maxMonth = month
+      }
+    })
   })
+
+  // 如果没有数据，使用当前时间范围
+  if (minYear === Infinity) {
+    const now = dayjs()
+    minYear = now.year()
+    minMonth = now.month() + 1
+    maxYear = minYear
+    maxMonth = minMonth
+  }
 
   // 生成完整的时间轴（年 or 月）
   const timeLabels: string[] = []
@@ -77,47 +135,48 @@ export function buildLineChartData(
     }
   }
 
-  // 初始化每月/每年数据结构
-  const initData = () =>
-    lineDisplayTypes.reduce(
-      (acc, type) => {
-        acc[type] = 0
-        return acc
-      },
-      {} as Record<string, number>
-    )
-
+  // 初始化时间数据结构
   const timeDataMap = new Map<string, Record<string, number>>()
   timeLabels.forEach((label) => {
-    timeDataMap.set(label, initData())
+    const initObj: Record<string, number> = {}
+    lines.forEach((line) => {
+      initObj[line.name] = 0
+    })
+    timeDataMap.set(label, initObj)
   })
 
-  // 聚合数据
-  filteredData.forEach((item) => {
-    const date = dayjs(item.transactionAt * 1000)
-    const label =
-      granularity === 'year'
-        ? String(date.year())
-        : `${date.year()}-${String(date.month() + 1).padStart(2, '0')}`
+  // 聚合每条曲线的数据
+  lines.forEach((line) => {
+    const filteredData = trList.filter((item) => {
+      if (item.transactionType !== line.transactionType) return false
+      if (!line.includeOutlier && item.outlier) return false
+      return filterByConditions(item, line.conditions)
+    })
 
-    const type = item.transactionType
-    const amount = item.price
+    filteredData.forEach((item) => {
+      const date = dayjs(item.transactionAt * 1000)
+      const label =
+        granularity === 'year'
+          ? String(date.year())
+          : `${date.year()}-${String(date.month() + 1).padStart(2, '0')}`
 
-    if (timeDataMap.has(label) && lineDisplayTypes.includes(type)) {
-      const record = timeDataMap.get(label)!
-      record[type]! += amount
-    }
+      if (timeDataMap.has(label)) {
+        const record = timeDataMap.get(label)!
+        record[line.name] = (record[line.name] ?? 0) + item.price
+      }
+    })
   })
 
   // 转换为G2数据格式
   const result: TimeSeriesData[] = []
   timeLabels.forEach((label) => {
     const record = timeDataMap.get(label)!
-    lineDisplayTypes.forEach((type) => {
+    lines.forEach((line) => {
       result.push({
         time: label,
-        type: TransactionTypeToLabel.get(type) || type,
-        amount: (record[type] ?? 0) / 100, // 转换为元
+        type: line.transactionType,  // 使用transactionType而非label
+        name: line.name,
+        amount: (record[line.name] ?? 0) / 100, // 转换为元
       })
     })
   })
@@ -126,81 +185,65 @@ export function buildLineChartData(
 }
 
 /**
- * 图表配置项
- */
-export interface ChartConfig {
-  title: string
-  granularity: 'year' | 'month'
-  lineDisplayTypes: string[]
-  includeOutlier: boolean
-  conditions: TrQueryConditionItem[]
-}
-
-/**
  * 保留的图表配置
  */
 export const KEEP_CHART_CONFIGS: ChartConfig[] = [
   {
-    title: '月度消费趋势(不含离群值)',
+    title: '月度消费趋势',
     granularity: 'month',
-    lineDisplayTypes: ['expense', 'income', 'transfer'],
-    includeOutlier: false,
-    conditions: [],
+    lines: [
+      { name: '支出', transactionType: 'expense', includeOutlier: false, conditions: [] },
+      { name: '收入', transactionType: 'income', includeOutlier: false, conditions: [] },
+      { name: '转账', transactionType: 'transfer', includeOutlier: false, conditions: [] },
+    ],
   },
   {
-    title: '年度消费趋势(含离群值)',
+    title: '年度消费趋势',
     granularity: 'year',
-    lineDisplayTypes: ['expense', 'income', 'transfer'],
-    includeOutlier: true,
-    conditions: [],
+    lines: [
+      { name: '支出', transactionType: 'expense', includeOutlier: true, conditions: [] },
+      { name: '收入', transactionType: 'income', includeOutlier: true, conditions: [] },
+      { name: '转账', transactionType: 'transfer', includeOutlier: true, conditions: [] },
+    ],
   },
   {
     title: '年度总收入',
     granularity: 'year',
-    lineDisplayTypes: ['income'],
-    includeOutlier: true,
-    conditions: [],
+    lines: [
+      { name: '年度总收入', transactionType: 'income', includeOutlier: true, conditions: [] },
+    ],
   },
   {
     title: '年度工资收入',
     granularity: 'year',
-    lineDisplayTypes: ['income'],
-    includeOutlier: true,
-    conditions: [{
-      transactionType: 'income',
-      category: '工资奖金',
-      tags: ['工资'],
-      tagPolicy: 'all',
-      tagNot: false,
-      description: '',
-    }],
+    lines: [
+      {
+        name: '年度工资收入', transactionType: 'income', includeOutlier: true, conditions: [
+          { transactionType: 'income', category: '工资奖金', tags: ['工资'], tagPolicy: 'all', tagNot: false, description: '' },
+        ]
+      },
+    ],
   },
   {
     title: '年度奖金收入',
     granularity: 'year',
-    lineDisplayTypes: ['income'],
-    includeOutlier: true,
-    conditions: [{
-      transactionType: 'income',
-      category: '工资奖金',
-      tags: ['奖金'],
-      tagPolicy: 'all',
-      tagNot: false,
-      description: '年奖金',
-    }],
+    lines: [
+      {
+        name: '年度奖金收入', transactionType: 'income', includeOutlier: true, conditions: [
+          { transactionType: 'income', category: '工资奖金', tags: ['奖金'], tagPolicy: 'all', tagNot: false, description: '年奖金' },
+        ]
+      },
+    ],
   },
   {
     title: '年度分红收入',
     granularity: 'year',
-    lineDisplayTypes: ['income'],
-    includeOutlier: true,
-    conditions: [{
-      transactionType: 'income',
-      category: '投资理财',
-      tags: [],
-      tagPolicy: 'all',
-      tagNot: false,
-      description: '年分红',
-    }],
+    lines: [
+      {
+        name: '年度分红收入', transactionType: 'income', includeOutlier: true, conditions: [
+          { transactionType: 'income', category: '投资理财', tags: [], tagPolicy: 'all', tagNot: false, description: '年分红' },
+        ]
+      },
+    ],
   },
 ]

@@ -12,7 +12,7 @@
     </div>
 
     <!-- 主内容区 -->
-    <a-card class="da-main" :body-style="{padding: '0', display: 'flex', height: '100%'}">
+    <a-card class="da-main" :body-style="{ padding: '0', display: 'flex', height: '100%' }">
       <!-- 左侧图表列表 -->
       <div class="da-sidebar">
         <billadm-chart-list :chart-configs="KEEP_CHART_CONFIGS" @select="onChartSelect" />
@@ -52,7 +52,7 @@ interface ChartInstance {
 const selectedChart = ref<ChartInstance | null>(null)
 
 // 查询交易记录
-const queryTrs = async (conditions: ChartConfig['conditions'] = []): Promise<{ items: TransactionRecord[], trStatistics: TrStatistics | null }> => {
+const queryTrs = async (conditions: import('@/types/billadm').TrQueryConditionItem[] = []): Promise<{ items: TransactionRecord[], trStatistics: TrStatistics | null }> => {
   if (!ledgerStore.currentLedgerId) return { items: [], trStatistics: null }
   const trCondition = {
     ledgerId: ledgerStore.currentLedgerId,
@@ -67,11 +67,11 @@ const queryTrs = async (conditions: ChartConfig['conditions'] = []): Promise<{ i
 
 // 加载图表数据
 const loadChartData = async (config: ChartConfig): Promise<{ chartInstance: ChartInstance, trStatistics: TrStatistics | null }> => {
-  const { items, trStatistics } = await queryTrs(config.conditions)
+  // 查询所有符合条件的交易记录（不过滤具体条件，由buildLineChartData根据lines中的条件分别过滤）
+  const { items, trStatistics } = await queryTrs([])
   const chartData = buildLineChartData(items, {
     granularity: config.granularity,
-    lineDisplayTypes: config.lineDisplayTypes,
-    includeOutlier: config.includeOutlier,
+    lines: config.lines,
   })
   return {
     chartInstance: {

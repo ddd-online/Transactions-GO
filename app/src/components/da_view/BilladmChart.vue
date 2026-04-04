@@ -6,7 +6,7 @@
 import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
 import { Chart } from '@antv/g2'
 import type { TimeSeriesData } from '@/backend/chart'
-import { TransactionTypeToColor, TransactionTypeToLabel } from '@/backend/constant'
+import { TransactionTypeToColor } from '@/backend/constant'
 
 interface Props {
   data: TimeSeriesData[]
@@ -44,14 +44,11 @@ const initChart = () => {
     data: props.data,
   })
 
-  // 使用TransactionTypeToColor和TransactionTypeToLabel设置颜色
-  // 数据中type字段使用的是label（收入/支出/转账），需要统一颜色映射
-  const colorDomain = Array.from(TransactionTypeToLabel.values()) // ['收入', '支出', '转账']
-  const colorRange = Array.from(TransactionTypeToLabel.keys()).map(k => TransactionTypeToColor.get(k)!) // ['#52c41a', '#f5222d', '#1677ff']
-
-  chart.scale('color', {
-    domain: colorDomain,
-    range: colorRange,
+  // 使用TransactionTypeToColor设置颜色映射
+  // data中的type是transactionType(income/expense/transfer)，name是曲线名称
+  chart.scale('type', {
+    domain: Array.from(TransactionTypeToColor.keys()),
+    range: Array.from(TransactionTypeToColor.values()),
   })
 
   chart.scale('y', {
@@ -78,14 +75,14 @@ const initChart = () => {
     .line()
     .encode('x', props.xField)
     .encode('y', props.yField)
-    .encode('color', props.seriesField)
+    .encode('color', 'type')
     .style('lineWidth', 2)
 
   chart
     .point()
     .encode('x', props.xField)
     .encode('y', props.yField)
-    .encode('color', props.seriesField)
+    .encode('color', 'type')
     .style('size', 4)
     .style('stroke', '#fff')
     .style('lineWidth', 1)
