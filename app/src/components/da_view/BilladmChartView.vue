@@ -139,6 +139,14 @@
         </div>
       </div>
     </div>
+
+    <!-- 曲线求和统计 -->
+    <div v-if="lineSums.length > 0" class="chart-view-footer">
+      <div v-for="item in lineSums" :key="item.label" class="line-sum-item">
+        <a-tag :color="getTypeColor(item.type)">{{ item.label }}</a-tag>
+        <span class="line-sum-value">{{ formatAmount(item.sum) }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -293,6 +301,30 @@ const handleAddLine = () => {
 const handleDeleteLine = (index: number) => {
   localLines.value.splice(index, 1)
 }
+
+// 计算每条曲线的求和值
+const lineSums = computed(() => {
+  const sums = new Map<string, { label: string; type: string; sum: number }>()
+
+  props.data.forEach((item) => {
+    const existing = sums.get(item.label)
+    if (existing) {
+      existing.sum += item.amount
+    } else {
+      sums.set(item.label, {
+        label: item.label,
+        type: item.type,
+        sum: item.amount,
+      })
+    }
+  })
+
+  return Array.from(sums.values())
+})
+
+const formatAmount = (amount: number) => {
+  return amount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
 </script>
 
 <style scoped>
@@ -353,5 +385,26 @@ const handleDeleteLine = (index: number) => {
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.chart-view-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--billadm-color-window-border);
+  background-color: var(--billadm-color-minor-background);
+}
+
+.line-sum-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.line-sum-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--billadm-color-text-major);
 }
 </style>

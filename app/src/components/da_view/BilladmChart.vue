@@ -21,6 +21,16 @@ const props = defineProps<Props>()
 const containerRef = ref<HTMLDivElement | null>(null)
 let chart: Chart | null = null
 
+// 获取当前主题颜色
+const getThemeColors = () => {
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+  return {
+    labelFill: isDark ? '#e8e8f0' : '#000000',
+    lineStroke: isDark ? '#e8e8f0' : '#000000',
+    titleFill: isDark ? '#e8e8f0' : '#000000',
+  }
+}
+
 const initChart = () => {
   if (!containerRef.value || !props.data.length) return
 
@@ -36,6 +46,9 @@ const initChart = () => {
   // 计算16:9的高度
   const width = containerRef.value.clientWidth
   const height = width * 9 / 16
+
+  // 获取主题颜色
+  const themeColors = getThemeColors()
 
   chart = new Chart({
     container: containerRef.value,
@@ -66,17 +79,23 @@ const initChart = () => {
 
   chart.axis('x', {
     title: xAxisTitle,
-    labelFill: '#000000',
+    labelFill: themeColors.labelFill,
     labelFontSize: 15,
     titleFontSize: 16,
-    line: { style: { stroke: '#000000', lineWidth: 1 } }
+    line: { style: { stroke: themeColors.lineStroke, lineWidth: 1 } }
   })
   chart.axis('y', {
     title: '金额（元）',
-    labelFill: '#000000',
+    labelFill: themeColors.labelFill,
     labelFontSize: 15,
     titleFontSize: 16,
-    line: { style: { stroke: '#000000', lineWidth: 1 } }
+    line: { style: { stroke: themeColors.lineStroke, lineWidth: 1 } }
+  })
+
+  // 图例配置
+  chart.legend('label', {
+    itemLabelFill: themeColors.labelFill,
+    itemValueFill: themeColors.labelFill,
   })
 
   chart
@@ -114,6 +133,16 @@ onUnmounted(() => {
 watch(() => props.data, () => {
   initChart()
 }, { deep: true })
+
+// 监听主题变化
+const themeObserver = new MutationObserver(() => {
+  initChart()
+})
+themeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+
+onUnmounted(() => {
+  themeObserver.disconnect()
+})
 </script>
 
 <style scoped>
