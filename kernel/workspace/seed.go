@@ -9,12 +9,13 @@ import (
 
 var defaultData = map[string]map[string][]string{
 	"expense": {
-		"餐饮美食": {"三餐", "商场", "外卖", "奶茶", "零食", "水果", "咖啡", "饮料", "茶叶", "买菜"},
-		"交通出行": {"打车", "地铁", "公交", "高铁", "油费", "停车", "ETC", "车险"},
+		"餐饮美食": {"三餐", "零食", "商场", "外卖", "饮料", "奶茶", "咖啡", "水果", "茶叶", "买菜"},
 		"购物消费": {"衣物", "数码", "家居", "书籍", "礼物", "玩具", "宠物", "游戏", "快递", "彩票", "电影", "运动", "酒店", "烟酒", "充值", "汽车", "还款"},
-		"娱乐休闲": {},
-		"生活缴费": {"房租", "物业", "水电", "燃气", "通讯", "人险", "还款", "网费", "理发"},
+		"交通出行": {"打车", "地铁", "公交", "高铁", "油费", "停车", "ETC", "车险"},
+		"生活缴费": {"房租", "物业", "燃气", "水费", "电费", "通讯", "还款", "网费", "理发"},
+		"贷款还款": {},
 		"医疗健康": {"医药", "医险"},
+		"娱乐休闲": {},
 		"人情往来": {"红包", "请客", "礼金"},
 		"教育学习": {},
 	},
@@ -59,7 +60,7 @@ func seedData(db *gorm.DB) error {
 			categoryTransactionType := categoryName + ":" + transactionType
 			for _, tagName := range tags {
 				tag := models.Tag{
-					Name:                     tagName,
+					Name:                    tagName,
 					CategoryTransactionType: categoryTransactionType,
 				}
 				if err := db.FirstOrCreate(&tag, tag).Error; err != nil {
