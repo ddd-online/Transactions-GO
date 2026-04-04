@@ -20,16 +20,16 @@ type QueryConditionItem struct {
 
 // Chart 图表配置
 type Chart struct {
-	ChartID      string `gorm:"primaryKey;comment:图表UUID" json:"chart_id"`
-	LedgerID     string `gorm:"not null;comment:关联账本ID" json:"ledger_id"`
-	Title        string `gorm:"not null;comment:图表名称" json:"title"`
-	Granularity  string `gorm:"not null;comment:时间粒度 year/month" json:"granularity"`
-	ChartLines   string `gorm:"not null;comment:曲线配置JSON" json:"chart_lines"`
-	ChartType    string `gorm:"not null;default:'line';comment:图表类型 line/bar" json:"chart_type"`
-	IsPreset     bool   `gorm:"not null;default:false;comment:是否预设图表" json:"is_preset"`
-	SortOrder    int    `gorm:"not null;default:0;comment:排序" json:"sort_order"`
-	CreatedAt    int64  `gorm:"autoCreateTime:unix;not null;comment:创建时间" json:"created_at"`
-	UpdatedAt    int64  `gorm:"autoUpdateTime:unix;not null;comment:更新时间" json:"updated_at"`
+	ChartID      string `gorm:"column:chart_id;primaryKey;comment:图表UUID" json:"chart_id"`
+	LedgerID     string `gorm:"column:ledger_id;not null;comment:关联账本ID" json:"ledger_id"`
+	Name         string `gorm:"column:name;not null;comment:图表名称" json:"name"`
+	Granularity  string `gorm:"column:granularity;not null;comment:时间粒度 year/month" json:"granularity"`
+	ChartLines   string `gorm:"column:chart_lines;not null;comment:曲线配置JSON" json:"chart_lines"`
+	ChartType    string `gorm:"column:chart_type;not null;default:line;comment:图表类型 line/bar" json:"chart_type"`
+	IsPreset     bool   `gorm:"column:is_preset;not null;default:false;comment:是否预设图表" json:"is_preset"`
+	SortOrder    int    `gorm:"column:sort_order;not null;default:0;comment:排序" json:"sort_order"`
+	CreatedAt    int64  `gorm:"column:created_at;autoCreateTime:unix;not null;comment:创建时间" json:"created_at"`
+	UpdatedAt    int64  `gorm:"column:updated_at;autoUpdateTime:unix;not null;comment:更新时间" json:"updated_at"`
 }
 
 func (c *Chart) TableName() string {

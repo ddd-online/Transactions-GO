@@ -63,7 +63,7 @@ func (t *chartServiceImpl) Create(ws *workspace.Workspace, req *dto.CreateChartR
 	chart := &models.Chart{
 		ChartID:     chartID,
 		LedgerID:    req.LedgerID,
-		Title:       req.Title,
+		Name:       req.Title,
 		Granularity:  req.Granularity,
 		ChartLines:   string(linesJSON),
 		ChartType:   req.ChartType,
@@ -134,7 +134,7 @@ func (t *chartServiceImpl) Update(ws *workspace.Workspace, req *dto.UpdateChartR
 		return nil, fmt.Errorf("marshal chart lines failed: %w", err)
 	}
 
-	chart.Title = req.Title
+	chart.Name = req.Title
 	chart.Granularity = req.Granularity
 	chart.ChartLines = string(linesJSON)
 	chart.ChartType = req.ChartType
@@ -158,7 +158,7 @@ func (t *chartServiceImpl) toDto(chart *models.Chart) (*dto.ChartDto, error) {
 	return &dto.ChartDto{
 		ChartID:     chart.ChartID,
 		LedgerID:    chart.LedgerID,
-		Title:       chart.Title,
+		Title:       chart.Name,
 		Granularity:  chart.Granularity,
 		Lines:       lines,
 		ChartType:   chart.ChartType,
