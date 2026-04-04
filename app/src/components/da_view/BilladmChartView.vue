@@ -12,7 +12,7 @@
     </div>
 
     <!-- 配置抽屉 -->
-    <a-drawer v-model:open="drawerVisible" title="图表配置详情" placement="right" width="400">
+    <a-drawer v-model:open="drawerVisible" title="图表配置详情" placement="right" width="600">
       <a-descriptions :column="1" size="small" bordered>
         <a-descriptions-item label="图表名称">{{ title }}</a-descriptions-item>
         <a-descriptions-item label="时间粒度">
