@@ -2,7 +2,9 @@ package service
 
 import (
 	"fmt"
+	"strings"
 	"sync"
+	"time"
 
 	"github.com/billadm/dao"
 	"github.com/billadm/models"
@@ -37,6 +39,7 @@ type TransactionRecordService interface {
 	CreateTr(ws *workspace.Workspace, dto *dto.TransactionRecordDto) (string, error)
 	BatchCreateTr(ws *workspace.Workspace, dtos []*dto.TransactionRecordDto) (int, error)
 	QueryTrsOnCondition(ws *workspace.Workspace, condition *dto.TrQueryCondition) (*dto.TrQueryResult, error)
+	QueryTrsForChart(ws *workspace.Workspace, req *dto.ChartQueryRequest) (*dto.ChartQueryResponse, error)
 	DeleteTrById(ws *workspace.Workspace, trId string) error
 }
 
@@ -185,6 +188,147 @@ func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspa
 
 	logrus.Infof("query trs by page success, len: %d", len(summary.Items))
 	return summary, nil
+}
+
+func (t *transactionRecordServiceImpl) QueryTrsForChart(ws *workspace.Workspace, req *dto.ChartQueryRequest) (*dto.ChartQueryResponse, error) {
+	logrus.Infof("start to query trs for chart, granularity: %s, lines: %d", req.Granularity, len(req.Lines))
+
+	// Collect all transaction types needed for chart lines
+	ttSet := make(map[string]bool)
+	for _, line := range req.Lines {
+		ttSet[line.TransactionType] = true
+	}
+
+	// Query all matching transaction records from DAO (without detailed filter)
+	trs, err := t.trDao.QueryTrsOnCondition(ws, &dto.TrQueryCondition{
+		LedgerID: req.LedgerID,
+		TsRange:  req.TsRange,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Batch query tags
+	trIds := make([]string, len(trs))
+	for i, tr := range trs {
+		trIds[i] = tr.TransactionID
+	}
+	tagMap, err := t.trTagDao.QueryTrTagsByTrIds(ws, trIds)
+	if err != nil {
+		return nil, err
+	}
+
+	// Build DTOs with tags
+	trDtos := make([]*dto.TransactionRecordDto, 0, len(trs))
+	for _, tr := range trs {
+		trDto := &dto.TransactionRecordDto{}
+		trDto.FromTransactionRecord(tr)
+		if tags, ok := tagMap[tr.TransactionID]; ok {
+			for _, tag := range tags {
+				trDto.Tags = append(trDto.Tags, tag.Tag)
+			}
+		}
+		trDtos = append(trDtos, trDto)
+	}
+
+	// Process each chart line
+	response := &dto.ChartQueryResponse{
+		Lines: make([]dto.ChartLineData, 0, len(req.Lines)),
+	}
+
+	for _, line := range req.Lines {
+		// Filter by transaction type and outlier flag
+		var filtered []*dto.TransactionRecordDto
+		for _, tr := range trDtos {
+			if tr.TransactionType != line.TransactionType {
+				continue
+			}
+			if !line.IncludeOutlier && tr.Outlier {
+				continue
+			}
+			// Apply additional conditions (AND logic)
+			if matchConditions(tr, line.Conditions) {
+				filtered = append(filtered, tr)
+			}
+		}
+
+		// Aggregate by time period
+		timeMap := make(map[string]float64)
+		for _, tr := range filtered {
+			timeLabel := getTimeLabel(tr.TransactionAt, req.Granularity)
+			timeMap[timeLabel] += float64(tr.Price)
+		}
+
+		// Build time series data points
+		dataPoints := make([]dto.TimeSeriesDataPoint, 0, len(timeMap))
+		for time, amount := range timeMap {
+			dataPoints = append(dataPoints, dto.TimeSeriesDataPoint{
+				Time:   time,
+				Amount: amount / 100, // Convert cents to yuan
+			})
+		}
+
+		response.Lines = append(response.Lines, dto.ChartLineData{
+			Label: line.Label,
+			Type:  line.TransactionType,
+			Data:  dataPoints,
+		})
+	}
+
+	logrus.Infof("query trs for chart success, lines: %d", len(response.Lines))
+	return response, nil
+}
+
+// matchConditions checks if a transaction record matches all conditions (AND logic)
+func matchConditions(tr *dto.TransactionRecordDto, conditions []dto.QueryConditionItem) bool {
+	if len(conditions) == 0 {
+		return true
+	}
+	for _, cond := range conditions {
+		if cond.TransactionType != "" && tr.TransactionType != cond.TransactionType {
+			return false
+		}
+		if cond.Category != "" && tr.Category != cond.Category {
+			return false
+		}
+		if len(cond.Tags) > 0 {
+			hasAllTags := true
+			for _, tag := range cond.Tags {
+				if !contains(tr.Tags, tag) {
+					hasAllTags = false
+					break
+				}
+			}
+			if cond.TagNot {
+				hasAllTags = !hasAllTags
+			}
+			if !hasAllTags {
+				return false
+			}
+		}
+		if cond.Description != "" && !strings.Contains(tr.Description, cond.Description) {
+			return false
+		}
+	}
+	return true
+}
+
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
+}
+
+func getTimeLabel(timestamp int64, granularity string) string {
+	// timestamp is in seconds, convert to time.Time
+	t := time.Unix(timestamp, 0)
+	if granularity == "year" {
+		return fmt.Sprintf("%d", t.Year())
+	}
+	return fmt.Sprintf("%d-%02d", t.Year(), t.Month())
 }
 
 func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trId string) error {

@@ -1,8 +1,31 @@
 import api from "@/backend/api/api-client";
 import type { TransactionRecord, TrQueryCondition, TrQueryResult } from "@/types/billadm";
+import type { ChartLine } from '@/backend/chart';
 
 export async function queryTrOnCondition(condition: TrQueryCondition): Promise<TrQueryResult> {
     return api.post<TrQueryResult>('/v1/transactions/query', condition, '查询消费记录');
+}
+
+export interface ChartQueryResponse {
+    lines: {
+        label: string
+        type: string
+        data: {
+            time: string
+            amount: number
+        }[]
+    }[]
+}
+
+export interface ChartQueryRequest {
+    ledgerId: string
+    tsRange?: number[]
+    granularity: 'year' | 'month'
+    lines: ChartLine[]
+}
+
+export async function queryChartData(request: ChartQueryRequest): Promise<ChartQueryResponse> {
+    return api.post<ChartQueryResponse>('/v1/transactions/query-chart-data', request, '查询图表数据');
 }
 
 export async function createTrForLedger(data: TransactionRecord): Promise<string> {

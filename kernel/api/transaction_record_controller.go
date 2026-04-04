@@ -138,3 +138,31 @@ func deleteTransaction(c *gin.Context) {
 		return
 	}
 }
+
+// POST /transactions/query-chart-data
+func queryChartData(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	req, ok := dto.JsonChartQuery(c, ret)
+	if !ok {
+		return
+	}
+	logrus.Debugf("chart query request: %v", req)
+
+	result, err := service.GetTrService().QueryTrsForChart(ws, req)
+	if err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ret.Data = result
+}

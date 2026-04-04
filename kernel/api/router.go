@@ -28,6 +28,7 @@ func ServeAPI(ginServer *gin.Engine) {
 		transactions := v1.Group("/transactions")
 		{
 			transactions.POST("/query", queryTransactions)
+			transactions.POST("/query-chart-data", queryChartData)
 			transactions.POST("/batch", batchCreateTransactions)
 			transactions.POST("", createTransaction)
 			transactions.DELETE("/:id", deleteTransaction)

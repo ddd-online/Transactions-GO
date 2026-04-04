@@ -38,8 +38,9 @@ import { useTrQueryConditionStore } from '@/stores/trQueryConditionStore.ts'
 import { useAppDataStore } from '@/stores/appDataStore.ts'
 import { convertToUnixTimeRange } from '@/backend/timerange.ts'
 import { getTrOnCondition } from '@/backend/functions.ts'
-import { buildLineChartData, KEEP_CHART_CONFIGS, type ChartLine, type ChartConfig, type TimeSeriesData } from '@/backend/chart'
-import type { TransactionRecord, TrStatistics } from '@/types/billadm'
+import { queryChartData } from '@/backend/api/tr.ts'
+import { KEEP_CHART_CONFIGS, type ChartLine, type ChartConfig, type TimeSeriesData } from '@/backend/chart'
+import type { TrStatistics } from '@/types/billadm'
 
 const ledgerStore = useLedgerStore()
 const trQueryConditionStore = useTrQueryConditionStore()
@@ -53,66 +54,93 @@ interface ChartInstance {
 
 const selectedChart = ref<ChartInstance | null>(null)
 
-// 查询交易记录
-const queryTrs = async (conditions: import('@/types/billadm').TrQueryConditionItem[] = []): Promise<{ items: TransactionRecord[], trStatistics: TrStatistics | null }> => {
-  if (!ledgerStore.currentLedgerId) return { items: [], trStatistics: null }
+// 缓存图表数据
+const chartDataCache = ref<Map<string, ChartInstance>>(new Map())
+
+// 缓存key，用于判断是否需要重新查询
+let cachedLedgerId: string | null = null
+let cachedTimeRange: typeof trQueryConditionStore.timeRange = undefined
+
+// 查询底部统计数据
+const queryStatistics = async (): Promise<TrStatistics | null> => {
+  if (!ledgerStore.currentLedgerId) return null
   const trCondition = {
     ledgerId: ledgerStore.currentLedgerId,
     tsRange: trQueryConditionStore.timeRange
       ? convertToUnixTimeRange(trQueryConditionStore.timeRange)
       : undefined,
-    items: conditions,
+    items: [],
   }
   const result = await getTrOnCondition(trCondition)
-  return { items: result.items || [], trStatistics: result.trStatistics || null }
+  return result.trStatistics || null
 }
 
-// 缓存所有图表数据
-const chartDataCache = ref<Map<string, ChartInstance>>(new Map())
-
-// 缓存原始交易数据，避免重复查询
-let cachedTrList: TransactionRecord[] | null = null
-let cachedLedgerId: string | null = null
-let cachedTimeRange: typeof trQueryConditionStore.timeRange = undefined
-
+// 加载所有图表数据
 const loadAllChartData = async () => {
   const currentLedgerId = ledgerStore.currentLedgerId
   const currentTimeRange = trQueryConditionStore.timeRange
 
-  // 检查是否需要重新查询原始数据
-  const needRefetch = !cachedTrList ||
-    cachedLedgerId !== currentLedgerId ||
-    cachedTimeRange !== currentTimeRange
+  // 检查是否需要重新查询
+  const needRefetch = cachedLedgerId !== currentLedgerId || cachedTimeRange !== currentTimeRange
 
-  let trStatistics: TrStatistics | null = null
-
-  if (needRefetch) {
-    // 只查询一次原始数据
-    const result = await queryTrs([])
-    cachedTrList = result.items
-    cachedLedgerId = currentLedgerId
-    cachedTimeRange = currentTimeRange
-    trStatistics = result.trStatistics
+  if (!needRefetch) {
+    // 只更新选中图表的引用
+    if (selectedChart.value) {
+      const updatedData = chartDataCache.value.get(selectedChart.value.title)
+      if (updatedData) {
+        selectedChart.value = updatedData
+      }
+    }
+    return
   }
 
-  // 并行构建所有图表数据（使用缓存的原始数据）
-  const promises = KEEP_CHART_CONFIGS.map(async (config) => {
-    if (!cachedTrList) return
-    const chartData = buildLineChartData(cachedTrList, {
-      granularity: config.granularity,
-      lines: config.lines,
-    })
-    chartDataCache.value.set(config.title, {
-      title: config.title,
-      data: chartData,
-      lines: config.lines,
-    })
+  cachedLedgerId = currentLedgerId
+  cachedTimeRange = currentTimeRange
+
+  // 并行查询所有图表数据和统计数据
+  const [statistics, ...chartResults] = await Promise.all([
+    queryStatistics(),
+    ...KEEP_CHART_CONFIGS.map(async (config) => {
+      const tsRange = trQueryConditionStore.timeRange
+        ? convertToUnixTimeRange(trQueryConditionStore.timeRange)
+        : undefined
+
+      const response = await queryChartData({
+        ledgerId: currentLedgerId || '',
+        tsRange,
+        granularity: config.granularity,
+        lines: config.lines,
+      })
+
+      // 转换API响应为TimeSeriesData格式
+      const data: TimeSeriesData[] = []
+      response.lines.forEach((line) => {
+        line.data.forEach((point) => {
+          data.push({
+            time: point.time,
+            type: line.type,
+            label: line.label,
+            amount: point.amount,
+          })
+        })
+      })
+
+      return {
+        title: config.title,
+        data,
+        lines: config.lines,
+      }
+    }),
+  ])
+
+  // 更新缓存
+  chartResults.forEach((chartInstance) => {
+    chartDataCache.value.set(chartInstance.title, chartInstance)
   })
-  await Promise.all(promises)
 
   // 更新底部统计信息
-  if (trStatistics) {
-    appDataStore.setStatistics(trStatistics)
+  if (statistics) {
+    appDataStore.setStatistics(statistics)
   }
 
   // 初始化选中第一个图表，或更新当前选中图表的数据
