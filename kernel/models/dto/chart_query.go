@@ -15,20 +15,16 @@ type ChartLineCondition struct {
 
 type ChartQueryRequest struct {
 	LedgerID    string               `json:"ledgerId"`
-	TsRange     []int64             `json:"tsRange"`
+	TsRange     []int64            `json:"tsRange"`
 	Granularity string               `json:"granularity"` // "year" or "month"
 	Lines       []ChartLineCondition `json:"lines"`
 }
 
-type TimeSeriesDataPoint struct {
-	Time   string  `json:"time"`
-	Amount float64 `json:"amount"`
-}
-
+// ChartLineData contains filtered transaction records for a single line
 type ChartLineData struct {
-	Label string                `json:"label"`
-	Type  string                `json:"type"`
-	Data  []TimeSeriesDataPoint `json:"data"`
+	Label string                     `json:"label"`
+	Type  string                     `json:"type"`
+	Items []*TransactionRecordDto    `json:"items"`
 }
 
 type ChartQueryResponse struct {

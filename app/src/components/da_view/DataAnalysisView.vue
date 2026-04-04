@@ -39,7 +39,7 @@ import { useAppDataStore } from '@/stores/appDataStore.ts'
 import { convertToUnixTimeRange } from '@/backend/timerange.ts'
 import { getTrOnCondition } from '@/backend/functions.ts'
 import { queryChartData } from '@/backend/api/tr.ts'
-import { KEEP_CHART_CONFIGS, type ChartLine, type ChartConfig, type TimeSeriesData } from '@/backend/chart'
+import { KEEP_CHART_CONFIGS, buildLineChartData, type ChartLine, type ChartConfig, type TimeSeriesData } from '@/backend/chart'
 import type { TrStatistics } from '@/types/billadm'
 
 const ledgerStore = useLedgerStore()
@@ -112,18 +112,13 @@ const loadAllChartData = async () => {
         lines: config.lines,
       })
 
-      // 转换API响应为TimeSeriesData格式
-      const data: TimeSeriesData[] = []
-      response.lines.forEach((line) => {
-        line.data.forEach((point) => {
-          data.push({
-            time: point.time,
-            type: line.type,
-            label: line.label,
-            amount: point.amount,
-          })
-        })
-      })
+      // 转换API响应为TimeSeriesData格式（前端完成时间聚合）
+      const lineRecords = response.lines.map((line) => ({
+        label: line.label,
+        type: line.type,
+        items: line.items,
+      }))
+      const data = buildLineChartData(lineRecords, config.granularity)
 
       return {
         title: config.title,

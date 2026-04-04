@@ -10,10 +10,7 @@ export interface ChartQueryResponse {
     lines: {
         label: string
         type: string
-        data: {
-            time: string
-            amount: number
-        }[]
+        items: TransactionRecord[]
     }[]
 }
 

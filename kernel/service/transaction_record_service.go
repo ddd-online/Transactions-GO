@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/billadm/dao"
 	"github.com/billadm/models"
@@ -231,7 +230,7 @@ func (t *transactionRecordServiceImpl) QueryTrsForChart(ws *workspace.Workspace,
 		trDtos = append(trDtos, trDto)
 	}
 
-	// Process each chart line
+	// Process each chart line - filter records per line
 	response := &dto.ChartQueryResponse{
 		Lines: make([]dto.ChartLineData, 0, len(req.Lines)),
 	}
@@ -252,26 +251,10 @@ func (t *transactionRecordServiceImpl) QueryTrsForChart(ws *workspace.Workspace,
 			}
 		}
 
-		// Aggregate by time period
-		timeMap := make(map[string]float64)
-		for _, tr := range filtered {
-			timeLabel := getTimeLabel(tr.TransactionAt, req.Granularity)
-			timeMap[timeLabel] += float64(tr.Price)
-		}
-
-		// Build time series data points
-		dataPoints := make([]dto.TimeSeriesDataPoint, 0, len(timeMap))
-		for time, amount := range timeMap {
-			dataPoints = append(dataPoints, dto.TimeSeriesDataPoint{
-				Time:   time,
-				Amount: amount / 100, // Convert cents to yuan
-			})
-		}
-
 		response.Lines = append(response.Lines, dto.ChartLineData{
 			Label: line.Label,
 			Type:  line.TransactionType,
-			Data:  dataPoints,
+			Items: filtered,
 		})
 	}
 
@@ -320,15 +303,6 @@ func contains(slice []string, item string) bool {
 		}
 	}
 	return false
-}
-
-func getTimeLabel(timestamp int64, granularity string) string {
-	// timestamp is in seconds, convert to time.Time
-	t := time.Unix(timestamp, 0)
-	if granularity == "year" {
-		return fmt.Sprintf("%d", t.Year())
-	}
-	return fmt.Sprintf("%d-%02d", t.Year(), t.Month())
 }
 
 func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trId string) error {
