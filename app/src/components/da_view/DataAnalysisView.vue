@@ -15,7 +15,7 @@
     <a-card class="da-main" :body-style="{ padding: '0', display: 'flex', height: '100%' }">
       <!-- 左侧图表列表 -->
       <div class="da-sidebar">
-        <billadm-chart-list :custom-charts="customCharts" @select="onChartSelect" @create="onChartCreate"
+        <billadm-chart-list :custom-charts="customCharts" @select="onChartSelect"
           @delete="onChartDelete" @refresh="loadCustomCharts" />
       </div>
 
@@ -27,12 +27,35 @@
         <a-empty v-else description="请选择图表" />
       </div>
     </a-card>
+
+    <!-- 新增图表弹窗 -->
+    <a-modal v-model:open="showCreateModal" title="新增图表" @ok="handleCreate" :confirm-loading="createLoading">
+      <a-form :model="createForm" layout="vertical">
+        <a-form-item label="图表名称" name="title">
+          <a-input v-model:value="createForm.title" placeholder="请输入图表名称" />
+        </a-form-item>
+        <a-form-item label="时间粒度" name="granularity">
+          <a-select v-model:value="createForm.granularity" placeholder="请选择时间粒度">
+            <a-select-option value="year">年度</a-select-option>
+            <a-select-option value="month">月度</a-select-option>
+          </a-select>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+
+    <!-- 悬浮按钮 -->
+    <a-float-button type="primary" class="float-add-chart" @click="showCreateModal = true">
+      <template #icon>
+        <PlusOutlined />
+      </template>
+    </a-float-button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { message } from 'ant-design-vue'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import BilladmTimeRangePicker from '@/components/common/BilladmTimeRangePicker.vue'
 import BilladmChartList from '@/components/da_view/BilladmChartList.vue'
 import BilladmChartView from '@/components/da_view/BilladmChartView.vue'
@@ -63,6 +86,9 @@ const selectedChart = ref<ChartInstance | null>(null)
 const selectedIsPreset = ref(false)
 const selectedChartId = ref<string | null>(null)
 const customCharts = ref<ChartDto[]>([])
+const showCreateModal = ref(false)
+const createLoading = ref(false)
+const createForm = ref({ title: '', granularity: 'year' as 'year' | 'month' })
 
 // 缓存图表数据
 const chartDataCache = ref<Map<string, ChartInstance>>(new Map())
@@ -244,10 +270,23 @@ const onChartCreate = async (request: { title: string; granularity: 'year' | 'mo
     selectedChartId.value = newChart.chartId
 
     message.success('创建成功')
+    showCreateModal.value = false
+    createForm.value = { title: '', granularity: 'year' }
   } catch (error) {
     message.error('创建失败')
     console.error('create chart failed:', error)
   }
+}
+
+// 处理新增图表弹窗确认
+const handleCreate = async () => {
+  if (!createForm.value.title.trim()) {
+    message.error('请输入图表名称')
+    return
+  }
+  createLoading.value = true
+  await onChartCreate({ title: createForm.value.title, granularity: createForm.value.granularity })
+  createLoading.value = false
 }
 
 // 删除图表
@@ -370,5 +409,10 @@ watch(
   min-width: 0;
   overflow-y: auto;
   background-color: var(--billadm-color-major-background);
+}
+
+.float-add-chart {
+  right: 50px;
+  bottom: 80px;
 }
 </style>

@@ -12,7 +12,20 @@
     </div>
 
     <!-- 配置抽屉 -->
-    <a-drawer v-model:open="drawerVisible" title="图表配置详情" placement="right" width="600">
+    <a-drawer v-model:open="drawerVisible" :title="drawerTitle" placement="right" width="600">
+      <template #extra>
+        <div v-if="!isPreset" class="drawer-actions">
+          <a-button type="primary" size="small" @click="showAddLineModal = true">
+            <template #icon>
+              <PlusOutlined />
+            </template>
+            添加曲线
+          </a-button>
+          <a-button type="primary" size="small" style="margin-left: 8px;" @click="handleSave">
+            保存修改
+          </a-button>
+        </div>
+      </template>
       <a-descriptions :column="1" size="small" bordered>
         <a-descriptions-item label="图表名称">
           <template v-if="!isPreset">
@@ -35,18 +48,6 @@
         </a-descriptions-item>
         <a-descriptions-item label="曲线数量">{{ lines.length }} 条</a-descriptions-item>
       </a-descriptions>
-
-      <div v-if="!isPreset" style="margin-bottom: 16px;">
-        <a-button type="primary" @click="showAddLineModal = true">
-          <template #icon>
-            <PlusOutlined />
-          </template>
-          添加曲线
-        </a-button>
-        <a-button type="primary" style="margin-left: 8px;" @click="handleSave">
-          保存修改
-        </a-button>
-      </div>
 
       <a-divider orientation="left">曲线详情</a-divider>
 
@@ -95,17 +96,32 @@
     </a-drawer>
 
     <!-- 添加曲线弹窗 -->
-    <a-modal v-model:open="showAddLineModal" title="添加曲线" @ok="handleAddLine" :confirm-loading="addLineLoading">
+    <a-modal v-model:open="showAddLineModal" title="添加曲线" @ok="handleAddLine" :confirm-loading="addLineLoading" width="500px">
       <a-form :model="newLineForm" layout="vertical">
         <a-form-item label="曲线名称" name="label">
           <a-input v-model:value="newLineForm.label" placeholder="请输入曲线名称" />
         </a-form-item>
         <a-form-item label="交易类型" name="transactionType">
-          <a-select v-model:value="newLineForm.transactionType" placeholder="请选择交易类型">
+          <a-select v-model:value="newLineForm.transactionType" placeholder="请选择交易类型" @change="onTransactionTypeChange">
             <a-select-option value="income">收入</a-select-option>
             <a-select-option value="expense">支出</a-select-option>
             <a-select-option value="transfer">转账</a-select-option>
           </a-select>
+        </a-form-item>
+        <a-form-item label="分类" name="category">
+          <a-select v-model:value="newLineForm.category" placeholder="请选择分类" :options="categoryOptions" allow-clear @change="onCategoryChange" />
+        </a-form-item>
+        <a-form-item label="标签" name="tags">
+          <a-select v-model:value="newLineForm.tags" mode="multiple" placeholder="请选择标签" :options="tagOptions" allow-clear />
+        </a-form-item>
+        <a-form-item label="标签匹配" name="tagPolicy">
+          <a-select v-model:value="newLineForm.tagPolicy">
+            <a-select-option value="any">任意</a-select-option>
+            <a-select-option value="all">全部</a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="描述包含" name="description">
+          <a-input v-model:value="newLineForm.description" placeholder="输入关键词" />
         </a-form-item>
         <a-form-item label="包含离群值" name="includeOutlier">
           <a-switch v-model:checked="newLineForm.includeOutlier" />
@@ -127,12 +143,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { SettingOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import BilladmChart from '@/components/da_view/BilladmChart.vue'
 import type { TimeSeriesData, ChartLine } from '@/backend/chart'
 import { TransactionTypeToColor, TransactionTypeToLabel } from '@/backend/constant'
+import { getCategoryByType, getTagsByCategory } from '@/backend/functions'
+import type { Category } from '@/types/billadm'
+import type { DefaultOptionType } from 'ant-design-vue/es/vc-cascader'
 
 interface Props {
   title: string
@@ -160,9 +179,27 @@ const editGranularity = ref(props.granularity)
 const localLines = ref<ChartLine[]>([...props.lines])
 const showAddLineModal = ref(false)
 const addLineLoading = ref(false)
-const newLineForm = ref({
+const categoryOptions = ref<DefaultOptionType[]>([])
+const tagOptions = ref<DefaultOptionType[]>([])
+const drawerTitle = computed(() => props.isPreset ? '图表配置详情' : '图表配置详情')
+
+interface NewLineForm {
+  label: string
+  transactionType: string
+  category: string | undefined
+  tags: string[]
+  tagPolicy: 'any' | 'all'
+  description: string
+  includeOutlier: boolean
+}
+
+const newLineForm = ref<NewLineForm>({
   label: '',
-  transactionType: 'income' as string,
+  transactionType: 'income',
+  category: undefined,
+  tags: [],
+  tagPolicy: 'any',
+  description: '',
   includeOutlier: true,
 })
 
@@ -188,6 +225,29 @@ const handleSave = () => {
   drawerVisible.value = false
 }
 
+const onTransactionTypeChange = async () => {
+  newLineForm.value.category = undefined
+  newLineForm.value.tags = []
+  tagOptions.value = []
+  if (!newLineForm.value.transactionType) {
+    categoryOptions.value = []
+    return
+  }
+  const categoryList: Category[] = await getCategoryByType(newLineForm.value.transactionType)
+  categoryOptions.value = categoryList.map((c) => ({ value: c.name }))
+}
+
+const onCategoryChange = async () => {
+  newLineForm.value.tags = []
+  if (!newLineForm.value.category) {
+    tagOptions.value = []
+    return
+  }
+  const categoryTransactionType = `${newLineForm.value.category}:${newLineForm.value.transactionType}`
+  const tagList = await getTagsByCategory(categoryTransactionType)
+  tagOptions.value = tagList.map((t) => ({ value: t.name }))
+}
+
 const handleAddLine = () => {
   if (!newLineForm.value.label.trim()) {
     message.error('请输入曲线名称')
@@ -195,15 +255,38 @@ const handleAddLine = () => {
   }
   if (!props.chartId) return
   addLineLoading.value = true
+
+  const conditions = []
+  if (newLineForm.value.category || newLineForm.value.tags.length > 0 || newLineForm.value.description) {
+    conditions.push({
+      transactionType: newLineForm.value.transactionType,
+      category: newLineForm.value.category || '',
+      tags: [...newLineForm.value.tags],
+      tagPolicy: newLineForm.value.tagPolicy,
+      tagNot: false,
+      description: newLineForm.value.description,
+    })
+  }
+
   const line: ChartLine = {
     label: newLineForm.value.label,
     transactionType: newLineForm.value.transactionType,
     includeOutlier: newLineForm.value.includeOutlier,
-    conditions: [],
+    conditions,
   }
   emit('addLine', props.chartId, line)
   showAddLineModal.value = false
-  newLineForm.value = { label: '', transactionType: 'income', includeOutlier: true }
+  newLineForm.value = {
+    label: '',
+    transactionType: 'income',
+    category: undefined,
+    tags: [],
+    tagPolicy: 'any',
+    description: '',
+    includeOutlier: true,
+  }
+  categoryOptions.value = []
+  tagOptions.value = []
   addLineLoading.value = false
 }
 
@@ -235,6 +318,16 @@ const handleDeleteLine = (index: number) => {
   font-size: 16px;
   font-weight: 500;
   color: var(--billadm-color-text-major);
+}
+
+.chart-view-actions {
+  display: flex;
+  align-items: center;
+}
+
+.drawer-actions {
+  display: flex;
+  align-items: center;
 }
 
 .chart-view-content {
