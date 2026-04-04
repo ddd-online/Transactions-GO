@@ -51,6 +51,7 @@ export function buildLineChartData(
     maxMonth = -Infinity
 
   lineRecords.forEach((line) => {
+    if (!line.items) return
     line.items.forEach((item) => {
       const date = dayjs(item.transactionAt * 1000)
       const year = date.year()
@@ -107,6 +108,7 @@ export function buildLineChartData(
 
   // 聚合每条曲线的数据
   lineRecords.forEach((line) => {
+    if (!line.items) return
     line.items.forEach((item) => {
       const date = dayjs(item.transactionAt * 1000)
       const timeLabel =
