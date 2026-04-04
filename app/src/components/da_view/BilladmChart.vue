@@ -22,7 +22,6 @@ const containerRef = ref<HTMLDivElement | null>(null)
 let chart: Chart | null = null
 
 const initChart = () => {
-  console.log("init chart start")
   if (!containerRef.value || !props.data.length) return
 
   // 销毁旧图表
@@ -98,7 +97,6 @@ const initChart = () => {
     .tooltip(false)
 
   chart.render()
-  console.log("init chart end")
 }
 
 onMounted(async () => {
