@@ -136,15 +136,16 @@ const loadAllChartData = async () => {
   const currentLedgerId = ledgerStore.currentLedgerId
   const currentTimeRange = trQueryConditionStore.timeRange
 
-  // 检查是否需要重新查询
-  const needRefetch = cachedLedgerId !== currentLedgerId || cachedTimeRange !== currentTimeRange
+  // 检查是否需要重新查询（时间范围需要深度比较）
+  const timeRangeChanged = JSON.stringify(cachedTimeRange) !== JSON.stringify(currentTimeRange)
+  const needRefetch = cachedLedgerId !== currentLedgerId || timeRangeChanged
 
   if (!needRefetch) {
     return
   }
 
   cachedLedgerId = currentLedgerId
-  cachedTimeRange = currentTimeRange
+  cachedTimeRange = currentTimeRange ? { ...currentTimeRange } : undefined
 
   // 加载自定义图表
   await loadCustomCharts()
@@ -180,7 +181,17 @@ const loadAllChartData = async () => {
     appDataStore.setStatistics(statistics)
   }
 
-  // 初始化选中第一个预设图表
+  // 如果当前有选中图表，刷新选中图表的数据
+  if (selectedChart.value) {
+    if (selectedIsPreset.value) {
+      const cacheKey = 'preset_' + selectedChart.value.title
+      selectedChart.value = chartDataCache.value.get(cacheKey) || null
+    } else if (selectedChartId.value) {
+      selectedChart.value = chartDataCache.value.get(selectedChartId.value) || null
+    }
+  }
+
+  // 初始化选中第一个预设图表（仅当没有选中时）
   if (!selectedChart.value && KEEP_CHART_CONFIGS.length > 0) {
     const firstConfig = KEEP_CHART_CONFIGS[0]!
     const cacheKey = 'preset_' + firstConfig.title
@@ -240,9 +251,29 @@ const onChartCreate = async (request: { title: string; granularity: 'year' | 'mo
 }
 
 // 删除图表
-const onChartDelete = async (_chartId: string) => {
+const onChartDelete = async (chartId: string) => {
+  // 如果删除的是当前选中的图表，重置选中状态
+  if (selectedChartId.value === chartId) {
+    selectedChart.value = null
+    selectedChartId.value = null
+    selectedIsPreset.value = false
+  }
+
+  // 强制刷新图表数据
+  cachedLedgerId = null
+  cachedTimeRange = undefined
+
   try {
     await loadAllChartData()
+
+    // 如果重置后没有选中图表，自动选中第一个预设图表
+    if (!selectedChart.value && KEEP_CHART_CONFIGS.length > 0) {
+      const firstConfig = KEEP_CHART_CONFIGS[0]!
+      const cacheKey = 'preset_' + firstConfig.title
+      selectedChart.value = chartDataCache.value.get(cacheKey) || null
+      selectedIsPreset.value = true
+      selectedChartId.value = null
+    }
   } catch (error) {
     console.error('refresh after delete failed:', error)
   }
@@ -285,7 +316,11 @@ onMounted(() => {
 
 // 监听查询条件或账本变化，重新加载
 watch(
-  () => [ledgerStore.currentLedgerId, trQueryConditionStore.timeRange],
+  () => ledgerStore.currentLedgerId,
+  () => loadAllChartData()
+)
+watch(
+  () => trQueryConditionStore.timeRange,
   () => loadAllChartData(),
   { deep: true }
 )
