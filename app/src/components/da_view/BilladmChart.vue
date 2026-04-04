@@ -46,10 +46,15 @@ const initChart = () => {
 
   // 使用TransactionTypeToColor设置颜色映射
   // data中的type是transactionType(income/expense/transfer)，label是曲线名称用于图例
-  chart.scale('type', {
-    domain: Array.from(TransactionTypeToColor.keys()),
-    range: Array.from(TransactionTypeToColor.values()),
-  })
+  // chart.scale('type', {
+  //   domain: Array.from(TransactionTypeToColor.keys()),
+  //   range: Array.from(TransactionTypeToColor.values()),
+  // })
+
+  // chart.scale('color', {
+  //   domain: props.data.map(d => d.label),
+  //   range: props.data.map(d => TransactionTypeToColor.get(d.type)!),
+  // })
 
   // 设置图例显示label名称
   chart.scale('label', {
@@ -75,19 +80,6 @@ const initChart = () => {
     labelFontSize: 15,
     titleFontSize: 16,
     line: { style: { stroke: '#000000', lineWidth: 1 } }
-  })
-
-  // 设置图例
-  chart.legend('label', {
-    itemName: {
-      fontSize: 14,
-    },
-    itemValue: {
-      fontSize: 14,
-    },
-    itemMarker: {
-      size: 10,
-    },
   })
 
   chart

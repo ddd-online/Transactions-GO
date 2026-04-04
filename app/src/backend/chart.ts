@@ -207,38 +207,20 @@ export const KEEP_CHART_CONFIGS: ChartConfig[] = [
     ],
   },
   {
-    title: '年度总收入',
+    title: '年度收入趋势',
     granularity: 'year',
     lines: [
       { label: '年度总收入', transactionType: 'income', includeOutlier: true, conditions: [] },
-    ],
-  },
-  {
-    title: '年度工资收入',
-    granularity: 'year',
-    lines: [
       {
         label: '年度工资收入', transactionType: 'income', includeOutlier: true, conditions: [
           { transactionType: 'income', category: '工资奖金', tags: ['工资'], tagPolicy: 'all', tagNot: false, description: '' },
         ]
       },
-    ],
-  },
-  {
-    title: '年度奖金收入',
-    granularity: 'year',
-    lines: [
       {
         label: '年度奖金收入', transactionType: 'income', includeOutlier: true, conditions: [
           { transactionType: 'income', category: '工资奖金', tags: ['奖金'], tagPolicy: 'all', tagNot: false, description: '年奖金' },
         ]
       },
-    ],
-  },
-  {
-    title: '年度分红收入',
-    granularity: 'year',
-    lines: [
       {
         label: '年度分红收入', transactionType: 'income', includeOutlier: true, conditions: [
           { transactionType: 'income', category: '投资理财', tags: [], tagPolicy: 'all', tagNot: false, description: '年分红' },
