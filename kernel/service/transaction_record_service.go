@@ -2,7 +2,6 @@ package service
 
 import (
 	"fmt"
-	"strings"
 	"sync"
 
 	"github.com/billadm/dao"
@@ -236,7 +235,7 @@ func (t *transactionRecordServiceImpl) QueryTrsForChart(ws *workspace.Workspace,
 	}
 
 	for _, line := range req.Lines {
-		// Filter by transaction type and outlier flag
+		// Filter by transaction type and outlier flag first
 		var filtered []*dto.TransactionRecordDto
 		for _, tr := range trDtos {
 			if tr.TransactionType != line.TransactionType {
@@ -245,11 +244,16 @@ func (t *transactionRecordServiceImpl) QueryTrsForChart(ws *workspace.Workspace,
 			if !line.IncludeOutlier && tr.Outlier {
 				continue
 			}
-			// Apply additional conditions (AND logic)
-			if matchConditions(tr, line.Conditions) {
-				filtered = append(filtered, tr)
-			}
+			filtered = append(filtered, tr)
 		}
+
+		// Apply conditions with OR logic using TrOperator
+		// TrOperator.Filter uses OR between conditions (any condition matches)
+		filtered = operator.NewTrOperator().
+			Add(filtered).
+			Filter(line.Conditions).
+			Summary().
+			Items
 
 		response.Lines = append(response.Lines, dto.ChartLineData{
 			Label: line.Label,
@@ -260,49 +264,6 @@ func (t *transactionRecordServiceImpl) QueryTrsForChart(ws *workspace.Workspace,
 
 	logrus.Infof("query trs for chart success, lines: %d", len(response.Lines))
 	return response, nil
-}
-
-// matchConditions checks if a transaction record matches all conditions (AND logic)
-func matchConditions(tr *dto.TransactionRecordDto, conditions []dto.QueryConditionItem) bool {
-	if len(conditions) == 0 {
-		return true
-	}
-	for _, cond := range conditions {
-		if cond.TransactionType != "" && tr.TransactionType != cond.TransactionType {
-			return false
-		}
-		if cond.Category != "" && tr.Category != cond.Category {
-			return false
-		}
-		if len(cond.Tags) > 0 {
-			hasAllTags := true
-			for _, tag := range cond.Tags {
-				if !contains(tr.Tags, tag) {
-					hasAllTags = false
-					break
-				}
-			}
-			if cond.TagNot {
-				hasAllTags = !hasAllTags
-			}
-			if !hasAllTags {
-				return false
-			}
-		}
-		if cond.Description != "" && !strings.Contains(tr.Description, cond.Description) {
-			return false
-		}
-	}
-	return true
-}
-
-func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
 }
 
 func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trId string) error {
