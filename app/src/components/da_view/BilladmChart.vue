@@ -77,6 +77,19 @@ const initChart = () => {
     line: { style: { stroke: '#000000', lineWidth: 1 } }
   })
 
+  // 设置图例
+  chart.legend('label', {
+    itemName: {
+      fontSize: 14,
+    },
+    itemValue: {
+      fontSize: 14,
+    },
+    itemMarker: {
+      size: 10,
+    },
+  })
+
   chart
     .line()
     .encode('x', props.xField)
