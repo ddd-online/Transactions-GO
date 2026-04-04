@@ -51,19 +51,13 @@ func (c *categoryDaoImpl) QueryCategory(ws *workspace.Workspace, trType string) 
 }
 
 func (c *categoryDaoImpl) CreateCategory(ws *workspace.Workspace, category *models.Category) error {
-	if err := ws.GetDb().Create(category).Error; err != nil {
-		return err
-	}
-	return nil
+	return ws.GetDb().Create(category).Error
 }
 
 func (c *categoryDaoImpl) DeleteCategory(ws *workspace.Workspace, name string, transactionType string) error {
-	if err := ws.GetDb().
+	return ws.GetDb().
 		Where("name = ? AND transaction_type = ?", name, transactionType).
-		Delete(&models.Category{}).Error; err != nil {
-		return err
-	}
-	return nil
+		Delete(&models.Category{}).Error
 }
 
 func (c *categoryDaoImpl) IsCategoryInUse(ws *workspace.Workspace, ledgerId string, category string) (bool, error) {
@@ -71,20 +65,14 @@ func (c *categoryDaoImpl) IsCategoryInUse(ws *workspace.Workspace, ledgerId stri
 	err := ws.GetDb().Model(&models.TransactionRecord{}).
 		Where("ledger_id = ? AND category = ?", ledgerId, category).
 		Count(&count).Error
-	if err != nil {
-		return false, err
-	}
-	return count > 0, nil
+	return count > 0, err
 }
 
 func (c *categoryDaoImpl) UpdateCategorySort(ws *workspace.Workspace, name string, transactionType string, sortOrder int) error {
-	if err := ws.GetDb().
+	return ws.GetDb().
 		Model(&models.Category{}).
 		Where("name = ? AND transaction_type = ?", name, transactionType).
-		Update("sort_order", sortOrder).Error; err != nil {
-		return err
-	}
-	return nil
+		Update("sort_order", sortOrder).Error
 }
 
 func (c *categoryDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, transactionType string) (int, error) {
@@ -93,10 +81,7 @@ func (c *categoryDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, transactionTy
 		Where("transaction_type = ?", transactionType).
 		Select("COALESCE(MAX(sort_order), 0)").
 		Scan(&maxSortOrder).Error
-	if err != nil {
-		return 0, err
-	}
-	return maxSortOrder, nil
+	return maxSortOrder, err
 }
 
 func (c *categoryDaoImpl) CountRecordsByCategory(ws *workspace.Workspace, ledgerId string, category string) (int64, error) {
@@ -104,8 +89,5 @@ func (c *categoryDaoImpl) CountRecordsByCategory(ws *workspace.Workspace, ledger
 	err := ws.GetDb().Model(&models.TransactionRecord{}).
 		Where("ledger_id = ? AND category = ?", ledgerId, category).
 		Count(&count).Error
-	if err != nil {
-		return 0, err
-	}
-	return count, nil
+	return count, err
 }

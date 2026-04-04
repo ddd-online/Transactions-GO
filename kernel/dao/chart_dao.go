@@ -38,47 +38,34 @@ var _ ChartDao = &chartDaoImpl{}
 type chartDaoImpl struct{}
 
 func (t *chartDaoImpl) Create(ws *workspace.Workspace, chart *models.Chart) error {
-	if err := ws.GetDb().Create(chart).Error; err != nil {
-		return err
-	}
-	return nil
+	return ws.GetDb().Create(chart).Error
 }
 
 func (t *chartDaoImpl) DeleteById(ws *workspace.Workspace, chartId string) error {
-	if err := ws.GetDb().
+	return ws.GetDb().
 		Where("chart_id = ?", chartId).
-		Delete(&models.Chart{}).Error; err != nil {
-		return err
-	}
-	return nil
+		Delete(&models.Chart{}).Error
 }
 
 func (t *chartDaoImpl) ListByLedgerId(ws *workspace.Workspace, ledgerId string) ([]*models.Chart, error) {
 	charts := make([]*models.Chart, 0)
-	if err := ws.GetDb().
+	err := ws.GetDb().
 		Where("ledger_id = ?", ledgerId).
 		Order("is_preset DESC, sort_order ASC, created_at DESC").
-		Find(&charts).Error; err != nil {
-		return nil, err
-	}
-	return charts, nil
+		Find(&charts).Error
+	return charts, err
 }
 
 func (t *chartDaoImpl) GetById(ws *workspace.Workspace, chartId string) (*models.Chart, error) {
 	var chart models.Chart
-	if err := ws.GetDb().
+	err := ws.GetDb().
 		Where("chart_id = ?", chartId).
-		First(&chart).Error; err != nil {
-		return nil, err
-	}
-	return &chart, nil
+		First(&chart).Error
+	return &chart, err
 }
 
 func (t *chartDaoImpl) Update(ws *workspace.Workspace, chart *models.Chart) error {
-	if err := ws.GetDb().Save(chart).Error; err != nil {
-		return err
-	}
-	return nil
+	return ws.GetDb().Save(chart).Error
 }
 
 func (t *chartDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, ledgerId string) (int, error) {

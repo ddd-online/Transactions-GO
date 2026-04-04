@@ -38,50 +38,37 @@ var _ TransactionTemplateDao = &transactionTemplateDaoImpl{}
 type transactionTemplateDaoImpl struct{}
 
 func (t *transactionTemplateDaoImpl) Create(ws *workspace.Workspace, template *models.TransactionTemplate) error {
-	if err := ws.GetDb().Create(template).Error; err != nil {
-		return err
-	}
-	return nil
+	return ws.GetDb().Create(template).Error
 }
 
 func (t *transactionTemplateDaoImpl) DeleteById(ws *workspace.Workspace, templateId string) error {
-	if err := ws.GetDb().
+	return ws.GetDb().
 		Where("template_id = ?", templateId).
-		Delete(&models.TransactionTemplate{}).Error; err != nil {
-		return err
-	}
-	return nil
+		Delete(&models.TransactionTemplate{}).Error
 }
 
 func (t *transactionTemplateDaoImpl) ListByLedgerId(ws *workspace.Workspace, ledgerId string) ([]*models.TransactionTemplate, error) {
 	templates := make([]*models.TransactionTemplate, 0)
-	if err := ws.GetDb().
+	err := ws.GetDb().
 		Where("ledger_id = ?", ledgerId).
 		Order("sort_order ASC, created_at DESC").
-		Find(&templates).Error; err != nil {
-		return nil, err
-	}
-	return templates, nil
+		Find(&templates).Error
+	return templates, err
 }
 
 func (t *transactionTemplateDaoImpl) GetById(ws *workspace.Workspace, templateId string) (*models.TransactionTemplate, error) {
 	var template models.TransactionTemplate
-	if err := ws.GetDb().
+	err := ws.GetDb().
 		Where("template_id = ?", templateId).
-		First(&template).Error; err != nil {
-		return nil, err
-	}
-	return &template, nil
+		First(&template).Error
+	return &template, err
 }
 
 func (t *transactionTemplateDaoImpl) UpdateSortOrder(ws *workspace.Workspace, templateId string, sortOrder int) error {
-	if err := ws.GetDb().
+	return ws.GetDb().
 		Model(&models.TransactionTemplate{}).
 		Where("template_id = ?", templateId).
-		Update("sort_order", sortOrder).Error; err != nil {
-		return err
-	}
-	return nil
+		Update("sort_order", sortOrder).Error
 }
 
 func (t *transactionTemplateDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, ledgerId string) (int, error) {

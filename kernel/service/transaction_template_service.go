@@ -90,7 +90,7 @@ func (t *transactionTemplateServiceImpl) ListByLedgerId(ws *workspace.Workspace,
 	// Reassign sort_order from 0 based on current order
 	for i, template := range templates {
 		if template.SortOrder != i {
-			template.SortOrder=i;
+			template.SortOrder = i
 			if err := t.trTemplateDao.UpdateSortOrder(ws, template.TemplateID, i); err != nil {
 				logrus.Errorf("reindex template sort failed: %v", err)
 				return nil,err

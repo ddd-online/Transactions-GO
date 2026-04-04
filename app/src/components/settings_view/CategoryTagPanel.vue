@@ -487,6 +487,7 @@ watch(
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 200px;
+  flex: 1;
+  min-height: 0;
 }
 </style>

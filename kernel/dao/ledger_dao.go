@@ -35,48 +35,30 @@ var _ LedgerDao = &ledgerDaoImpl{}
 type ledgerDaoImpl struct{}
 
 func (l *ledgerDaoImpl) CreateLedger(ws *workspace.Workspace, ledger *models.Ledger) error {
-	if err := ws.GetDb().Create(ledger).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return ws.GetDb().Create(ledger).Error
 }
 
 func (l *ledgerDaoImpl) ModifyLedger(ws *workspace.Workspace, ledger *models.Ledger) error {
-	if err := ws.GetDb().Model(ledger).
+	return ws.GetDb().Model(ledger).
 		Where("id = ?", ledger.ID).
 		Updates(map[string]interface{}{
 			"name":        ledger.Name,
 			"description": ledger.Description,
-		}).Error; err != nil {
-		return err
-	}
-
-	return nil
+		}).Error
 }
 
 func (l *ledgerDaoImpl) ListAllLedger(ws *workspace.Workspace) ([]models.Ledger, error) {
 	ledgers := make([]models.Ledger, 0)
-	if err := ws.GetDb().Find(&ledgers).Error; err != nil {
-		return nil, err
-	}
-
-	return ledgers, nil
+	err := ws.GetDb().Find(&ledgers).Error
+	return ledgers, err
 }
 
 func (l *ledgerDaoImpl) QueryLedgerById(ws *workspace.Workspace, ledgerId string) (*models.Ledger, error) {
 	var ledger models.Ledger
-	if err := ws.GetDb().Where("id = ?", ledgerId).First(&ledger).Error; err != nil {
-		return nil, err
-	}
-
-	return &ledger, nil
+	err := ws.GetDb().Where("id = ?", ledgerId).First(&ledger).Error
+	return &ledger, err
 }
 
 func (l *ledgerDaoImpl) DeleteLedgerById(ws *workspace.Workspace, ledgerId string) error {
-	if err := ws.GetDb().Where("id = ?", ledgerId).Delete(&models.Ledger{}).Error; err != nil {
-		return err
-	}
-
-	return nil
+	return ws.GetDb().Where("id = ?", ledgerId).Delete(&models.Ledger{}).Error
 }

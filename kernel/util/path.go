@@ -24,18 +24,10 @@ func GetDistDir() string {
 
 // IsDirectoryExists 判断指定路径是否为一个存在的目录
 func IsDirectoryExists(path string) bool {
-	// 获取路径的文件信息
 	fileInfo, err := os.Stat(path)
 	if err != nil {
-		// 如果是路径不存在的错误，返回 false, nil
-		if os.IsNotExist(err) {
-			return false
-		}
-		// 如果是其他错误（如权限问题），返回 false 和错误信息
 		return false
 	}
-
-	// 检查是否为目录
 	return fileInfo.IsDir()
 }
 

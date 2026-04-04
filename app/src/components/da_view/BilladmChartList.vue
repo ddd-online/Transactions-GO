@@ -1,5 +1,15 @@
 <template>
   <div class="chart-list">
+    <!-- 新增图表按钮 -->
+    <div class="chart-list-add">
+      <a-button type="primary" block @click="showCreateModal = true">
+        <template #icon>
+          <PlusOutlined />
+        </template>
+        新增图表
+      </a-button>
+    </div>
+
     <!-- 预设图表 -->
     <div class="chart-list-section">
       <div class="chart-list-section-title">预设图表</div>
@@ -50,7 +60,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RiseOutlined, LineChartOutlined, DeleteOutlined } from '@ant-design/icons-vue'
+import { RiseOutlined, LineChartOutlined, PlusOutlined, DeleteOutlined } from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import type { ChartConfig } from '@/backend/chart'
 import { KEEP_CHART_CONFIGS } from '@/backend/chart'

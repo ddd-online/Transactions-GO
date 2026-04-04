@@ -51,38 +51,26 @@ func (t *TagDaoImpl) QueryTags(ws *workspace.Workspace, categoryTransactionType 
 }
 
 func (t *TagDaoImpl) CreateTag(ws *workspace.Workspace, tag *models.Tag) error {
-	if err := ws.GetDb().Create(tag).Error; err != nil {
-		return err
-	}
-	return nil
+	return ws.GetDb().Create(tag).Error
 }
 
 func (t *TagDaoImpl) DeleteTag(ws *workspace.Workspace, name string, categoryTransactionType string) error {
-	if err := ws.GetDb().
+	return ws.GetDb().
 		Where("name = ? AND category_transaction_type = ?", name, categoryTransactionType).
-		Delete(&models.Tag{}).Error; err != nil {
-		return err
-	}
-	return nil
+		Delete(&models.Tag{}).Error
 }
 
 func (t *TagDaoImpl) DeleteTagsByCategory(ws *workspace.Workspace, categoryTransactionType string) error {
-	if err := ws.GetDb().
+	return ws.GetDb().
 		Where("category_transaction_type = ?", categoryTransactionType).
-		Delete(&models.Tag{}).Error; err != nil {
-		return err
-	}
-	return nil
+		Delete(&models.Tag{}).Error
 }
 
 func (t *TagDaoImpl) UpdateTagSort(ws *workspace.Workspace, name string, categoryTransactionType string, sortOrder int) error {
-	if err := ws.GetDb().
+	return ws.GetDb().
 		Model(&models.Tag{}).
 		Where("name = ? AND category_transaction_type = ?", name, categoryTransactionType).
-		Update("sort_order", sortOrder).Error; err != nil {
-		return err
-	}
-	return nil
+		Update("sort_order", sortOrder).Error
 }
 
 func (t *TagDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, categoryTransactionType string) (int, error) {
@@ -91,10 +79,7 @@ func (t *TagDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, categoryTransactio
 		Where("category_transaction_type = ?", categoryTransactionType).
 		Select("COALESCE(MAX(sort_order), 0)").
 		Scan(&maxSortOrder).Error
-	if err != nil {
-		return 0, err
-	}
-	return maxSortOrder, nil
+	return maxSortOrder, err
 }
 
 func (t *TagDaoImpl) CountRecordsByTag(ws *workspace.Workspace, ledgerId string, tag string) (int64, error) {
