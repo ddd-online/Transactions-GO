@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 export interface TimeSeriesData {
   time: string
   type: string  // 存储transactionType: income/expense/transfer
-  name: string  // 曲线名称，用于图例显示
+  label: string  // 图例显示名称
   amount: number
 }
 
@@ -16,7 +16,7 @@ export interface TimeSeriesData {
  * 图表曲线配置
  */
 export interface ChartLine {
-  name: string              // 曲线名称，用于图例显示
+  label: string              // 图例显示名称
   transactionType: string   // 交易类型：income/expense/transfer
   includeOutlier: boolean  // 是否包含离群值
   conditions: TrQueryConditionItem[]  // 查询条件
@@ -137,12 +137,12 @@ export function buildLineChartData(
 
   // 初始化时间数据结构
   const timeDataMap = new Map<string, Record<string, number>>()
-  timeLabels.forEach((label) => {
+  timeLabels.forEach((timeLabel) => {
     const initObj: Record<string, number> = {}
     lines.forEach((line) => {
-      initObj[line.name] = 0
+      initObj[line.label] = 0
     })
-    timeDataMap.set(label, initObj)
+    timeDataMap.set(timeLabel, initObj)
   })
 
   // 聚合每条曲线的数据
@@ -155,28 +155,28 @@ export function buildLineChartData(
 
     filteredData.forEach((item) => {
       const date = dayjs(item.transactionAt * 1000)
-      const label =
+      const timeLabel =
         granularity === 'year'
           ? String(date.year())
           : `${date.year()}-${String(date.month() + 1).padStart(2, '0')}`
 
-      if (timeDataMap.has(label)) {
-        const record = timeDataMap.get(label)!
-        record[line.name] = (record[line.name] ?? 0) + item.price
+      if (timeDataMap.has(timeLabel)) {
+        const record = timeDataMap.get(timeLabel)!
+        record[line.label] = (record[line.label] ?? 0) + item.price
       }
     })
   })
 
   // 转换为G2数据格式
   const result: TimeSeriesData[] = []
-  timeLabels.forEach((label) => {
-    const record = timeDataMap.get(label)!
+  timeLabels.forEach((timeLabel) => {
+    const record = timeDataMap.get(timeLabel)!
     lines.forEach((line) => {
       result.push({
-        time: label,
-        type: line.transactionType,  // 使用transactionType而非label
-        name: line.name,
-        amount: (record[line.name] ?? 0) / 100, // 转换为元
+        time: timeLabel,
+        type: line.transactionType,
+        label: line.label,
+        amount: (record[line.label] ?? 0) / 100, // 转换为元
       })
     })
   })
@@ -192,25 +192,25 @@ export const KEEP_CHART_CONFIGS: ChartConfig[] = [
     title: '月度消费趋势',
     granularity: 'month',
     lines: [
-      { name: '支出', transactionType: 'expense', includeOutlier: false, conditions: [] },
-      { name: '收入', transactionType: 'income', includeOutlier: false, conditions: [] },
-      { name: '转账', transactionType: 'transfer', includeOutlier: false, conditions: [] },
+      { label: '支出', transactionType: 'expense', includeOutlier: false, conditions: [] },
+      { label: '收入', transactionType: 'income', includeOutlier: false, conditions: [] },
+      { label: '转账', transactionType: 'transfer', includeOutlier: false, conditions: [] },
     ],
   },
   {
     title: '年度消费趋势',
     granularity: 'year',
     lines: [
-      { name: '支出', transactionType: 'expense', includeOutlier: true, conditions: [] },
-      { name: '收入', transactionType: 'income', includeOutlier: true, conditions: [] },
-      { name: '转账', transactionType: 'transfer', includeOutlier: true, conditions: [] },
+      { label: '支出', transactionType: 'expense', includeOutlier: true, conditions: [] },
+      { label: '收入', transactionType: 'income', includeOutlier: true, conditions: [] },
+      { label: '转账', transactionType: 'transfer', includeOutlier: true, conditions: [] },
     ],
   },
   {
     title: '年度总收入',
     granularity: 'year',
     lines: [
-      { name: '年度总收入', transactionType: 'income', includeOutlier: true, conditions: [] },
+      { label: '年度总收入', transactionType: 'income', includeOutlier: true, conditions: [] },
     ],
   },
   {
@@ -218,7 +218,7 @@ export const KEEP_CHART_CONFIGS: ChartConfig[] = [
     granularity: 'year',
     lines: [
       {
-        name: '年度工资收入', transactionType: 'income', includeOutlier: true, conditions: [
+        label: '年度工资收入', transactionType: 'income', includeOutlier: true, conditions: [
           { transactionType: 'income', category: '工资奖金', tags: ['工资'], tagPolicy: 'all', tagNot: false, description: '' },
         ]
       },
@@ -229,7 +229,7 @@ export const KEEP_CHART_CONFIGS: ChartConfig[] = [
     granularity: 'year',
     lines: [
       {
-        name: '年度奖金收入', transactionType: 'income', includeOutlier: true, conditions: [
+        label: '年度奖金收入', transactionType: 'income', includeOutlier: true, conditions: [
           { transactionType: 'income', category: '工资奖金', tags: ['奖金'], tagPolicy: 'all', tagNot: false, description: '年奖金' },
         ]
       },
@@ -240,7 +240,7 @@ export const KEEP_CHART_CONFIGS: ChartConfig[] = [
     granularity: 'year',
     lines: [
       {
-        name: '年度分红收入', transactionType: 'income', includeOutlier: true, conditions: [
+        label: '年度分红收入', transactionType: 'income', includeOutlier: true, conditions: [
           { transactionType: 'income', category: '投资理财', tags: [], tagPolicy: 'all', tagNot: false, description: '年分红' },
         ]
       },

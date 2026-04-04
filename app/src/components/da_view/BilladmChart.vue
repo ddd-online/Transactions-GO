@@ -45,10 +45,16 @@ const initChart = () => {
   })
 
   // 使用TransactionTypeToColor设置颜色映射
-  // data中的type是transactionType(income/expense/transfer)，name是曲线名称
+  // data中的type是transactionType(income/expense/transfer)，label是曲线名称用于图例
   chart.scale('type', {
     domain: Array.from(TransactionTypeToColor.keys()),
     range: Array.from(TransactionTypeToColor.values()),
+  })
+
+  // 设置图例显示label名称
+  chart.scale('label', {
+    domain: props.data.map(d => d.label),
+    range: props.data.map(d => TransactionTypeToColor.get(d.type)!),
   })
 
   chart.scale('y', {
@@ -75,14 +81,14 @@ const initChart = () => {
     .line()
     .encode('x', props.xField)
     .encode('y', props.yField)
-    .encode('color', 'type')
+    .encode('color', 'label')
     .style('lineWidth', 2)
 
   chart
     .point()
     .encode('x', props.xField)
     .encode('y', props.yField)
-    .encode('color', 'type')
+    .encode('color', 'label')
     .style('size', 4)
     .style('stroke', '#fff')
     .style('lineWidth', 1)
