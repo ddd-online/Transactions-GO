@@ -5,14 +5,14 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch, nextTick } from 'vue'
 import { Chart } from '@antv/g2'
-import type { TimeSeriesData } from '@/backend/chart'
+import type { TimeSeriesData, ChartLine } from '@/backend/chart'
 import { TransactionTypeToColor } from '@/backend/constant'
 
 interface Props {
+  lines: ChartLine[]
   data: TimeSeriesData[]
   xField: string
   yField: string
-  seriesField: string
   title: string
 }
 
@@ -22,6 +22,7 @@ const containerRef = ref<HTMLDivElement | null>(null)
 let chart: Chart | null = null
 
 const initChart = () => {
+  console.log("init chart start")
   if (!containerRef.value || !props.data.length) return
 
   // 销毁旧图表
@@ -44,17 +45,14 @@ const initChart = () => {
     data: props.data,
   })
 
-  // 使用TransactionTypeToColor设置颜色映射
-  // data中的type是transactionType(income/expense/transfer)，label是曲线名称用于图例
-  // chart.scale('type', {
-  //   domain: Array.from(TransactionTypeToColor.keys()),
-  //   range: Array.from(TransactionTypeToColor.values()),
-  // })
-
-  // chart.scale('color', {
-  //   domain: props.data.map(d => d.label),
-  //   range: props.data.map(d => TransactionTypeToColor.get(d.type)!),
-  // })
+  // 如果存在相同交易类型则让图表随机使用颜色以区分显示
+  let tts = props.lines.map(l => l.transactionType);
+  if (new Set(tts).size == tts.length) {
+    chart.scale('color', {
+      domain: props.lines.map(l => l.label),
+      range: props.lines.map(l => TransactionTypeToColor.get(l.transactionType)!),
+    })
+  }
 
   // 设置图例显示label名称
   chart.scale('label', {
@@ -100,6 +98,7 @@ const initChart = () => {
     .tooltip(false)
 
   chart.render()
+  console.log("init chart end")
 }
 
 onMounted(async () => {

@@ -9,8 +9,8 @@
     <div class="chart-view-content">
       <div class="chart-wrapper">
         <div class="chart-container">
-          <BilladmChart v-if="data.length > 0" :data="data" x-field="time" y-field="amount" series-field="type"
-            :title="title" />
+          <BilladmChart v-if="data.length > 0" :data="data" x-field="time" y-field="amount" :title="title"
+            :lines="lines" />
           <a-empty v-else description="暂无数据" />
         </div>
       </div>
@@ -20,11 +20,12 @@
 
 <script setup lang="ts">
 import BilladmChart from '@/components/da_view/BilladmChart.vue'
-import type { TimeSeriesData } from '@/backend/chart'
+import type { TimeSeriesData, ChartLine } from '@/backend/chart'
 
 interface Props {
   title: string
   data: TimeSeriesData[]
+  lines: ChartLine[]
 }
 
 defineProps<Props>()

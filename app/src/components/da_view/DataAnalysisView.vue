@@ -20,7 +20,8 @@
 
       <!-- 右侧图表显示 -->
       <div class="da-content">
-        <billadm-chart-view v-if="selectedChart" :title="selectedChart.title" :data="selectedChart.data" />
+        <billadm-chart-view v-if="selectedChart" :title="selectedChart.title" :data="selectedChart.data"
+          :lines="selectedChart.lines" />
         <a-empty v-else description="请选择图表" />
       </div>
     </a-card>
@@ -37,7 +38,7 @@ import { useTrQueryConditionStore } from '@/stores/trQueryConditionStore.ts'
 import { useAppDataStore } from '@/stores/appDataStore.ts'
 import { convertToUnixTimeRange } from '@/backend/timerange.ts'
 import { getTrOnCondition } from '@/backend/functions.ts'
-import { buildLineChartData, KEEP_CHART_CONFIGS, type ChartConfig, type TimeSeriesData } from '@/backend/chart'
+import { buildLineChartData, KEEP_CHART_CONFIGS, type ChartLine, type ChartConfig, type TimeSeriesData } from '@/backend/chart'
 import type { TransactionRecord, TrStatistics } from '@/types/billadm'
 
 const ledgerStore = useLedgerStore()
@@ -47,6 +48,7 @@ const appDataStore = useAppDataStore()
 interface ChartInstance {
   title: string
   data: TimeSeriesData[]
+  lines: ChartLine[]
 }
 
 const selectedChart = ref<ChartInstance | null>(null)
@@ -77,6 +79,7 @@ const loadChartData = async (config: ChartConfig): Promise<{ chartInstance: Char
     chartInstance: {
       title: config.title,
       data: chartData,
+      lines: config.lines,
     },
     trStatistics,
   }
