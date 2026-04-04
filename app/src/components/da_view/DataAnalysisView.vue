@@ -21,7 +21,7 @@
       <!-- 右侧图表显示 -->
       <div class="da-content">
         <billadm-chart-view v-if="selectedChart" :title="selectedChart.title" :data="selectedChart.data"
-          :lines="selectedChart.lines" />
+          :lines="selectedChart.lines" :granularity="selectedChart.granularity" />
         <a-empty v-else description="请选择图表" />
       </div>
     </a-card>
@@ -48,6 +48,7 @@ const appDataStore = useAppDataStore()
 
 interface ChartInstance {
   title: string
+  granularity: 'year' | 'month'
   data: TimeSeriesData[]
   lines: ChartLine[]
 }
@@ -122,6 +123,7 @@ const loadAllChartData = async () => {
 
       return {
         title: config.title,
+        granularity: config.granularity,
         data,
         lines: config.lines,
       }
