@@ -172,7 +172,7 @@ export const KEEP_CHART_CONFIGS: ChartConfig[] = [
       tags: ['工资'],
       tagPolicy: 'all',
       tagNot: false,
-      description: '-',
+      description: '',
     }],
   },
   {
