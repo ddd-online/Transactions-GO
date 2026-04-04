@@ -60,6 +60,15 @@ func ServeAPI(ginServer *gin.Engine) {
 		{
 			workspace.POST("", openWorkspace)
 		}
+
+		// Charts
+		charts := v1.Group("/charts")
+		{
+			charts.POST("", createChart)
+			charts.GET("", listCharts)
+			charts.DELETE("/:id", deleteChart)
+			charts.PATCH("", updateChart)
+		}
 	}
 }
 
