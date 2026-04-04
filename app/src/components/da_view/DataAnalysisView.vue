@@ -67,39 +67,52 @@ const queryTrs = async (conditions: import('@/types/billadm').TrQueryConditionIt
   return { items: result.items || [], trStatistics: result.trStatistics || null }
 }
 
-// 加载图表数据
-const loadChartData = async (config: ChartConfig): Promise<{ chartInstance: ChartInstance, trStatistics: TrStatistics | null }> => {
-  // 查询所有符合条件的交易记录（不过滤具体条件，由buildLineChartData根据lines中的条件分别过滤）
-  const { items, trStatistics } = await queryTrs([])
-  const chartData = buildLineChartData(items, {
-    granularity: config.granularity,
-    lines: config.lines,
-  })
-  return {
-    chartInstance: {
-      title: config.title,
-      data: chartData,
-      lines: config.lines,
-    },
-    trStatistics,
-  }
-}
-
 // 缓存所有图表数据
 const chartDataCache = ref<Map<string, ChartInstance>>(new Map())
 
+// 缓存原始交易数据，避免重复查询
+let cachedTrList: TransactionRecord[] | null = null
+let cachedLedgerId: string | null = null
+let cachedTimeRange: typeof trQueryConditionStore.timeRange = undefined
+
 const loadAllChartData = async () => {
-  let statistics: TrStatistics | null = null
+  const currentLedgerId = ledgerStore.currentLedgerId
+  const currentTimeRange = trQueryConditionStore.timeRange
+
+  // 检查是否需要重新查询原始数据
+  const needRefetch = !cachedTrList ||
+    cachedLedgerId !== currentLedgerId ||
+    cachedTimeRange !== currentTimeRange
+
+  let trStatistics: TrStatistics | null = null
+
+  if (needRefetch) {
+    // 只查询一次原始数据
+    const result = await queryTrs([])
+    cachedTrList = result.items
+    cachedLedgerId = currentLedgerId
+    cachedTimeRange = currentTimeRange
+    trStatistics = result.trStatistics
+  }
+
+  // 并行构建所有图表数据（使用缓存的原始数据）
   const promises = KEEP_CHART_CONFIGS.map(async (config) => {
-    const { chartInstance, trStatistics } = await loadChartData(config)
-    chartDataCache.value.set(config.title, chartInstance)
-    if (trStatistics) statistics = trStatistics
+    if (!cachedTrList) return
+    const chartData = buildLineChartData(cachedTrList, {
+      granularity: config.granularity,
+      lines: config.lines,
+    })
+    chartDataCache.value.set(config.title, {
+      title: config.title,
+      data: chartData,
+      lines: config.lines,
+    })
   })
   await Promise.all(promises)
 
   // 更新底部统计信息
-  if (statistics) {
-    appDataStore.setStatistics(statistics)
+  if (trStatistics) {
+    appDataStore.setStatistics(trStatistics)
   }
 
   // 初始化选中第一个图表，或更新当前选中图表的数据
