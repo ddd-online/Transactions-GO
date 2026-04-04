@@ -83,9 +83,3 @@ func JsonArg(c *gin.Context, result *models.Result) (arg map[string]any, ok bool
 	ok = true
 	return
 }
-
-func PathParam(c *gin.Context, name string) (val string, ok bool) {
-	val = c.Param(name)
-	ok = val != ""
-	return
-}

@@ -13,7 +13,6 @@ const locale = ref(zhCN);
 const themeStore = useThemeStore();
 
 const themeConfig = computed(() => ({
-  algorithm: themeStore.mode === 'dark' ? undefined : undefined,
   token: {
     colorPrimary: themeStore.mode === 'dark' ? '#7c9cff' : '#1677ff',
     colorBgContainer: themeStore.mode === 'dark' ? '#1a1a2e' : '#ffffff',

@@ -1,13 +1,5 @@
 package models
 
-// ChartLine 图表曲线配置（与前端 ChartLine 对应）
-type ChartLine struct {
-	Label           string               `json:"label"`
-	TransactionType string               `json:"transactionType"`
-	IncludeOutlier  bool                 `json:"includeOutlier"`
-	Conditions      []QueryConditionItem `json:"conditions"`
-}
-
 // QueryConditionItem 查询条件项
 type QueryConditionItem struct {
 	TransactionType string   `json:"transactionType"`
@@ -16,6 +8,14 @@ type QueryConditionItem struct {
 	TagPolicy       string   `json:"tagPolicy"`
 	TagNot          bool     `json:"tagNot"`
 	Description     string   `json:"description"`
+}
+
+// ChartLine 图表曲线配置（与前端 ChartLine 对应）
+type ChartLine struct {
+	Label           string                 `json:"label"`
+	TransactionType string                `json:"transactionType"`
+	IncludeOutlier  bool                  `json:"includeOutlier"`
+	Conditions      []QueryConditionItem   `json:"conditions"`
 }
 
 // Chart 图表配置

@@ -18,7 +18,7 @@ func GetTagDao() TagDao {
 		return tagDao
 	}
 	tagDaoOnce.Do(func() {
-		tagDao = &TagDaoImpl{}
+		tagDao = &tagDaoImpl{}
 	})
 	return tagDao
 }
@@ -33,11 +33,11 @@ type TagDao interface {
 	CountRecordsByTag(ws *workspace.Workspace, ledgerId string, tag string) (int64, error)
 }
 
-var _ TagDao = &TagDaoImpl{}
+var _ TagDao = &tagDaoImpl{}
 
-type TagDaoImpl struct{}
+type tagDaoImpl struct{}
 
-func (t *TagDaoImpl) QueryTags(ws *workspace.Workspace, categoryTransactionType string) ([]models.Tag, error) {
+func (t *tagDaoImpl) QueryTags(ws *workspace.Workspace, categoryTransactionType string) ([]models.Tag, error) {
 	tags := make([]models.Tag, 0)
 	db := ws.GetDb()
 	if categoryTransactionType != constant.All {
@@ -50,30 +50,30 @@ func (t *TagDaoImpl) QueryTags(ws *workspace.Workspace, categoryTransactionType 
 	return tags, nil
 }
 
-func (t *TagDaoImpl) CreateTag(ws *workspace.Workspace, tag *models.Tag) error {
+func (t *tagDaoImpl) CreateTag(ws *workspace.Workspace, tag *models.Tag) error {
 	return ws.GetDb().Create(tag).Error
 }
 
-func (t *TagDaoImpl) DeleteTag(ws *workspace.Workspace, name string, categoryTransactionType string) error {
+func (t *tagDaoImpl) DeleteTag(ws *workspace.Workspace, name string, categoryTransactionType string) error {
 	return ws.GetDb().
 		Where("name = ? AND category_transaction_type = ?", name, categoryTransactionType).
 		Delete(&models.Tag{}).Error
 }
 
-func (t *TagDaoImpl) DeleteTagsByCategory(ws *workspace.Workspace, categoryTransactionType string) error {
+func (t *tagDaoImpl) DeleteTagsByCategory(ws *workspace.Workspace, categoryTransactionType string) error {
 	return ws.GetDb().
 		Where("category_transaction_type = ?", categoryTransactionType).
 		Delete(&models.Tag{}).Error
 }
 
-func (t *TagDaoImpl) UpdateTagSort(ws *workspace.Workspace, name string, categoryTransactionType string, sortOrder int) error {
+func (t *tagDaoImpl) UpdateTagSort(ws *workspace.Workspace, name string, categoryTransactionType string, sortOrder int) error {
 	return ws.GetDb().
 		Model(&models.Tag{}).
 		Where("name = ? AND category_transaction_type = ?", name, categoryTransactionType).
 		Update("sort_order", sortOrder).Error
 }
 
-func (t *TagDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, categoryTransactionType string) (int, error) {
+func (t *tagDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, categoryTransactionType string) (int, error) {
 	var maxSortOrder int
 	err := ws.GetDb().Model(&models.Tag{}).
 		Where("category_transaction_type = ?", categoryTransactionType).
@@ -82,7 +82,7 @@ func (t *TagDaoImpl) GetMaxSortOrder(ws *workspace.Workspace, categoryTransactio
 	return maxSortOrder, err
 }
 
-func (t *TagDaoImpl) CountRecordsByTag(ws *workspace.Workspace, ledgerId string, tag string) (int64, error) {
+func (t *tagDaoImpl) CountRecordsByTag(ws *workspace.Workspace, ledgerId string, tag string) (int64, error) {
 	var count int64
 	err := ws.GetDb().Model(&models.TrTag{}).
 		Where("ledger_id = ? AND tag = ?", ledgerId, tag).
