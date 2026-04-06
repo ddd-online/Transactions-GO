@@ -67,6 +67,11 @@ cd electron && npm start
 ./build/build.ps1
 ```
 
+**Run tests:**
+```bash
+cd kernel && go test ./...
+```
+
 ## Development (Hot Reload)
 
 Three processes must run simultaneously:
