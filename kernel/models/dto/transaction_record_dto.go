@@ -3,6 +3,7 @@ package dto
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 
@@ -43,13 +44,18 @@ type TransactionRecordDto struct {
 }
 
 func (dto *TransactionRecordDto) Validate(result *models.Result) bool {
-	// TODO:校验账本ID是否合法
+	// 校验账本ID是否合法
+	if strings.TrimSpace(dto.LedgerID) == "" {
+		result.Code = -1
+		result.Msg = "LedgerID is empty"
+		return false
+	}
 	// 校验交易类型是否合法
 	if dto.TransactionType != constant.TransactionTypeIncome &&
 		dto.TransactionType != constant.TransactionTypeExpense &&
 		dto.TransactionType != constant.TransactionTypeTransfer {
 		result.Code = -1
-		result.Msg = fmt.Sprintf("invalid transaction type: %s", dto.TransactionType)
+		result.Msg = fmt.Sprintf("invalid TransactionType: %s", dto.TransactionType)
 		return false
 	}
 	// TODO: 校验类型ID是否合法
