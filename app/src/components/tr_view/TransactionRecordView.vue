@@ -34,6 +34,36 @@
         <FilterOutlined />
       </template>
     </a-float-button>
+    <a-float-button class="float-sort" @click="openSortModal = true">
+      <template #icon>
+        <SortAscendingOutlined v-if="isAscending" />
+        <SortDescendingOutlined v-else />
+      </template>
+    </a-float-button>
+
+    <!-- 排序弹窗 -->
+    <a-modal v-model:open="openSortModal" title="排序" :footer="null" centered width="500px">
+      <div class="sort-list">
+        <div v-for="(item, index) in sortItems" :key="index" class="sort-item">
+          <span class="sort-priority">{{ index + 1 }}</span>
+          <a-select v-model:value="item.field" :options="getAvailableFields(index)" placeholder="选择字段" style="width: 120px" />
+          <a-select v-model:value="item.order" style="width: 100px">
+            <a-select-option value="asc">升序</a-select-option>
+            <a-select-option value="desc">降序</a-select-option>
+          </a-select>
+          <a-button type="text" danger :disabled="sortItems.length <= 1" @click="removeSortItem(index)">
+            <DeleteOutlined />
+          </a-button>
+        </div>
+        <a-button type="link" :disabled="sortItems.length >= 4" @click="addSortItem">
+          <PlusOutlined /> 添加排序条件
+        </a-button>
+      </div>
+      <div class="sort-actions">
+        <a-button @click="resetSort">重置</a-button>
+        <a-button type="primary" @click="applySort">应用</a-button>
+      </div>
+    </a-modal>
 
     <!-- 筛选弹窗 -->
     <TransactionRecordFilter v-model="openTrFilterModal" />
@@ -98,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import TransactionRecordTable from '@/components/tr_view/TransactionRecordTable.vue';
 import type { TransactionRecord, TrForm, TrQueryCondition, TransactionTemplate } from "@/types/billadm";
 import { convertToUnixTimeRange } from "@/backend/timerange.ts";
@@ -119,7 +149,7 @@ import dayjs from "dayjs";
 import { trDtoToTrForm, trFormToTrDto } from "@/backend/dto-utils.ts";
 import type { DefaultOptionType } from "ant-design-vue/es/vc-cascader";
 import type { Rule } from "ant-design-vue/es/form";
-import { FilterOutlined, PlusOutlined } from "@ant-design/icons-vue";
+import { FilterOutlined, PlusOutlined, SortAscendingOutlined, SortDescendingOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 
 const ledgerStore = useLedgerStore();
@@ -165,6 +195,60 @@ const templateOptions = ref<DefaultOptionType[]>([]);
 const selectedTemplateId = ref<string | undefined>();
 const openSaveTemplateModal = ref(false);
 const templateName = ref('');
+
+// 排序相关状态
+interface SortItem {
+  field: string;
+  order: 'asc' | 'desc';
+}
+
+const openSortModal = ref(false);
+const sortItems = ref<SortItem[]>([
+  { field: 'transactionAt', order: 'desc' }
+]);
+
+const sortFieldOptions = [
+  { value: 'transactionAt', label: '时间' },
+  { value: 'price', label: '金额' },
+  { value: 'category', label: '分类' },
+  { value: 'transactionType', label: '类型' },
+];
+
+// 判断当前排序是否为升序（用于图标显示）
+const isAscending = computed(() => {
+  const first = sortItems.value[0];
+  return !!first && first.order === 'asc';
+});
+
+// 获取可选字段，排除已在前面使用的字段
+const getAvailableFields = (currentIndex: number) => {
+  const usedFields = sortItems.value.slice(0, currentIndex).map(item => item.field);
+  return sortFieldOptions.filter(opt => !usedFields.includes(opt.value));
+};
+
+const addSortItem = () => {
+  if (sortItems.value.length >= 4) return;
+  // 找一个未使用的字段
+  const usedFields = sortItems.value.map(item => item.field);
+  const availableField = sortFieldOptions.find(opt => !usedFields.includes(opt.value));
+  if (availableField) {
+    sortItems.value.push({ field: availableField.value, order: 'desc' });
+  }
+};
+
+const removeSortItem = (index: number) => {
+  if (sortItems.value.length <= 1) return;
+  sortItems.value.splice(index, 1);
+};
+
+const resetSort = () => {
+  sortItems.value = [{ field: 'transactionAt', order: 'desc' }];
+};
+
+const applySort = () => {
+  openSortModal.value = false;
+  refreshTable();
+};
 
 const createTr = () => {
   trForm.value.type = 'expense';
@@ -220,7 +304,38 @@ const refreshTable = async () => {
     trCondition.items = trQueryConditionStore.trQueryConditionItems;
   }
   const trQueryResult = await getTrOnCondition(trCondition);
-  tableData.value = trQueryResult.items;
+
+  // 客户端多字段排序
+  const sortedItems = [...trQueryResult.items].sort((a, b) => {
+    for (const sortItem of sortItems.value) {
+      let aVal: any, bVal: any;
+      switch (sortItem.field) {
+        case 'transactionAt':
+          aVal = a.transactionAt;
+          bVal = b.transactionAt;
+          break;
+        case 'price':
+          aVal = a.price;
+          bVal = b.price;
+          break;
+        case 'category':
+          aVal = a.category;
+          bVal = b.category;
+          break;
+        case 'transactionType':
+          aVal = a.transactionType;
+          bVal = b.transactionType;
+          break;
+        default:
+          continue;
+      }
+      if (aVal < bVal) return sortItem.order === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortItem.order === 'asc' ? 1 : -1;
+    }
+    return 0;
+  });
+
+  tableData.value = sortedItems;
   trTotal.value = trQueryResult.total;
   appDataStore.setStatistics(trQueryResult.trStatistics);
 };
@@ -369,5 +484,42 @@ watch(() => ledgerStore.currentLedgerId, () => {
 .float-secondary {
   right: 110px;
   bottom: 80px;
+}
+
+.float-sort {
+  right: 170px;
+  bottom: 80px;
+}
+
+.sort-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sort-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-priority {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: var(--billadm-color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.sort-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 </style>
