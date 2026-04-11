@@ -30,7 +30,7 @@ func StopMcpServer() error {
 
 func GetMcpStatus() map[string]interface{} {
 	server := GetMcpServer()
-	return map[string]interface{}{
+	return map[string]any{
 		"running": server.IsRunning(),
 		"port":    ServerPort,
 	}

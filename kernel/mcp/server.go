@@ -232,9 +232,8 @@ func formatTransactionRecord(tr *dto.TransactionRecordDto) string {
 	if tr.Outlier {
 		outlierStr = " [离群值]"
 	}
-	return fmt.Sprintf("[%s] %s | %s | 金额: %.2f | 分类: %s | 备注: %s%s%s",
-		tr.TransactionID[:8],
-		time.Unix(tr.TransactionAt/1000, 0).Format("2006-01-02 15:04:05"),
+	return fmt.Sprintf("%s | %s | 金额: %.2f | 分类: %s | 备注: %s%s%s",
+		time.Unix(tr.TransactionAt, 0).Format("2006-01-02 15:04:05"),
 		tr.TransactionType,
 		float64(tr.Price)/100,
 		tr.Category,
