@@ -242,27 +242,3 @@ func (s *McpServer) handleToolsCall(req *JsonRpcRequest) JsonRpcResponse {
 	})
 }
 
-// ToolHandler handles tool-related operations
-type ToolHandler struct{}
-
-// NewToolHandler creates a new ToolHandler instance
-func NewToolHandler() *ToolHandler {
-	return &ToolHandler{}
-}
-
-// ListTools returns the list of available tools
-func (h *ToolHandler) ListTools() []ToolDefinition {
-	return []ToolDefinition{}
-}
-
-// CallTool calls a tool by name with the given arguments
-func (h *ToolHandler) CallTool(name string, arguments json.RawMessage) (interface{}, error) {
-	return nil, fmt.Errorf("not implemented")
-}
-
-// ToolDefinition defines a tool exposed by the server
-type ToolDefinition struct {
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	InputSchema map[string]interface{} `json:"inputSchema"`
-}
