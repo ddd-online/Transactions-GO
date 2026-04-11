@@ -69,6 +69,14 @@ func ServeAPI(ginServer *gin.Engine) {
 			charts.DELETE("/:id", deleteChart)
 			charts.PATCH("", updateChart)
 		}
+
+		// MCP server control
+		mcpGroup := v1.Group("/mcp")
+		{
+			mcpGroup.POST("/start", startMcpServer)
+			mcpGroup.POST("/stop", stopMcpServer)
+			mcpGroup.GET("/status", getMcpStatus)
+		}
 	}
 }
 
