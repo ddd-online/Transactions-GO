@@ -1,6 +1,6 @@
-import {defineStore} from 'pinia'
-import {ref} from 'vue'
-import {startMcpServer, stopMcpServer, getMcpStatus} from "@/backend/api/mcp"
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { startMcpServer, stopMcpServer, getMcpStatus } from "@/backend/api/mcp"
 import NotificationUtil from "@/backend/notification"
 
 export const useMcpStore = defineStore('mcp', () => {
@@ -22,7 +22,7 @@ export const useMcpStore = defineStore('mcp', () => {
             const status = await startMcpServer()
             isRunning.value = status.running
             port.value = status.port
-            NotificationUtil.success('MCP 服务已启动', `端口: ${status.port}`)
+            NotificationUtil.success('MCP 服务已启动')
         } catch (error) {
             NotificationUtil.error('启动 MCP 服务失败', `${error}`)
             throw error

@@ -1,8 +1,8 @@
-import {defineStore} from 'pinia'
-import {computed, ref} from 'vue'
-import {createLedger, deleteLedgerById, modifyLedger, queryAllLedgers} from "@/backend/api/ledger.ts"
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { createLedger, deleteLedgerById, modifyLedger, queryAllLedgers } from "@/backend/api/ledger.ts"
 import NotificationUtil from "@/backend/notification"
-import type {Ledger} from "@/types/billadm"
+import type { Ledger } from "@/types/billadm"
 
 
 export const useLedgerStore = defineStore('ledger', () => {
@@ -51,9 +51,9 @@ export const useLedgerStore = defineStore('ledger', () => {
         try {
             await createLedger(name, description)
             await refreshLedgers()
-            NotificationUtil.success(`创建账本 ${name} 成功`)
+            NotificationUtil.success(`创建账本成功`)
         } catch (error) {
-            NotificationUtil.error(`创建账本 ${name} 失败`, `${error}`)
+            NotificationUtil.error(`创建账本失败`, `${error}`)
         }
     }
 
@@ -64,7 +64,7 @@ export const useLedgerStore = defineStore('ledger', () => {
             await refreshLedgers();
             NotificationUtil.success(`删除账本成功`);
         } catch (error) {
-            NotificationUtil.error(`删除账本失败`);
+            NotificationUtil.error(`删除账本失败`, `${error}`);
         }
     }
 
