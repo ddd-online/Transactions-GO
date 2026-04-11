@@ -43,8 +43,8 @@
           <div class="tool-desc">按条件查询交易记录</div>
           <div class="tool-params">
             <code>ledger_id</code> (必填) - 账本ID<br>
-            <code>time_range</code> - 时间戳范围 [start, end]<br>
-            <code>transaction_type</code> - expense/income/transfer<br>
+            <code>time_range</code> - 时间戳范围 [start, end]，单位为秒级时间戳<br>
+            <code>transaction_type</code> - expense/income/transfer，收入不含转账<br>
             <code>category</code> - 分类名称<br>
             <code>tags</code> - 标签列表<br>
             <code>description</code> - 备注包含的字符<br>

@@ -49,10 +49,10 @@ func NewMcpServer() *McpServer {
 			mcp.WithDescription("按条件查询交易记录"),
 			mcp.WithString("ledger_id", mcp.Required(), mcp.Description("账本ID")),
 			mcp.WithArray("time_range",
-				mcp.Description("时间戳范围 [start, end]"),
+				mcp.Description("时间戳范围 [start, end]，单位为秒级时间戳"),
 				mcp.WithNumberItems(),
 			),
-			mcp.WithString("transaction_type", mcp.Description("expense/income/transfer")),
+			mcp.WithString("transaction_type", mcp.Description("expense/income/transfer，收入不含转账")),
 			mcp.WithString("category", mcp.Description("分类名称")),
 			mcp.WithArray("tags",
 				mcp.Description("标签列表"),
@@ -224,9 +224,21 @@ func queryTransactionsHandler(ctx context.Context, request mcp.CallToolRequest) 
 }
 
 func formatTransactionRecord(tr *dto.TransactionRecordDto) string {
-	return fmt.Sprintf("[%s] %s | %s | %d",
+	tagsStr := ""
+	if len(tr.Tags) > 0 {
+		tagsStr = " | 标签: " + strings.Join(tr.Tags, ", ")
+	}
+	outlierStr := ""
+	if tr.Outlier {
+		outlierStr = " [离群值]"
+	}
+	return fmt.Sprintf("[%s] %s | %s | 金额: %.2f | 分类: %s | 备注: %s%s%s",
 		tr.TransactionID[:8],
 		time.Unix(tr.TransactionAt/1000, 0).Format("2006-01-02 15:04:05"),
 		tr.TransactionType,
-		tr.Price)
+		float64(tr.Price)/100,
+		tr.Category,
+		tr.Description,
+		tagsStr,
+		outlierStr)
 }
