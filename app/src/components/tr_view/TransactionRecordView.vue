@@ -295,7 +295,8 @@ const refreshTable = async () => {
   const trCondition: TrQueryCondition = {
     ledgerId: ledgerStore.currentLedgerId,
     offset: pageSize.value * (currentPage.value - 1),
-    limit: pageSize.value
+    limit: pageSize.value,
+    sortFields: sortItems.value
   };
   if (trQueryConditionStore.timeRange) {
     trCondition.tsRange = convertToUnixTimeRange(trQueryConditionStore.timeRange);
@@ -305,37 +306,7 @@ const refreshTable = async () => {
   }
   const trQueryResult = await getTrOnCondition(trCondition);
 
-  // 客户端多字段排序
-  const sortedItems = [...trQueryResult.items].sort((a, b) => {
-    for (const sortItem of sortItems.value) {
-      let aVal: any, bVal: any;
-      switch (sortItem.field) {
-        case 'transactionAt':
-          aVal = a.transactionAt;
-          bVal = b.transactionAt;
-          break;
-        case 'price':
-          aVal = a.price;
-          bVal = b.price;
-          break;
-        case 'category':
-          aVal = a.category;
-          bVal = b.category;
-          break;
-        case 'transactionType':
-          aVal = a.transactionType;
-          bVal = b.transactionType;
-          break;
-        default:
-          continue;
-      }
-      if (aVal < bVal) return sortItem.order === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortItem.order === 'asc' ? 1 : -1;
-    }
-    return 0;
-  });
-
-  tableData.value = sortedItems;
+  tableData.value = trQueryResult.items;
   trTotal.value = trQueryResult.total;
   appDataStore.setStatistics(trQueryResult.trStatistics);
 };

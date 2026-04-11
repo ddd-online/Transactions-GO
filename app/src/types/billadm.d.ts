@@ -93,6 +93,15 @@ export interface TrQueryCondition {
     items?: TrQueryConditionItem[];
     offset?: number;
     limit?: number;
+    sortFields?: TrQuerySortField[];
+}
+
+/**
+ * 消费记录排序字段
+ */
+export interface TrQuerySortField {
+    field: string;
+    order: 'asc' | 'desc';
 }
 
 /**

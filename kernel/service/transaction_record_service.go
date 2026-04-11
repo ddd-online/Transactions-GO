@@ -138,6 +138,27 @@ func (t *transactionRecordServiceImpl) BatchCreateTr(ws *workspace.Workspace, dt
 	return successCount, nil
 }
 
+// convertSortFields converts DTO sort fields to operator sort fields
+func convertSortFields(dtoSortFields []dto.QueryConditionSortField) []operator.SortField {
+	if len(dtoSortFields) == 0 {
+		return []operator.SortField{
+			{Field: "transactionAt", Order: operator.Desc},
+		}
+	}
+	result := make([]operator.SortField, 0, len(dtoSortFields))
+	for _, sf := range dtoSortFields {
+		order := operator.Desc
+		if sf.Order == "asc" {
+			order = operator.Asc
+		}
+		result = append(result, operator.SortField{
+			Field: sf.Field,
+			Order: order,
+		})
+	}
+	return result
+}
+
 func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspace, condition *dto.TrQueryCondition) (*dto.TrQueryResult, error) {
 	logrus.Infof("start to query trs, condition: %#v", condition)
 
@@ -171,12 +192,7 @@ func (t *transactionRecordServiceImpl) QueryTrsOnCondition(ws *workspace.Workspa
 	}
 
 	// Filter, sort, paginate and summarize
-	sortFields := []operator.SortField{
-		{
-			Field: "transactionAt",
-			Order: operator.Desc,
-		},
-	}
+	sortFields := convertSortFields(condition.SortFields)
 	summary := operator.NewTrOperator().
 		Add(trDtos).
 		Filter(condition.Items).

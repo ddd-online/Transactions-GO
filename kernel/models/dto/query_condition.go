@@ -29,11 +29,17 @@ func JsonQueryCondition(c *gin.Context, result *models.Result) (*TrQueryConditio
 }
 
 type TrQueryCondition struct {
-	LedgerID string               `json:"ledgerId"`
-	Offset   int                  `json:"offset"`
-	Limit    int                  `json:"limit"`
-	TsRange  []int64              `json:"tsRange"`
-	Items    []QueryConditionItem `json:"items"`
+	LedgerID   string               `json:"ledgerId"`
+	Offset     int                  `json:"offset"`
+	Limit      int                  `json:"limit"`
+	TsRange    []int64              `json:"tsRange"`
+	Items      []QueryConditionItem `json:"items"`
+	SortFields []QueryConditionSortField `json:"sortFields"`
+}
+
+type QueryConditionSortField struct {
+	Field string `json:"field"`
+	Order string `json:"order"`
 }
 
 func (qc *TrQueryCondition) Validate(result *models.Result) bool {
