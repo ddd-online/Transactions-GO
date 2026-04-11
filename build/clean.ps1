@@ -10,11 +10,11 @@ $scriptDir = $PSScriptRoot
 $projectRoot = Split-Path -Parent $scriptDir
 
 # 定义要清理的路径
-$vueDistDir        = Join-Path $projectRoot "app" "dist"
-$kernelExe         = Join-Path $projectRoot "kernel" "Billadm-Kernel.exe"
-$electronDistDir   = Join-Path $projectRoot "electron" "dist"
-$electronLogsDir   = Join-Path $projectRoot "electron" "logs"
-$electronOutDir    = Join-Path $projectRoot "electron" "out"
+$vueDistDir = Join-Path $projectRoot "app" "dist"
+$kernelExe = Join-Path $projectRoot "kernel" "Billadm-Kernel.exe"
+$electronDistDir = Join-Path $projectRoot "electron" "dist"
+$electronLogsDir = Join-Path $projectRoot "electron" "logs"
+$buildTargetDir = Join-Path $projectRoot "build" "target"
 $electronKernelExe = Join-Path $projectRoot "electron" "Billadm-Kernel.exe"
 
 # 颜色辅助函数（提升可读性）
@@ -34,7 +34,7 @@ try {
         $kernelExe,
         $electronDistDir,
         $electronLogsDir,
-        $electronOutDir,
+        $buildTargetDir,
         $electronKernelExe
     )
 
@@ -44,17 +44,20 @@ try {
             Write-Warn "正在删除: $itemName"
             Remove-Item $item -Recurse -Force -ErrorAction Stop
             Write-Success "已删除: $itemName"
-        } else {
+        }
+        else {
             Write-Info "跳过（不存在）: $(Split-Path $item -Leaf)"
         }
     }
 
     Write-Host "`n✨ 清理完成！所有指定文件/目录已移除。" -ForegroundColor Green
 
-} catch {
+}
+catch {
     Write-Error "❌ 清理过程中发生错误：$($_.Exception.Message)"
     exit 1
-} finally {
+}
+finally {
     # 返回原始目录
     Set-Location $initialLocation
     Write-Host "`n↩️  已返回脚本所在目录: $scriptDir" -ForegroundColor DarkCyan

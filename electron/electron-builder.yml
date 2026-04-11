@@ -2,7 +2,7 @@ appId: com.github.Transactions
 productName: Transactions
 asar: false
 directories:
-  output: out
+  output: ../build/target
   buildResources: assets
 files:
   - src/**
