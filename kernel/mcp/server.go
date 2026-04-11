@@ -24,6 +24,8 @@ const (
 // McpServer is the main MCP server using mcp-go SDK
 type McpServer struct {
 	httpServer *server.StreamableHTTPServer
+	httpMux    *http.ServeMux
+	listener   net.Listener
 	mcpServer  *server.MCPServer
 	mu         sync.Mutex
 	running    bool
@@ -98,6 +100,8 @@ func (s *McpServer) Start() error {
 	}()
 
 	s.httpServer = httpServer
+	s.httpMux = mux
+	s.listener = listener
 	s.running = true
 	s.mu.Unlock()
 
@@ -112,6 +116,13 @@ func (s *McpServer) Stop() error {
 	if !s.running {
 		return nil
 	}
+
+	// Close the listener to stop accepting new connections
+	if s.listener != nil {
+		s.listener.Close()
+		s.listener = nil
+	}
+
 	s.running = false
 	logrus.Info("MCP server stopped")
 	return nil
