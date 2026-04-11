@@ -35,6 +35,14 @@
           <FileTextOutlined class="settings-list-item-icon"/>
           <span class="settings-list-item-title">消费模板</span>
         </div>
+        <div
+            class="settings-list-item"
+            :class="{ active: activeComponent === 'mcp' }"
+            @click="activeComponent = 'mcp'"
+        >
+          <SettingOutlined class="settings-list-item-icon"/>
+          <span class="settings-list-item-title">MCP 设置</span>
+        </div>
       </div>
     </div>
 
@@ -44,15 +52,17 @@
       <workspace-setting v-else-if="activeComponent === 'workspace'"/>
       <data-import-export-setting v-else-if="activeComponent === 'data-import-export'"/>
       <billadm-template-setting v-else-if="activeComponent === 'template'"/>
+      <mcp-setting v-else-if="activeComponent === 'mcp'"/>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {ref} from 'vue';
-import {CloudUploadOutlined, FolderOpenOutlined, TagOutlined, FileTextOutlined} from "@ant-design/icons-vue";
+import {CloudUploadOutlined, FolderOpenOutlined, TagOutlined, FileTextOutlined, SettingOutlined} from "@ant-design/icons-vue";
 import WorkspaceSetting from './WorkspaceSetting.vue';
 import BilladmTemplateSetting from './BilladmTemplateSetting.vue';
+import McpSetting from './McpSetting.vue';
 
 const activeComponent = ref('category-tag');
 </script>
