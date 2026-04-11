@@ -3,6 +3,7 @@ package mcp
 import (
 	"context"
 	"fmt"
+	"net"
 	"net/http"
 	"strings"
 	"sync"
@@ -69,7 +70,7 @@ func NewMcpServer() *McpServer {
 	}
 }
 
-// Start starts the MCP server
+// Start starts the MCP server in a goroutine
 func (s *McpServer) Start() error {
 	s.mu.Lock()
 	if s.running {
@@ -82,17 +83,25 @@ func (s *McpServer) Start() error {
 	mux := http.NewServeMux()
 	mux.Handle("/mcp", httpServer)
 
-	addr := fmt.Sprintf(":%d", ServerPort)
-	if err := httpServer.Start(addr); err != nil {
+	addr := fmt.Sprintf("127.0.0.1:%d", ServerPort)
+	listener, err := net.Listen("tcp", addr)
+	if err != nil {
 		s.mu.Unlock()
-		return fmt.Errorf("failed to start MCP server: %w", err)
+		return fmt.Errorf("failed to listen on %s: %w", addr, err)
 	}
+
+	// Start HTTP server in a goroutine so it doesn't block
+	go func() {
+		if err := http.Serve(listener, mux); err != nil {
+			logrus.Errorf("MCP HTTP server error: %v", err)
+		}
+	}()
 
 	s.httpServer = httpServer
 	s.running = true
 	s.mu.Unlock()
 
-	logrus.Infof("MCP server listening on 127.0.0.1:%d/mcp", ServerPort)
+	logrus.Infof("MCP server listening on %s/mcp", addr)
 	return nil
 }
 
