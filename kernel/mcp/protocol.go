@@ -30,6 +30,13 @@ func (e *JsonRpcError) Error() string {
 	return e.Message
 }
 
+// JSON-RPC 2.0 notification (no id field per JSON-RPC 2.0 spec)
+type JsonRpcNotification struct {
+	JsonRpc string      `json:"jsonrpc"`
+	Method  string      `json:"method"`
+	Params  interface{} `json:"params,omitempty"`
+}
+
 // JSON-RPC 2.0 error codes
 const (
 	CodeParseError     = -32700

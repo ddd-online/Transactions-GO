@@ -122,10 +122,11 @@ func (s *McpServer) handleConnection(conn net.Conn) {
 	reader := bufio.NewReader(conn)
 	encoder := json.NewEncoder(conn)
 
-	// Send initialized notification
-	initialized := JsonRpcResponse{
+	// Send initialized notification (no id field per JSON-RPC 2.0 spec)
+	initialized := JsonRpcNotification{
 		JsonRpc: "2.0",
-		Result: map[string]interface{}{
+		Method:  "notifications/initialized",
+		Params: map[string]interface{}{
 			"protocolVersion": ProtocolVersion,
 		},
 	}
