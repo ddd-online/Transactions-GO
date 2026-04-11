@@ -1,6 +1,6 @@
 import {defineStore} from 'pinia'
 import {ref} from 'vue'
-import {startMcpServer, stopMcpServer, getMcpStatus, type McpStatus} from "@/backend/api/mcp"
+import {startMcpServer, stopMcpServer, getMcpStatus} from "@/backend/api/mcp"
 import NotificationUtil from "@/backend/notification"
 
 export const useMcpStore = defineStore('mcp', () => {

@@ -12,6 +12,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AAlert: typeof import('ant-design-vue/es')['Alert']
+    ABadge: typeof import('ant-design-vue/es')['Badge']
     AButton: typeof import('ant-design-vue/es')['Button']
     ACard: typeof import('ant-design-vue/es')['Card']
     ACheckboxGroup: typeof import('ant-design-vue/es')['CheckboxGroup']
@@ -69,6 +70,7 @@ declare module 'vue' {
     DataImportExportSetting: typeof import('./../components/settings_view/DataImportExportSetting.vue')['default']
     Layout: typeof import('./../components/Layout.vue')['default']
     LedgerView: typeof import('./../components/ledger_view/LedgerView.vue')['default']
+    McpSetting: typeof import('./../components/settings_view/McpSetting.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SettingsView: typeof import('./../components/settings_view/SettingsView.vue')['default']

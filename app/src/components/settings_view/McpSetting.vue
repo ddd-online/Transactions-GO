@@ -63,7 +63,7 @@ onMounted(async () => {
   switchLoading.value = mcpStore.isRunning;
 });
 
-const handleToggle = async (checked: boolean) => {
+const handleToggle = async (checked: boolean | string | number) => {
   loading.value = true;
   try {
     if (checked) {
