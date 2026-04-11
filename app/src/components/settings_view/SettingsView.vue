@@ -41,7 +41,7 @@
             @click="activeComponent = 'mcp'"
         >
           <SettingOutlined class="settings-list-item-icon"/>
-          <span class="settings-list-item-title">MCP 设置</span>
+          <span class="settings-list-item-title">MCP</span>
         </div>
       </div>
     </div>
