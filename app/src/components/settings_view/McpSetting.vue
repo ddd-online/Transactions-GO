@@ -37,6 +37,11 @@
         <div class="tool-item">
           <div class="tool-name">query_ledgers</div>
           <div class="tool-desc">查询所有账本列表，返回账本 ID、名称和描述</div>
+          <div class="tool-example">
+            <div class="example-label">输出样例</div>
+            <pre class="example-output"><code>[a1b2c3d4] 主账本 - 我的日常开支记录
+[e5f6g7h8] 生意账本</code></pre>
+          </div>
         </div>
         <div class="tool-item">
           <div class="tool-name">query_transactions</div>
