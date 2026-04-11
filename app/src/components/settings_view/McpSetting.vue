@@ -51,6 +51,13 @@
             <code>offset</code> - 分页偏移<br>
             <code>limit</code> - 每页数量，最大100
           </div>
+          <div class="tool-example">
+            <div class="example-label">输出样例</div>
+            <pre class="example-output"><code>共 2 条记录
+
+2026-04-10 14:30:00 | expense | 金额: 58.50 | 分类: 餐饮 | 备注: 午餐 | 标签: 工作餐
+2026-04-10 09:15:00 | income | 金额: 15000.00 | 分类: 工资 | 备注: 月薪 | 标签: 固定收入 [离群值]</code></pre>
+          </div>
         </div>
       </div>
     </div>
@@ -219,5 +226,33 @@ const handleToggle = async (checked: boolean | string | number) => {
   background-color: rgba(0, 0, 0, 0.1);
   padding: 1px 4px;
   border-radius: 3px;
+}
+
+.tool-example {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.example-label {
+  font-size: 11px;
+  color: var(--billadm-color-text-minor);
+  margin-bottom: 4px;
+}
+
+.example-output {
+  background-color: #1e1e1e;
+  color: #d4d4d4;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  overflow-x: auto;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.example-output code {
+  white-space: pre;
 }
 </style>
