@@ -25,8 +25,8 @@ const (
 type McpServer struct {
 	httpServer *server.StreamableHTTPServer
 	mcpServer  *server.MCPServer
-	mu          sync.Mutex
-	running     bool
+	mu         sync.Mutex
+	running    bool
 }
 
 // NewMcpServer creates a new MCP server instance using mcp-go SDK
@@ -205,10 +205,7 @@ func queryTransactionsHandler(ctx context.Context, request mcp.CallToolRequest) 
 	}
 
 	// limit
-	limit := request.GetInt("limit", 20)
-	if limit > 100 {
-		limit = 100
-	}
+	limit := min(request.GetInt("limit", 20), 100)
 	condition.Limit = limit
 
 	result, err := service.GetTrService().QueryTrsOnCondition(ws, condition)
@@ -217,7 +214,7 @@ func queryTransactionsHandler(ctx context.Context, request mcp.CallToolRequest) 
 	}
 
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprintf("共 %d 条记录\n\n", result.Total))
+	fmt.Fprintf(&sb, "共 %d 条记录\n\n", result.Total)
 	for _, tr := range result.Items {
 		sb.WriteString(formatTransactionRecord(tr))
 		sb.WriteString("\n")

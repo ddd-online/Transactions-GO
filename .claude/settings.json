@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh search:*)",
+      "mcp__plugin_ecc_context7__query-docs"
+    ]
+  }
+}
