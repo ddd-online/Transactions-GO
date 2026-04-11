@@ -50,9 +50,8 @@ const configExample = computed(() => {
   return JSON.stringify({
     "mcpServers": {
       "billadm": {
-        "type": "tcp",
-        "host": "127.0.0.1",
-        "port": mcpStore.port
+        "command": "npx",
+        "args": ["-y", "@modelcontextprotocol/server-streamable-http", `http://127.0.0.1:${mcpStore.port}/mcp`]
       }
     }
   }, null, 2);
