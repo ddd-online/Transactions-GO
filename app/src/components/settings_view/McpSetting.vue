@@ -26,13 +26,32 @@
       <div class="port-display">{{ mcpStore.port }}</div>
     </div>
 
-    <!-- Claude Code 配置示例 -->
+    <!-- Claude Code 配置 -->
     <div v-if="mcpStore.isRunning" class="config-section">
       <div class="config-title">Claude Code 配置</div>
-      <div class="config-desc">在 <code>~/.claude/settings.json</code> 中添加以下配置：</div>
-      <pre class="config-code"><code>{{ configExample }}</code></pre>
-      <div class="config-tip">
-        配置后重启 Claude Code，然后可以使用 MCP 工具查询账本和交易记录。
+      <div class="config-desc">在终端运行以下命令添加 MCP 服务器：</div>
+      <pre class="config-code"><code>{{ configCommand }}</code></pre>
+
+      <div class="config-title" style="margin-top: 16px;">可用工具</div>
+      <div class="tools-list">
+        <div class="tool-item">
+          <div class="tool-name">query_ledgers</div>
+          <div class="tool-desc">查询所有账本列表，返回账本 ID、名称和描述</div>
+        </div>
+        <div class="tool-item">
+          <div class="tool-name">query_transactions</div>
+          <div class="tool-desc">按条件查询交易记录</div>
+          <div class="tool-params">
+            <code>ledger_id</code> (必填) - 账本ID<br>
+            <code>time_range</code> - 时间戳范围 [start, end]<br>
+            <code>transaction_type</code> - expense/income/transfer<br>
+            <code>category</code> - 分类名称<br>
+            <code>tags</code> - 标签列表<br>
+            <code>description</code> - 备注包含的字符<br>
+            <code>offset</code> - 分页偏移<br>
+            <code>limit</code> - 每页数量，最大100
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -46,15 +65,8 @@ const mcpStore = useMcpStore();
 const loading = ref(false);
 const switchLoading = ref(false);
 
-const configExample = computed(() => {
-  return JSON.stringify({
-    "mcpServers": {
-      "billadm": {
-        "command": "npx",
-        "args": ["-y", "@modelcontextprotocol/server-streamable-http", `http://127.0.0.1:${mcpStore.port}/mcp`]
-      }
-    }
-  }, null, 2);
+const configCommand = computed(() => {
+  return `claude mcp add --transport http transactions http://127.0.0.1:${mcpStore.port}/mcp`;
 });
 
 onMounted(async () => {
@@ -168,5 +180,44 @@ const handleToggle = async (checked: boolean | string | number) => {
 .config-tip {
   font-size: 12px;
   color: var(--billadm-color-text-minor);
+}
+
+.tools-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tool-item {
+  padding: 12px;
+  background-color: var(--billadm-color-icon-hover-bg);
+  border-radius: 6px;
+}
+
+.tool-name {
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--billadm-color-text-major);
+  margin-bottom: 4px;
+}
+
+.tool-desc {
+  font-size: 12px;
+  color: var(--billadm-color-text-minor);
+}
+
+.tool-params {
+  font-size: 11px;
+  color: var(--billadm-color-text-minor);
+  margin-top: 6px;
+  line-height: 1.6;
+}
+
+.tool-params code {
+  font-family: 'Consolas', 'Monaco', monospace;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding: 1px 4px;
+  border-radius: 3px;
 }
 </style>
