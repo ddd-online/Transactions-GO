@@ -1,82 +1,109 @@
 package mcp
 
 import (
-	"bufio"
-	"encoding/json"
+	"context"
 	"fmt"
-	"net"
+	"net/http"
+	"strings"
 	"sync"
+	"time"
 
+	"github.com/billadm/models/dto"
+	"github.com/billadm/service"
+	"github.com/billadm/workspace"
+	"github.com/mark3labs/mcp-go/mcp"
+	"github.com/mark3labs/mcp-go/server"
 	"github.com/sirupsen/logrus"
 )
 
-// Protocol version and server configuration
 const (
-	ProtocolVersion = "2024-11-05"
-	ServerPort      = 31944
+	ServerPort = 31944
 )
 
-// McpServer is the main MCP TCP server
+// McpServer is the main MCP server using mcp-go SDK
 type McpServer struct {
-	listener net.Listener
-	wg       sync.WaitGroup
-	tools    *ToolHandler
-	mu       sync.Mutex
-	running  bool
+	httpServer *server.StreamableHTTPServer
+	mcpServer  *server.MCPServer
+	mu          sync.Mutex
+	running     bool
 }
 
-// NewMcpServer creates a new MCP server instance
+// NewMcpServer creates a new MCP server instance using mcp-go SDK
 func NewMcpServer() *McpServer {
+	s := server.NewMCPServer("Billadm MCP", "1.0.0",
+		server.WithToolCapabilities(true),
+	)
+
+	// Add query_ledgers tool
+	s.AddTool(
+		mcp.NewTool("query_ledgers",
+			mcp.WithDescription("查询所有账本"),
+		),
+		queryLedgersHandler,
+	)
+
+	// Add query_transactions tool
+	s.AddTool(
+		mcp.NewTool("query_transactions",
+			mcp.WithDescription("按条件查询交易记录"),
+			mcp.WithString("ledger_id", mcp.Required(), mcp.Description("账本ID")),
+			mcp.WithArray("time_range",
+				mcp.Description("时间戳范围 [start, end]"),
+				mcp.WithNumberItems(),
+			),
+			mcp.WithString("transaction_type", mcp.Description("expense/income/transfer")),
+			mcp.WithString("category", mcp.Description("分类名称")),
+			mcp.WithArray("tags",
+				mcp.Description("标签列表"),
+				mcp.WithStringItems(),
+			),
+			mcp.WithString("description", mcp.Description("备注包含的字符")),
+			mcp.WithNumber("offset", mcp.Description("分页偏移")),
+			mcp.WithNumber("limit", mcp.Description("每页数量，最大100")),
+		),
+		queryTransactionsHandler,
+	)
+
 	return &McpServer{
-		tools: NewToolHandler(),
+		mcpServer: s,
 	}
 }
 
-// Start starts the TCP listener and begins accepting connections
+// Start starts the MCP server
 func (s *McpServer) Start() error {
 	s.mu.Lock()
 	if s.running {
 		s.mu.Unlock()
-		return fmt.Errorf("server is already running")
+		return nil
 	}
 
-	addr := fmt.Sprintf("127.0.0.1:%d", ServerPort)
-	listener, err := net.Listen("tcp", addr)
-	if err != nil {
+	httpServer := server.NewStreamableHTTPServer(s.mcpServer)
+
+	mux := http.NewServeMux()
+	mux.Handle("/mcp", httpServer)
+
+	addr := fmt.Sprintf(":%d", ServerPort)
+	if err := httpServer.Start(addr); err != nil {
 		s.mu.Unlock()
-		return fmt.Errorf("failed to listen on %s: %w", addr, err)
+		return fmt.Errorf("failed to start MCP server: %w", err)
 	}
 
-	s.listener = listener
+	s.httpServer = httpServer
 	s.running = true
 	s.mu.Unlock()
 
-	logrus.Infof("MCP server listening on %s", addr)
-
-	s.wg.Add(1)
-	go s.acceptConnections()
-
+	logrus.Infof("MCP server listening on 127.0.0.1:%d/mcp", ServerPort)
 	return nil
 }
 
-// Stop stops the server and closes the listener
+// Stop stops the server
 func (s *McpServer) Stop() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-
 	if !s.running {
-		return fmt.Errorf("server is not running")
+		return nil
 	}
-
 	s.running = false
-
-	if s.listener != nil {
-		if err := s.listener.Close(); err != nil {
-			return fmt.Errorf("failed to close listener: %w", err)
-		}
-	}
-
-	s.wg.Wait()
 	logrus.Info("MCP server stopped")
 	return nil
 }
@@ -88,157 +115,112 @@ func (s *McpServer) IsRunning() bool {
 	return s.running
 }
 
-// acceptConnections accepts incoming TCP connections
-func (s *McpServer) acceptConnections() {
-	defer s.wg.Done()
+// Tool handlers
 
-	for {
-		conn, err := s.listener.Accept()
-		if err != nil {
-			s.mu.Lock()
-			running := s.running
-			s.mu.Unlock()
-
-			if !running {
-				// Server was stopped, exit gracefully
-				return
-			}
-			logrus.Errorf("failed to accept connection: %v", err)
-			continue
-		}
-
-		s.wg.Add(1)
-		go s.handleConnection(conn)
-	}
-}
-
-// handleConnection handles a single TCP connection
-func (s *McpServer) handleConnection(conn net.Conn) {
-	defer s.wg.Done()
-	defer conn.Close()
-
-	logrus.Debugf("new connection from %s", conn.RemoteAddr())
-
-	reader := bufio.NewReader(conn)
-	encoder := json.NewEncoder(conn)
-
-	// Send initialized notification (no id field per JSON-RPC 2.0 spec)
-	initialized := JsonRpcNotification{
-		JsonRpc: "2.0",
-		Method:  "notifications/initialized",
-		Params: map[string]interface{}{
-			"protocolVersion": ProtocolVersion,
-		},
-	}
-	if err := encoder.Encode(initialized); err != nil {
-		logrus.Errorf("failed to send initialized notification: %v", err)
-		return
+func queryLedgersHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		return mcp.NewToolResultError("工作空间未打开"), nil
 	}
 
-	// Handle requests in a loop
-	for {
-		data, err := reader.ReadBytes('\n')
-		if err != nil {
-			if err.Error() != "EOF" {
-				logrus.Errorf("read error: %v", err)
-			}
-			return
-		}
-
-		// Remove trailing newline
-		if len(data) > 0 && data[len(data)-1] == '\n' {
-			data = data[:len(data)-1]
-		}
-		// Also handle carriage return
-		if len(data) > 0 && data[len(data)-1] == '\r' {
-			data = data[:len(data)-1]
-		}
-
-		if len(data) == 0 {
-			continue
-		}
-
-		req, err := ParseRequest(data)
-		if err != nil {
-			logrus.Errorf("failed to parse request: %v", err)
-			resp := NewErrorResponse(nil, CodeInvalidRequest, err.Error())
-			encoder.Encode(resp)
-			continue
-		}
-
-		resp := s.handleRequest(conn, encoder, req)
-		if resp != nil {
-			if err := encoder.Encode(resp); err != nil {
-				logrus.Errorf("failed to encode response: %v", err)
-			}
-		}
-	}
-}
-
-// handleRequest routes requests to the appropriate handler
-func (s *McpServer) handleRequest(conn net.Conn, encoder *json.Encoder, req *JsonRpcRequest) *JsonRpcResponse {
-	switch req.Method {
-	case "initialize":
-		resp := s.handleInitialize(req)
-		return &resp
-	case "tools/list":
-		resp := s.handleToolsList(req)
-		return &resp
-	case "tools/call":
-		resp := s.handleToolsCall(req)
-		return &resp
-	default:
-		logrus.Warnf("unknown method: %s", req.Method)
-		resp := NewErrorResponse(req.ID, CodeMethodNotFound, fmt.Sprintf("method not found: %s", req.Method))
-		return &resp
-	}
-}
-
-// handleInitialize handles the initialize request
-func (s *McpServer) handleInitialize(req *JsonRpcRequest) JsonRpcResponse {
-	return NewSuccessResponse(req.ID, map[string]interface{}{
-		"protocolVersion": ProtocolVersion,
-		"capabilities": map[string]interface{}{
-			"tools": struct{}{},
-		},
-		"serverInfo": map[string]interface{}{
-			"name":    "billadm-mcp",
-			"version": "1.0.0",
-		},
-	})
-}
-
-// handleToolsList handles the tools/list request
-func (s *McpServer) handleToolsList(req *JsonRpcRequest) JsonRpcResponse {
-	tools := s.tools.ListTools()
-	return NewSuccessResponse(req.ID, map[string]interface{}{
-		"tools": tools,
-	})
-}
-
-// handleToolsCall handles the tools/call request
-func (s *McpServer) handleToolsCall(req *JsonRpcRequest) JsonRpcResponse {
-	var params struct {
-		Name      string          `json:"name"`
-		Arguments json.RawMessage `json:"arguments,omitempty"`
-	}
-
-	if err := json.Unmarshal(req.Params, &params); err != nil {
-		return NewErrorResponse(req.ID, CodeInvalidParams, fmt.Sprintf("invalid params: %v", err))
-	}
-
-	result, err := s.tools.CallTool(params.Name, params.Arguments)
+	ledgers, err := service.GetLedgerService().ListAllLedger(ws)
 	if err != nil {
-		return NewErrorResponse(req.ID, CodeInternalError, err.Error())
+		return mcp.NewToolResultError(err.Error()), nil
 	}
 
-	return NewSuccessResponse(req.ID, map[string]interface{}{
-		"content": []map[string]interface{}{
-			{
-				"type": "text",
-				"text": fmt.Sprintf("%v", result),
-			},
-		},
-	})
+	var sb strings.Builder
+	for _, ledger := range ledgers {
+		sb.WriteString(fmt.Sprintf("[%s] %s", ledger.ID, ledger.Name))
+		if ledger.Description != "" {
+			sb.WriteString(fmt.Sprintf(" - %s", ledger.Description))
+		}
+		sb.WriteString("\n")
+	}
+
+	return mcp.NewToolResultText(sb.String()), nil
 }
 
+func queryTransactionsHandler(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		return mcp.NewToolResultError("工作空间未打开"), nil
+	}
+
+	ledgerID, err := request.RequireString("ledger_id")
+	if err != nil {
+		return mcp.NewToolResultError("ledger_id is required"), nil
+	}
+
+	condition := &dto.TrQueryCondition{
+		LedgerID: ledgerID,
+		Offset:   0,
+		Limit:    20,
+	}
+
+	// Parse optional parameters
+
+	// time_range - array of numbers [start, end]
+	timeRange := request.GetFloatSlice("time_range", nil)
+	if len(timeRange) == 2 {
+		condition.TsRange = []int64{int64(timeRange[0]), int64(timeRange[1])}
+	}
+
+	// transaction_type
+	transactionType := request.GetString("transaction_type", "")
+	if transactionType != "" {
+		condition.Items = append(condition.Items, dto.QueryConditionItem{TransactionType: transactionType})
+	}
+
+	// category
+	category := request.GetString("category", "")
+	if category != "" {
+		condition.Items = append(condition.Items, dto.QueryConditionItem{Category: category})
+	}
+
+	// description
+	description := request.GetString("description", "")
+	if description != "" {
+		condition.Items = append(condition.Items, dto.QueryConditionItem{Description: description})
+	}
+
+	// tags - array of strings
+	tags := request.GetStringSlice("tags", nil)
+	if len(tags) > 0 {
+		condition.Items = append(condition.Items, dto.QueryConditionItem{Tags: tags})
+	}
+
+	// offset
+	offset := request.GetInt("offset", 0)
+	if offset > 0 {
+		condition.Offset = offset
+	}
+
+	// limit
+	limit := request.GetInt("limit", 20)
+	if limit > 100 {
+		limit = 100
+	}
+	condition.Limit = limit
+
+	result, err := service.GetTrService().QueryTrsOnCondition(ws, condition)
+	if err != nil {
+		return mcp.NewToolResultError(err.Error()), nil
+	}
+
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprintf("共 %d 条记录\n\n", result.Total))
+	for _, tr := range result.Items {
+		sb.WriteString(formatTransactionRecord(tr))
+		sb.WriteString("\n")
+	}
+
+	return mcp.NewToolResultText(sb.String()), nil
+}
+
+func formatTransactionRecord(tr *dto.TransactionRecordDto) string {
+	return fmt.Sprintf("[%s] %s | %s | %d",
+		tr.TransactionID[:8],
+		time.Unix(tr.TransactionAt/1000, 0).Format("2006-01-02 15:04:05"),
+		tr.TransactionType,
+		tr.Price)
+}
