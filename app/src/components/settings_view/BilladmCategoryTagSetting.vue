@@ -5,37 +5,24 @@
       <div class="header-left">
         <h1 class="setting-title">分类与标签</h1>
         <nav class="type-nav">
-          <button
-            v-for="type in transactionTypes"
-            :key="type.value"
-            class="type-pill"
-            :class="{ 'is-active': activeType === type.value }"
-            :style="{ '--c': type.color }"
-            @click="activeType = type.value"
-          >
+          <button v-for="type in transactionTypes" :key="type.value" class="type-pill"
+            :class="{ 'is-active': activeType === type.value }" :style="{ '--c': type.color }"
+            @click="activeType = type.value">
             <span class="pill-dot"></span>
             {{ type.label }}
           </button>
         </nav>
       </div>
       <div class="header-right">
-        <button
-          v-if="selectedCategory"
-          class="add-btn add-btn--secondary"
-          @click="openAddTagModal"
-        >
+        <button v-if="selectedCategory" class="add-btn add-btn--secondary" @click="openAddTagModal">
           <svg class="add-btn__icon" viewBox="0 0 20 20" fill="none">
-            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           </svg>
           <span>添加标签</span>
         </button>
-        <button
-          class="add-btn add-btn--primary"
-          @click="openAddCategoryModal"
-          :disabled="!ledgerStore.currentLedgerId"
-        >
+        <button class="add-btn add-btn--primary" @click="openAddCategoryModal" :disabled="!ledgerStore.currentLedgerId">
           <svg class="add-btn__icon" viewBox="0 0 20 20" fill="none">
-            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
           </svg>
           <span>添加分类</span>
         </button>
@@ -51,45 +38,30 @@
           <span class="column-count">{{ categories.length }}</span>
         </div>
         <div class="column-body category-list" v-if="categories.length > 0">
-          <div
-            v-for="(category, index) in categories"
-            :key="category.name"
-            class="list-item"
-            :class="{ 'is-active': selectedCategory === category.name }"
-            @click="selectCategory(category.name)"
-          >
+          <div v-for="(category, index) in categories" :key="category.name" class="list-item"
+            :class="{ 'is-active': selectedCategory === category.name }" @click="selectCategory(category.name)">
             <div class="item-main">
               <span class="item-name">{{ category.name }}</span>
               <span class="item-badge" v-if="category.recordCount">{{ category.recordCount }}</span>
             </div>
             <div class="item-actions">
-              <button
-                class="action-icon"
-                @click.stop="moveCategory(index, -1)"
-                :disabled="index === 0"
-                title="上移"
-              >
+              <button class="action-icon" @click.stop="moveCategory(index, -1)" :disabled="index === 0" title="上移">
                 <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 2L8 14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 2L8 14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
                 </svg>
               </button>
-              <button
-                class="action-icon"
-                @click.stop="moveCategory(index, 1)"
-                :disabled="index === categories.length - 1"
-                title="下移"
-              >
+              <button class="action-icon" @click.stop="moveCategory(index, 1)"
+                :disabled="index === categories.length - 1" title="下移">
                 <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 14L8 2M8 14L4 10M8 14L12 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 14L8 2M8 14L4 10M8 14L12 10" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
-              <button
-                class="action-icon delete"
-                @click.stop="confirmDeleteCategory(category.name)"
-                title="删除"
-              >
+              <button class="action-icon delete" @click.stop="confirmDeleteCategory(category.name)" title="删除">
                 <svg class="delete-icon" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M12 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M12 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
             </div>
@@ -107,43 +79,29 @@
           <span class="column-count">{{ selectedTags.length }}</span>
         </div>
         <div class="column-body tag-list" v-if="selectedTags.length > 0">
-          <div
-            v-for="(tag, index) in selectedTags"
-            :key="tag.name"
-            class="list-item"
-          >
+          <div v-for="(tag, index) in selectedTags" :key="tag.name" class="list-item">
             <div class="item-main">
               <span class="item-name">{{ tag.name }}</span>
               <span class="item-badge" v-if="tag.recordCount">{{ tag.recordCount }}</span>
             </div>
             <div class="item-actions">
-              <button
-                class="action-icon"
-                @click="moveTag(index, -1)"
-                :disabled="index === 0"
-                title="上移"
-              >
+              <button class="action-icon" @click="moveTag(index, -1)" :disabled="index === 0" title="上移">
                 <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 2L8 14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 2L8 14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                    stroke-linejoin="round" />
                 </svg>
               </button>
-              <button
-                class="action-icon"
-                @click="moveTag(index, 1)"
-                :disabled="index === selectedTags.length - 1"
-                title="下移"
-              >
+              <button class="action-icon" @click="moveTag(index, 1)" :disabled="index === selectedTags.length - 1"
+                title="下移">
                 <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
-                  <path d="M8 14L8 2M8 14L4 10M8 14L12 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M8 14L8 2M8 14L4 10M8 14L12 10" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
-              <button
-                class="action-icon delete"
-                @click="confirmDeleteTag(tag.name)"
-                title="删除"
-              >
+              <button class="action-icon delete" @click="confirmDeleteTag(tag.name)" title="删除">
                 <svg class="delete-icon" viewBox="0 0 16 16" fill="none">
-                  <path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M12 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M12 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </button>
             </div>
@@ -156,15 +114,8 @@
     </div>
 
     <!-- 添加分类弹窗 -->
-    <a-modal
-      v-model:open="openCategoryModal"
-      title="新增分类"
-      @ok="confirmAddCategory"
-      ok-text="确认"
-      cancel-text="取消"
-      centered
-      :width="360"
-    >
+    <a-modal v-model:open="openCategoryModal" title="新增分类" @ok="confirmAddCategory" ok-text="确认" cancel-text="取消"
+      centered :width="360">
       <div class="modal-form">
         <label class="form-label">名称</label>
         <a-input v-model:value="categoryForm.name" placeholder="输入分类名称" size="large" :maxlength="20" />
@@ -172,15 +123,8 @@
     </a-modal>
 
     <!-- 添加标签弹窗 -->
-    <a-modal
-      v-model:open="openTagModal"
-      title="新增标签"
-      @ok="confirmAddTag"
-      ok-text="确认"
-      cancel-text="取消"
-      centered
-      :width="360"
-    >
+    <a-modal v-model:open="openTagModal" title="新增标签" @ok="confirmAddTag" ok-text="确认" cancel-text="取消" centered
+      :width="360">
       <div class="modal-form">
         <label class="form-label">名称</label>
         <a-input v-model:value="tagForm.name" placeholder="输入标签名称" size="large" :maxlength="20" />
@@ -188,32 +132,24 @@
     </a-modal>
 
     <!-- 删除确认弹窗 -->
-    <a-modal
-      v-model:open="openDeleteModal"
-      :title="deleteTarget.type === 'category' ? '删除分类' : '删除标签'"
-      @ok="executeDelete"
-      ok-text="删除"
-      ok-type="danger"
-      cancel-text="取消"
-      centered
-      :width="360"
-    >
+    <a-modal v-model:open="openDeleteModal" :title="deleteTarget.type === 'category' ? '删除分类' : '删除标签'"
+      @ok="executeDelete" ok-text="删除" ok-type="danger" cancel-text="取消" centered :width="360">
       <p>{{ deleteTarget.message }}</p>
     </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref, watch, computed} from 'vue';
-import type {TransactionType, Category, Tag} from '@/types/billadm';
-import {useLedgerStore} from '@/stores/ledgerStore';
+import { ref, watch } from 'vue';
+import type { TransactionType, Category, Tag } from '@/types/billadm';
+import { useLedgerStore } from '@/stores/ledgerStore';
 import {
   getCategoryByType, getTagsByCategory,
   addCategory, removeCategory, addTag, removeTag,
   reorderCategory, reorderTag
 } from '@/backend/functions';
-import {TransactionTypeToColor} from "@/backend/constant.ts";
-import {message} from "ant-design-vue";
+import { TransactionTypeToColor } from "@/backend/constant.ts";
+import { message } from "ant-design-vue";
 
 interface CategoryWithTags extends Category {
   tags: Tag[];
@@ -239,15 +175,15 @@ const selectedTags = ref<Tag[]>([]);
 
 // 添加分类弹窗
 const openCategoryModal = ref(false);
-const categoryForm = ref({name: ''});
+const categoryForm = ref({ name: '' });
 
 // 添加标签弹窗
 const openTagModal = ref(false);
-const tagForm = ref({name: ''});
+const tagForm = ref({ name: '' });
 
 // 删除确认弹窗
 const openDeleteModal = ref(false);
-const deleteTarget = ref<{type: 'category' | 'tag', name: string, message: string}>({
+const deleteTarget = ref<{ type: 'category' | 'tag', name: string, message: string }>({
   type: 'category',
   name: '',
   message: ''
@@ -402,7 +338,7 @@ watch(
     selectedTags.value = [];
     loadCategories();
   },
-  {immediate: true}
+  { immediate: true }
 );
 </script>
 
