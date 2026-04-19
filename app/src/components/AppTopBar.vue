@@ -83,19 +83,18 @@ const onClose = () => {
 }
 
 .menu-bar-left {
+  flex: 1;
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex: 1;
 }
 
 .app-title {
   font-family: var(--billadm-font-display);
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--billadm-color-text-secondary);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--billadm-color-primary);
   margin: 0;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
 }
 
 .menu-bar-center {
@@ -107,11 +106,11 @@ const onClose = () => {
 
 .page-title {
   font-family: var(--billadm-font-display);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--billadm-color-text-major);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--billadm-color-text-secondary);
   margin: 0;
-  letter-spacing: -0.01em;
+  letter-spacing: 0;
 }
 
 .menu-bar-right {
