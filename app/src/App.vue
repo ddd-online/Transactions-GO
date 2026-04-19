@@ -14,14 +14,15 @@ const themeStore = useThemeStore();
 
 const themeConfig = computed(() => ({
   token: {
-    colorPrimary: themeStore.mode === 'dark' ? '#7c9cff' : '#1677ff',
-    colorBgContainer: themeStore.mode === 'dark' ? '#1a1a2e' : '#ffffff',
-    colorBgElevated: themeStore.mode === 'dark' ? '#252538' : '#ffffff',
-    colorBgLayout: themeStore.mode === 'dark' ? '#1a1a2e' : '#f5f5f5',
-    colorBorder: themeStore.mode === 'dark' ? '#3a3a52' : '#e0e0e0',
-    colorText: themeStore.mode === 'dark' ? '#e8e8f0' : '#333333',
-    colorTextSecondary: themeStore.mode === 'dark' ? '#a0a0b8' : '#7b7b7b',
-    borderRadius: 8,
+    colorPrimary: '#2D5A27',
+    colorBgContainer: themeStore.mode === 'dark' ? '#1A1A18' : '#FFFFFF',
+    colorBgElevated: themeStore.mode === 'dark' ? '#252522' : '#FFFFFF',
+    colorBgLayout: themeStore.mode === 'dark' ? '#1A1A18' : '#FAFAF8',
+    colorBorder: themeStore.mode === 'dark' ? '#3A3A38' : '#E5E5E0',
+    colorText: themeStore.mode === 'dark' ? '#F5F5F3' : '#1A1A18',
+    colorTextSecondary: themeStore.mode === 'dark' ? '#A0A09A' : '#6B6B66',
+    borderRadius: 6,
+    fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
   },
 }));
 </script>

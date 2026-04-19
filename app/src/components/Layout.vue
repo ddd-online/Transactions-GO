@@ -82,6 +82,7 @@ onMounted(initWorkspace);
   height: 100vh;
   width: 100vw;
   overflow: hidden;
+  background-color: var(--billadm-color-major-warm);
 }
 
 .app-shell-body {
@@ -91,12 +92,12 @@ onMounted(initWorkspace);
   overflow: hidden;
 }
 
-/* 顶部状态栏 - 次要背景色 */
+/* 顶部状态栏 */
 .app-header {
   height: var(--billadm-size-header-height);
-  background-color: var(--billadm-color-minor-background);
+  background-color: var(--billadm-color-major-background);
   flex-shrink: 0;
-  border-bottom: 1px solid var(--billadm-color-window-border);
+  border-bottom: 1px solid var(--billadm-color-divider);
 }
 
 /* 主体区域 */
@@ -106,30 +107,29 @@ onMounted(initWorkspace);
   overflow: hidden;
 }
 
-/* 侧边栏 - 次要背景色 */
+/* 侧边栏 */
 .app-sidebar {
   width: var(--billadm-size-sider-width);
   min-width: var(--billadm-size-sider-width);
   height: 100%;
   background-color: var(--billadm-color-minor-background);
   flex-shrink: 0;
-  border-right: 1px solid var(--billadm-color-window-border);
+  border-right: 1px solid var(--billadm-color-divider);
 }
 
-/* 内容区域 - 主背景色 */
+/* 内容区域 */
 .app-content {
   flex: 1;
-  background-color: var(--billadm-color-major-background);
+  background-color: var(--billadm-color-major-warm);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* 底部状态栏 - 次要背景色 */
+/* 底部状态栏 */
 .app-footer {
-  height: var(--billadm-size-header-height);
+  height: var(--billadm-size-footer-height);
   background-color: var(--billadm-color-minor-background);
   flex-shrink: 0;
-  border-top: 1px solid var(--billadm-color-window-border);
 }
 </style>

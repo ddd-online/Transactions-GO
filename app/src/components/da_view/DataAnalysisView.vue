@@ -1,10 +1,15 @@
 <template>
   <div class="da-view">
+    <!-- 页面标题 -->
+    <h1 class="page-title">数据分析</h1>
+
     <!-- 工具栏 -->
     <div class="da-toolbar">
       <div class="da-toolbar-left">
-        <BilladmTimeRangePicker v-model:time-range="trQueryConditionStore.timeRange"
-          v-model:time-range-type="trQueryConditionStore.timeRangeType" />
+        <BilladmTimeRangePicker
+          v-model:time-range="trQueryConditionStore.timeRange"
+          v-model:time-range-type="trQueryConditionStore.timeRangeType"
+        />
       </div>
       <div class="da-toolbar-right">
         <billadm-ledger-select />
@@ -15,16 +20,31 @@
     <a-card class="da-main" :body-style="{ padding: '0', display: 'flex', height: '100%' }">
       <!-- 左侧图表列表 -->
       <div class="da-sidebar">
-        <billadm-chart-list :custom-charts="customCharts" @select="onChartSelect" @create="onChartCreate"
-          @delete="onChartDelete" @refresh="loadCustomCharts" />
+        <billadm-chart-list
+          :custom-charts="customCharts"
+          @select="onChartSelect"
+          @create="onChartCreate"
+          @delete="onChartDelete"
+          @refresh="loadCustomCharts"
+        />
       </div>
 
       <!-- 右侧图表显示 -->
       <div class="da-content">
-        <billadm-chart-view v-if="selectedChart" :title="selectedChart.title" :data="selectedChart.data"
-          :lines="selectedChart.lines" :granularity="selectedChart.granularity" :is-preset="selectedIsPreset"
-          :chart-id="selectedChartId" @update="onChartUpdate" @add-line="onChartAddLine" />
-        <a-empty v-else description="请选择图表" />
+        <billadm-chart-view
+          v-if="selectedChart"
+          :title="selectedChart.title"
+          :data="selectedChart.data"
+          :lines="selectedChart.lines"
+          :granularity="selectedChart.granularity"
+          :is-preset="selectedIsPreset"
+          :chart-id="selectedChartId"
+          @update="onChartUpdate"
+          @add-line="onChartAddLine"
+        />
+        <div v-else class="da-empty">
+          <a-empty description="请选择一个图表" />
+        </div>
       </div>
     </a-card>
   </div>
@@ -331,35 +351,50 @@ watch(
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 16px;
-  gap: 16px;
+  padding: var(--billadm-space-xl);
+  gap: var(--billadm-space-lg);
+}
+
+.page-title {
+  font-family: var(--billadm-font-display);
+  font-size: var(--billadm-size-text-display-sm);
+  font-weight: 500;
+  color: var(--billadm-color-text-major);
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .da-toolbar {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  flex-shrink: 0;
+  align-items: center;
+  gap: var(--billadm-space-lg);
+  padding: var(--billadm-space-lg);
+  background-color: var(--billadm-color-major-background);
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-lg);
 }
 
 .da-toolbar-left {
   display: flex;
-  gap: 8px;
+  gap: var(--billadm-space-md);
 }
 
 .da-toolbar-right {
   display: flex;
-  gap: 8px;
+  gap: var(--billadm-space-md);
 }
 
 .da-main {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  border-radius: var(--billadm-radius-lg);
+  border: 1px solid var(--billadm-color-window-border);
 }
 
 .da-sidebar {
-  flex: 0 0 200px;
+  flex: 0 0 220px;
   background-color: var(--billadm-color-minor-background);
   border-right: 1px solid var(--billadm-color-window-border);
   overflow-y: auto;
@@ -370,5 +405,12 @@ watch(
   min-width: 0;
   overflow-y: auto;
   background-color: var(--billadm-color-major-background);
+}
+
+.da-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 </style>

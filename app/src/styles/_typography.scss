@@ -1,106 +1,166 @@
 // ============================================
 // Billadm Typography
-// 记账软件文字层次规范
-// 主次分明，层次清晰
+// "Warm Editorial Precision" Design System
 // ============================================
+
+// ============================================
+// Font Imports (@fontsource packages)
+// ============================================
+
+// Note: These packages were installed via npm:
+// npm install @fontsource/inter @fontsource/jetbrains-mono @fontsource/playfair-display
+// For Instrument Serif (commercial font), we use Playfair Display as an elegant alternative
+
+@use '@fontsource/inter/400.css' as inter-400;
+@use '@fontsource/inter/500.css' as inter-500;
+@use '@fontsource/inter/600.css' as inter-600;
+@use '@fontsource/jetbrains-mono/400.css' as jb-400;
+@use '@fontsource/jetbrains-mono/500.css' as jb-500;
+@use '@fontsource/playfair-display/400.css' as pd-400;
+@use '@fontsource/playfair-display/400-italic.css' as pd-400i;
+@use '@fontsource/playfair-display/600.css' as pd-600;
+
+// ============================================
+// Font Variables
+// ============================================
+
+:root {
+  --billadm-font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --billadm-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --billadm-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, 'Courier New', monospace;
+}
 
 // ============================================
 // Typography CSS Classes
-// 供组件直接引用的文字样式类
 // ============================================
 
 .typography {
-  // 标题层级
+  // Display - Editorial serif for major headings
   &-display {
+    font-family: var(--billadm-font-display);
     font-size: var(--billadm-size-text-display);
-    font-weight: var(--billadm-weight-bold);
+    font-weight: 600;
     color: var(--billadm-color-text-major);
-    line-height: 1.4;
+    line-height: var(--billadm-height-tight);
     margin: 0;
+    letter-spacing: -0.02em;
   }
 
+  &-display-sm {
+    font-family: var(--billadm-font-display);
+    font-size: var(--billadm-size-text-display-sm);
+    font-weight: 600;
+    color: var(--billadm-color-text-major);
+    line-height: var(--billadm-height-tight);
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  // Title - Serif for section headers
   &-title {
+    font-family: var(--billadm-font-display);
     font-size: var(--billadm-size-text-title);
-    font-weight: var(--billadm-weight-medium);
+    font-weight: 500;
     color: var(--billadm-color-text-major);
-    line-height: 1.5;
+    line-height: var(--billadm-height-snug);
     margin: 0;
   }
 
+  &-title-sm {
+    font-family: var(--billadm-font-display);
+    font-size: var(--billadm-size-text-title-sm);
+    font-weight: 500;
+    color: var(--billadm-color-text-major);
+    line-height: var(--billadm-height-snug);
+    margin: 0;
+  }
+
+  // Section - Sans-serif for UI labels
   &-section {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-section);
-    font-weight: var(--billadm-weight-medium);
+    font-weight: 500;
     color: var(--billadm-color-text-major);
-    line-height: 1.5;
+    line-height: var(--billadm-height-normal);
     margin: 0;
   }
 
+  // Body - Clean sans-serif for content
   &-body {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-body);
-    font-weight: var(--billadm-weight-regular);
+    font-weight: 400;
     color: var(--billadm-color-text-major);
-    line-height: 1.6;
+    line-height: var(--billadm-height-normal);
     margin: 0;
   }
 
+  // Caption - Smaller body text
   &-caption {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-caption);
-    font-weight: var(--billadm-weight-regular);
-    color: var(--billadm-color-text-minor);
-    line-height: 1.5;
+    font-weight: 400;
+    color: var(--billadm-color-text-secondary);
+    line-height: var(--billadm-height-normal);
     margin: 0;
   }
 
+  // Small - Labels and badges
   &-small {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-small);
-    font-weight: var(--billadm-weight-regular);
-    color: var(--billadm-color-text-minor);
-    line-height: 1.4;
+    font-weight: 500;
+    color: var(--billadm-color-text-secondary);
+    line-height: var(--billadm-height-tight);
     margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
 
-  // 金额
+  // Amount - Monospace for financial data
   &-amount {
+    font-family: var(--billadm-font-mono);
     font-size: var(--billadm-size-text-title);
-    font-weight: var(--billadm-weight-bold);
-    font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
-    letter-spacing: 0;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
   }
 
   &-amount-large {
+    font-family: var(--billadm-font-mono);
     font-size: var(--billadm-size-text-display);
-    font-weight: var(--billadm-weight-bold);
-    font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
-    letter-spacing: 0;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
   }
 
   &-amount-small {
+    font-family: var(--billadm-font-mono);
     font-size: var(--billadm-size-text-body);
-    font-weight: var(--billadm-weight-medium);
-    font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
-    letter-spacing: 0;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    font-variant-numeric: tabular-nums;
   }
 
-  // 标签文字
+  // Labels - Uppercase small text
   &-label {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-caption);
-    font-weight: var(--billadm-weight-medium);
-    color: var(--billadm-color-text-minor);
+    font-weight: 500;
+    color: var(--billadm-color-text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.06em;
   }
 
-  // 辅助文字
+  // Semantic variants
   &-secondary {
-    color: var(--billadm-color-text-minor);
+    color: var(--billadm-color-text-secondary);
   }
 
-  // 禁用文字
   &-disabled {
     color: var(--billadm-color-text-disabled);
   }
 
-  // 成功/错误
   &-success {
     color: var(--billadm-color-success);
   }
@@ -108,17 +168,31 @@
   &-danger {
     color: var(--billadm-color-negative);
   }
+
+  // Income/Expense/Transfer
+  &-income {
+    color: var(--billadm-color-income);
+  }
+
+  &-expense {
+    color: var(--billadm-color-expense);
+  }
+
+  &-transfer {
+    color: var(--billadm-color-transfer);
+  }
 }
 
 // ============================================
-// Ant Design Vue Typography 增强
+// Ant Design Vue Typography Enhancement
 // ============================================
 
 .ant-typography {
+  font-family: var(--billadm-font-body);
   color: var(--billadm-color-text-major);
 
   &-secondary {
-    color: var(--billadm-color-text-minor);
+    color: var(--billadm-color-text-secondary);
   }
 
   &-disabled {
@@ -135,32 +209,54 @@
 }
 
 // ============================================
-// 统计数字展示
+// Statistic Display
 // ============================================
 
 .statistic {
   &-value {
+    font-family: var(--billadm-font-mono);
     font-size: var(--billadm-size-text-display);
-    font-weight: var(--billadm-weight-bold);
-    font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+    font-weight: 600;
     color: var(--billadm-color-text-major);
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
   }
 
   &-label {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-caption);
-    color: var(--billadm-color-text-minor);
+    font-weight: 500;
+    color: var(--billadm-color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
     margin: var(--billadm-space-xs) 0 0 0;
   }
 
   &-income {
     .statistic-value {
-      color: var(--billadm-color-positive);
+      color: var(--billadm-color-income);
     }
   }
 
   &-expense {
     .statistic-value {
-      color: var(--billadm-color-negative);
+      color: var(--billadm-color-expense);
     }
   }
+
+  &-transfer {
+    .statistic-value {
+      color: var(--billadm-color-transfer);
+    }
+  }
+}
+
+// ============================================
+// Monospace Numbers (for tables and data)
+// ============================================
+
+.mono-number {
+  font-family: var(--billadm-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }

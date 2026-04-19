@@ -1,54 +1,66 @@
 <template>
   <div class="ledger-view">
+    <!-- 页面标题 -->
+    <h1 class="page-title">我的账本</h1>
+
+    <!-- 账本卡片列表 -->
+    <div class="ledger-list">
+      <div
+        v-for="ledger in ledgerStore.ledgers"
+        :key="ledger.id"
+        class="ledger-card-item"
+        :class="{ active: ledger.id === ledgerStore.currentLedgerId }"
+      >
+        <div class="ledger-card-header">
+          <div class="ledger-card-icon">
+            <BookOutlined />
+          </div>
+          <div class="ledger-card-info">
+            <h3 class="ledger-card-name">{{ ledger.name }}</h3>
+            <p v-if="ledger.description" class="ledger-card-desc">{{ ledger.description }}</p>
+            <p v-else class="ledger-card-desc-empty">暂无描述</p>
+          </div>
+        </div>
+
+        <div class="ledger-card-meta">
+          <span class="ledger-card-meta-item">
+            <ClockCircleOutlined /> 创建于 {{ formatTimestamp(ledger.createdAt, 'YYYY-MM-DD') }}
+          </span>
+          <span class="ledger-card-meta-item">
+            <EditOutlined /> {{ formatTimestamp(ledger.updatedAt, 'YYYY-MM-DD HH:mm') }}
+          </span>
+        </div>
+
+        <div class="ledger-card-actions">
+          <a-button type="text" class="action-btn" @click="openEditModal(ledger)">
+            <EditOutlined /> 编辑
+          </a-button>
+          <a-popconfirm
+            title="确认删除此账本吗？"
+            ok-text="确认"
+            :showCancel="false"
+            @confirm="ledgerStore.deleteLedger(ledger.id)"
+          >
+            <a-button type="text" class="action-btn danger">
+              <DeleteOutlined /> 删除
+            </a-button>
+          </a-popconfirm>
+        </div>
+      </div>
+    </div>
+
+    <!-- 空状态 -->
+    <div v-if="ledgerStore.ledgers.length === 0" class="empty-state">
+      <BookOutlined class="empty-state-icon" />
+      <p class="empty-state-text">暂无账本，点击右下角按钮创建一个</p>
+    </div>
+
     <!-- 悬浮按钮 -->
     <a-float-button type="primary" class="float-btn" @click="openCreateModal">
       <template #icon>
         <PlusOutlined />
       </template>
     </a-float-button>
-
-    <!-- 账本卡片列表 -->
-    <div class="ledger-list">
-      <a-card v-for="ledger in ledgerStore.ledgers" :key="ledger.id" class="ledger-card">
-        <template #title>
-          <div class="ledger-card-header">
-            <BookOutlined class="ledger-icon" />
-            <span class="ledger-name">{{ ledger.name }}</span>
-          </div>
-        </template>
-        <template #extra>
-          <a-space>
-            <a-button type="text" @click="openEditModal(ledger)">
-              <template #icon>
-                <EditOutlined />
-              </template>
-              编辑
-            </a-button>
-            <a-popconfirm title="确认删除吗" ok-text="确认" :showCancel="false" @confirm="ledgerStore.deleteLedger(ledger.id)">
-              <a-button type="text" danger>
-                <template #icon>
-                  <DeleteOutlined />
-                </template>
-              </a-button>
-            </a-popconfirm>
-          </a-space>
-        </template>
-
-        <div class="ledger-content">
-          <p v-if="ledger.description" class="ledger-description">{{ ledger.description }}</p>
-          <p v-else class="ledger-description-empty">暂无描述</p>
-
-          <a-descriptions :column="2" size="small" class="ledger-meta">
-            <a-descriptions-item label="创建时间">
-              {{ formatTimestamp(ledger.createdAt, 'YYYY-MM-DD HH:mm') }}
-            </a-descriptions-item>
-            <a-descriptions-item label="更新时间">
-              {{ formatTimestamp(ledger.updatedAt, 'YYYY-MM-DD HH:mm') }}
-            </a-descriptions-item>
-          </a-descriptions>
-        </div>
-      </a-card>
-    </div>
 
     <!-- 新建/编辑账本弹窗 -->
     <a-modal
@@ -63,10 +75,21 @@
     >
       <a-form layout="vertical" class="ledger-form">
         <a-form-item label="账本名称" required>
-          <a-input v-model:value="ledgerForm.name" placeholder="请输入账本名称" :maxlength="50" show-count />
+          <a-input
+            v-model:value="ledgerForm.name"
+            placeholder="请输入账本名称"
+            :maxlength="50"
+            show-count
+          />
         </a-form-item>
         <a-form-item label="账本描述">
-          <a-textarea v-model:value="ledgerForm.description" placeholder="请输入账本描述（可选）" :rows="3" :maxlength="200" show-count />
+          <a-textarea
+            v-model:value="ledgerForm.description"
+            placeholder="请输入账本描述（可选）"
+            :rows="3"
+            :maxlength="200"
+            show-count
+          />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -77,7 +100,13 @@
 import { ref, reactive } from 'vue';
 import { useLedgerStore } from "@/stores/ledgerStore";
 import { formatTimestamp } from "@/backend/functions";
-import { PlusOutlined, BookOutlined, EditOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import {
+  PlusOutlined,
+  BookOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  ClockCircleOutlined
+} from "@ant-design/icons-vue";
 import type { Ledger } from '@/types/billadm';
 
 const ledgerStore = useLedgerStore();
@@ -132,79 +161,169 @@ const handleOk = async () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 16px;
-  gap: 16px;
+  padding: var(--billadm-space-xl);
+  gap: var(--billadm-space-xl);
   overflow-y: auto;
 }
 
-.float-btn {
-  position: fixed;
-  right: 50px;
-  bottom: 80px;
+.page-title {
+  font-family: var(--billadm-font-display);
+  font-size: var(--billadm-size-text-display-sm);
+  font-weight: 500;
+  color: var(--billadm-color-text-major);
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .ledger-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--billadm-space-lg);
 }
 
-.ledger-card {
-  border-radius: 8px;
+.ledger-card-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--billadm-space-lg);
+  padding: var(--billadm-space-xl);
+  background-color: var(--billadm-color-major-background);
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-lg);
+  box-shadow: var(--billadm-shadow-sm);
+  transition: all var(--billadm-transition-normal);
 }
 
-.ledger-card :deep(.ant-card-head) {
-  min-height: 48px;
-  background-color: var(--billadm-color-minor-background);
-  border-bottom: 1px solid var(--billadm-color-window-border);
+.ledger-card-item:hover {
+  border-color: var(--billadm-color-primary);
+  box-shadow: var(--billadm-shadow-md);
+  transform: translateY(-2px);
 }
 
-.ledger-card :deep(.ant-card-body) {
-  padding: 16px;
+.ledger-card-item.active {
+  border-color: var(--billadm-color-primary);
+  background-color: rgba(45, 90, 39, 0.02);
 }
 
 .ledger-card-header {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-start;
+  gap: var(--billadm-space-lg);
 }
 
-.ledger-icon {
-  font-size: 20px;
+.ledger-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--billadm-radius-md);
+  background-color: rgba(45, 90, 39, 0.1);
   color: var(--billadm-color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
 }
 
-.ledger-name {
-  font-size: 16px;
+.ledger-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ledger-card-name {
+  font-family: var(--billadm-font-display);
+  font-size: var(--billadm-size-text-title-sm);
   font-weight: 500;
   color: var(--billadm-color-text-major);
+  margin: 0 0 var(--billadm-space-xs) 0;
 }
 
-.ledger-content {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.ledger-description {
+.ledger-card-desc {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-secondary);
   margin: 0;
-  font-size: 14px;
-  color: var(--billadm-color-text-minor);
   line-height: 1.5;
 }
 
-.ledger-description-empty {
-  margin: 0;
-  font-size: 14px;
+.ledger-card-desc-empty {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-body);
   color: var(--billadm-color-text-disabled);
   font-style: italic;
+  margin: 0;
 }
 
-.ledger-meta {
-  margin-top: 8px;
+.ledger-card-meta {
+  display: flex;
+  gap: var(--billadm-space-xl);
+  padding-top: var(--billadm-space-md);
+  border-top: 1px solid var(--billadm-color-divider);
+}
+
+.ledger-card-meta-item {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--billadm-space-xs);
+}
+
+.ledger-card-actions {
+  display: flex;
+  gap: var(--billadm-space-sm);
+}
+
+.action-btn {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
+  border-radius: var(--billadm-radius-md);
+  transition: all var(--billadm-transition-fast);
+}
+
+.action-btn:hover {
+  color: var(--billadm-color-primary);
+  background-color: var(--billadm-color-hover-bg);
+}
+
+.action-btn.danger:hover {
+  color: var(--billadm-color-expense);
+  background-color: rgba(199, 62, 58, 0.1);
+}
+
+.float-btn {
+  position: fixed;
+  right: 48px;
+  bottom: 80px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--billadm-space-3xl);
+  color: var(--billadm-color-text-secondary);
+}
+
+.empty-state-icon {
+  font-size: 56px;
+  color: var(--billadm-color-primary);
+  opacity: 0.3;
+  margin-bottom: var(--billadm-space-xl);
+}
+
+.empty-state-text {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-secondary);
+  text-align: center;
+  margin: 0;
 }
 
 .ledger-form :deep(.ant-form-item-label > label) {
+  font-family: var(--billadm-font-body);
   font-weight: 500;
+  color: var(--billadm-color-text-major);
 }
 </style>

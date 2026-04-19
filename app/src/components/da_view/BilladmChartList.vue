@@ -13,8 +13,13 @@
     <!-- 预设图表 -->
     <div class="chart-list-section">
       <div class="chart-list-section-title">预设图表</div>
-      <div v-for="chart in presetCharts" :key="chart.title" class="chart-list-item"
-        :class="{ active: selectedId === 'preset_' + chart.title }" @click="selectChart(chart, true)">
+      <div
+        v-for="chart in presetCharts"
+        :key="chart.title"
+        class="chart-list-item"
+        :class="{ active: selectedId === 'preset_' + chart.title }"
+        @click="selectChart(chart, true)"
+      >
         <div class="chart-list-item-icon">
           <RiseOutlined style="font-size: 14px" />
         </div>
@@ -25,8 +30,13 @@
     <!-- 自定义图表 -->
     <div v-if="customCharts.length > 0" class="chart-list-section">
       <div class="chart-list-section-title">自定义图表</div>
-      <div v-for="chart in customCharts" :key="chart.chartId" class="chart-list-item"
-        :class="{ active: selectedId === chart.chartId }" @click="selectChart(chart, false)">
+      <div
+        v-for="chart in customCharts"
+        :key="chart.chartId"
+        class="chart-list-item"
+        :class="{ active: selectedId === chart.chartId }"
+        @click="selectChart(chart, false)"
+      >
         <div class="chart-list-item-icon">
           <LineChartOutlined style="font-size: 14px" />
         </div>
@@ -42,7 +52,12 @@
     </div>
 
     <!-- 新增图表弹窗 -->
-    <a-modal v-model:open="showCreateModal" title="新增图表" @ok="handleCreate" :confirm-loading="createLoading">
+    <a-modal
+      v-model:open="showCreateModal"
+      title="新增图表"
+      @ok="handleCreate"
+      :confirm-loading="createLoading"
+    >
       <a-form :model="createForm" layout="vertical">
         <a-form-item label="图表名称" name="title">
           <a-input v-model:value="createForm.title" placeholder="请输入图表名称" />
@@ -128,43 +143,67 @@ const handleDelete = async (chart: ChartDto) => {
 .chart-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px;
+  gap: var(--billadm-space-sm);
+  padding: var(--billadm-space-lg);
+}
+
+.chart-list-add {
+  padding: 0 var(--billadm-space-sm);
+  margin-bottom: var(--billadm-space-md);
 }
 
 .chart-list-section {
-  margin-top: 8px;
+  margin-top: var(--billadm-space-md);
 }
 
 .chart-list-section-title {
-  font-size: 12px;
-  color: var(--billadm-color-text-minor);
-  padding: 4px 12px;
-  margin-bottom: 4px;
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--billadm-color-text-secondary);
+  padding: var(--billadm-space-xs) var(--billadm-space-sm);
+  margin-bottom: var(--billadm-space-xs);
 }
 
 .chart-list-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 6px;
+  gap: var(--billadm-space-md);
+  padding: var(--billadm-space-md);
+  border-radius: var(--billadm-radius-md);
   cursor: pointer;
-  transition: all 0.2s;
-  color: var(--billadm-color-text-minor);
+  transition: all var(--billadm-transition-fast);
+  color: var(--billadm-color-text-secondary);
+  position: relative;
+}
+
+.chart-list-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background-color: var(--billadm-color-primary);
+  border-radius: 0 2px 2px 0;
+  transition: height var(--billadm-transition-fast);
 }
 
 .chart-list-item:hover {
-  background-color: var(--billadm-color-hover-bg, #e4e4e4);
+  background-color: var(--billadm-color-hover-bg);
+  color: var(--billadm-color-primary);
 }
 
 .chart-list-item.active {
-  background-color: var(--billadm-color-primary);
-  color: #ffffff;
+  background-color: rgba(45, 90, 39, 0.1);
+  color: var(--billadm-color-primary);
 }
 
-.chart-list-item.active .chart-list-item-icon {
-  color: #ffffff;
+.chart-list-item.active::before {
+  height: 24px;
 }
 
 .chart-list-item-icon {
@@ -176,7 +215,8 @@ const handleDelete = async (chart: ChartDto) => {
 
 .chart-list-item-title {
   flex: 1;
-  font-size: 13px;
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-body-sm);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -195,6 +235,10 @@ const handleDelete = async (chart: ChartDto) => {
 }
 
 .chart-list-item.active .chart-list-item-actions :deep(.ant-btn) {
-  color: #ffffff;
+  color: var(--billadm-color-expense);
+}
+
+.chart-list-item.active .chart-list-item-actions :deep(.ant-btn:hover) {
+  background-color: rgba(199, 62, 58, 0.1);
 }
 </style>

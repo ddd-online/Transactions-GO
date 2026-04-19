@@ -1,9 +1,9 @@
 // ============================================
 // Billadm Mixins
-// 可复用的样式片段
+// "Warm Editorial Precision" Design System
 // ============================================
 
-// Flexbox 工具
+// Flexbox utilities
 @mixin flex-center {
   display: flex;
   align-items: center;
@@ -22,12 +22,18 @@
   justify-content: flex-start;
 }
 
+@mixin flex-end {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
 @mixin flex-column {
   display: flex;
   flex-direction: column;
 }
 
-// 文字截断
+// Text truncation
 @mixin text-ellipsis {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -42,7 +48,7 @@
   text-overflow: ellipsis;
 }
 
-// 滚动条样式
+// Custom scrollbar - warm editorial style
 @mixin custom-scrollbar {
   &::-webkit-scrollbar {
     width: 6px;
@@ -54,16 +60,29 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.15);
+    background-color: var(--billadm-color-window-border);
     border-radius: 3px;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.25);
+      background-color: var(--billadm-color-text-secondary);
     }
   }
 }
 
-// 拖拽区域
+// Dark mode scrollbar
+[data-theme='dark'] {
+  @mixin custom-scrollbar {
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--billadm-color-window-border);
+
+      &:hover {
+        background-color: var(--billadm-color-text-secondary);
+      }
+    }
+  }
+}
+
+// Drag region for Electron
 @mixin drag-region {
   -webkit-app-region: drag;
 }
@@ -72,35 +91,52 @@
   -webkit-app-region: no-drag;
 }
 
-// 卡片基础样式
+// Card base - warm editorial style
 @mixin card-base {
   background-color: var(--billadm-color-major-background);
-  border-radius: var(--billadm-radius-md);
-  transition: box-shadow 0.2s ease;
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-lg);
+  box-shadow: var(--billadm-shadow-sm);
+  transition: box-shadow var(--billadm-transition-normal),
+              border-color var(--billadm-transition-normal),
+              transform var(--billadm-transition-normal);
 
   &:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    box-shadow: var(--billadm-shadow-md);
+    border-color: var(--billadm-color-primary);
   }
 }
 
-// 按钮基础样式
+// Elevated card
+@mixin card-elevated {
+  @include card-base;
+  background-color: var(--billadm-color-elevated);
+  box-shadow: var(--billadm-shadow-md);
+
+  &:hover {
+    box-shadow: var(--billadm-shadow-lg);
+  }
+}
+
+// Button reset
 @mixin button-reset {
   border: none;
   background: none;
   padding: 0;
   cursor: pointer;
   outline: none;
+  font-family: inherit;
 }
 
-// 输入框聚焦样式
+// Input focus - warm editorial style
 @mixin input-focus {
   &:focus-within {
     border-color: var(--billadm-color-primary);
-    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+    box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.1);
   }
 }
 
-// 页面容器
+// Page container
 @mixin page-container {
   height: 100%;
   background-color: var(--billadm-color-major-background);
@@ -108,7 +144,92 @@
   @include custom-scrollbar;
 }
 
-// 区块间距
+// Section gap
 @mixin section-gap {
-  margin-bottom: var(--billadm-space-lg);
+  margin-bottom: var(--billadm-space-xl);
+}
+
+// Icon button - warm editorial
+@mixin icon-button {
+  @include button-reset;
+  @include flex-center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--billadm-radius-md);
+  color: var(--billadm-color-icon);
+  transition: all var(--billadm-transition-fast);
+
+  &:hover {
+    background-color: var(--billadm-color-hover-bg);
+    color: var(--billadm-color-icon-hover);
+  }
+
+  &:active {
+    background-color: var(--billadm-color-active-bg);
+  }
+}
+
+// Nav button - for sidebar navigation
+@mixin nav-button {
+  @include button-reset;
+  @include flex-center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--billadm-radius-md);
+  color: var(--billadm-color-icon);
+  transition: all var(--billadm-transition-fast);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 0;
+    background-color: var(--billadm-color-primary);
+    border-radius: 0 2px 2px 0;
+    transition: height var(--billadm-transition-fast);
+  }
+
+  &:hover {
+    background-color: var(--billadm-color-hover-bg);
+    color: var(--billadm-color-primary);
+  }
+
+  &.active {
+    background-color: var(--billadm-color-active-bg);
+    color: var(--billadm-color-primary);
+
+    &::before {
+      height: 20px;
+    }
+  }
+}
+
+// Focus ring - warm editorial
+@mixin focus-ring {
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--billadm-color-major-background),
+                0 0 0 4px var(--billadm-color-primary);
+  }
+}
+
+// Noise texture overlay (for atmosphere)
+@mixin noise-texture {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    opacity: 0.015;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  }
 }

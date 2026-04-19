@@ -1,16 +1,16 @@
 // ============================================
 // Billadm Styles Entry
-// 主样式入口文件
+// "Warm Editorial Precision" Design System
 // ============================================
 
-// 1. Variables (必须在最前面，因为其他文件依赖它)
+// 1. Variables (must be first, other files depend on it)
 @use 'variables';
 
-// 2. Mixins
-@use 'mixins';
-
-// 3. Typography
+// 2. Typography
 @use 'typography';
+
+// 3. Mixins
+@use 'mixins';
 
 // 4. Layout
 @use 'layout';
@@ -30,22 +30,47 @@ html,
 body {
   margin: 0;
   padding: 0;
-  font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont,
-    'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--billadm-font-body);
   font-size: var(--billadm-size-text-body);
-  line-height: 1.6;
+  line-height: var(--billadm-height-normal);
   color: var(--billadm-color-text-major);
-  background-color: var(--billadm-color-minor-background);
+  background-color: var(--billadm-color-major-warm);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 // ============================================
-// Ant Design Vue 全局覆盖
+// Atmospheric Background
 // ============================================
 
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: -1;
+  // Subtle warm gradient
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(45, 90, 39, 0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(201, 162, 39, 0.02) 0%, transparent 50%);
+}
+
+[data-theme='dark'] body::before {
+  background:
+    radial-gradient(ellipse at 20% 0%, rgba(90, 143, 78, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 100%, rgba(212, 180, 74, 0.03) 0%, transparent 50%);
+}
+
+// ============================================
+// Ant Design Vue Global Overrides
+// ============================================
+
+// Layout
 .ant-layout {
-  background-color: var(--billadm-color-minor-background);
+  background-color: var(--billadm-color-major-warm);
 }
 
 .ant-layout-header,
@@ -62,14 +87,18 @@ body {
   background-color: var(--billadm-color-major-background);
 }
 
-// 按钮
+// Buttons
 .ant-btn {
-  border-radius: var(--billadm-radius-sm);
+  font-family: var(--billadm-font-body);
+  font-weight: 500;
+  border-radius: var(--billadm-radius-md);
   box-shadow: none;
+  transition: all var(--billadm-transition-fast);
 
   &-text {
     &:hover {
-      background-color: var(--billadm-color-icon-hover-bg);
+      background-color: var(--billadm-color-hover-bg);
+      color: var(--billadm-color-primary);
     }
   }
 
@@ -77,71 +106,128 @@ body {
     background-color: var(--billadm-color-primary);
     border-color: var(--billadm-color-primary);
     color: #fff;
+
+    &:hover {
+      background-color: var(--billadm-color-primary-light);
+      border-color: var(--billadm-color-primary-light);
+    }
+
+    &:active {
+      background-color: var(--billadm-color-primary);
+      border-color: var(--billadm-color-primary);
+    }
+  }
+
+  // Secondary/outline button
+  &-default {
+    border-color: var(--billadm-color-window-border);
+    color: var(--billadm-color-text-major);
+
+    &:hover {
+      border-color: var(--billadm-color-primary);
+      color: var(--billadm-color-primary);
+    }
   }
 }
 
-// 暗黑模式按钮
+// Dark mode buttons
 [data-theme='dark'] {
   .ant-btn {
     &-primary {
-      background-color: #4a5a8a;
-      border-color: #4a5a8a;
-      color: rgba(255, 255, 255, 0.9);
+      background-color: var(--billadm-color-primary);
+      border-color: var(--billadm-color-primary);
+      color: #fff;
 
       &:hover {
-        background-color: #5a6a9a;
-        border-color: #5a6a9a;
+        background-color: var(--billadm-color-primary-light);
+        border-color: var(--billadm-color-primary-light);
       }
 
       &:disabled {
-        background-color: #3a3a52;
-        border-color: #3a3a52;
-        color: rgba(255, 255, 255, 0.3);
+        background-color: var(--billadm-color-window-border);
+        border-color: var(--billadm-color-window-border);
+        color: var(--billadm-color-text-disabled);
+      }
+    }
+
+    &-default {
+      border-color: var(--billadm-color-window-border);
+      color: var(--billadm-color-text-major);
+
+      &:hover {
+        border-color: var(--billadm-color-primary);
+        color: var(--billadm-color-primary);
+        background-color: var(--billadm-color-hover-bg);
       }
     }
   }
 }
 
-// 卡片
+// Cards
 .ant-card {
-  border-radius: var(--billadm-radius-md);
-  border-color: var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-lg);
+  border: 1px solid var(--billadm-color-window-border);
+  background-color: var(--billadm-color-major-background);
+  box-shadow: var(--billadm-shadow-sm);
+  transition: box-shadow var(--billadm-transition-normal);
 
   &-hoverable:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.09);
+    box-shadow: var(--billadm-shadow-md);
+    border-color: var(--billadm-color-primary);
   }
 }
 
-// 模态框
+// Modals
 .ant-modal {
   &-content {
-    border-radius: var(--billadm-radius-md);
+    border-radius: var(--billadm-radius-xl);
     overflow: hidden;
+    box-shadow: var(--billadm-shadow-xl);
   }
 
   &-header {
-    border-bottom: 1px solid var(--billadm-color-window-border);
+    border-bottom: 1px solid var(--billadm-color-divider);
+    padding: var(--billadm-space-lg) var(--billadm-space-xl);
+  }
+
+  &-body {
+    padding: var(--billadm-space-xl);
   }
 
   &-footer {
-    border-top: 1px solid var(--billadm-color-window-border);
+    border-top: 1px solid var(--billadm-color-divider);
+    padding: var(--billadm-space-lg) var(--billadm-space-xl);
+  }
+
+  &-title {
+    font-family: var(--billadm-font-display);
+    font-size: var(--billadm-size-text-title-sm);
+    font-weight: 500;
+    color: var(--billadm-color-text-major);
   }
 }
 
-// 表单
-.ant-form-item {
-  margin-bottom: var(--billadm-space-md);
+// Form
+.ant-form {
+  &-item {
+    margin-bottom: var(--billadm-space-lg);
+  }
+
+  &-item-label > label {
+    font-family: var(--billadm-font-body);
+    font-weight: 500;
+    color: var(--billadm-color-text-major);
+  }
 }
 
-.ant-form-item-label > label {
-  color: var(--billadm-color-text-major);
-}
-
-// 输入框
+// Input, Select, DatePicker
 .ant-input,
 .ant-select-selector,
 .ant-picker {
-  border-radius: var(--billadm-radius-sm);
+  border-radius: var(--billadm-radius-md);
+  border-color: var(--billadm-color-window-border);
+  font-family: var(--billadm-font-body);
+  transition: all var(--billadm-transition-fast);
 
   &:hover {
     border-color: var(--billadm-color-primary);
@@ -150,56 +236,105 @@ body {
   &:focus,
   &.ant-input-focused {
     border-color: var(--billadm-color-primary);
-    box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+    box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.1);
   }
 }
 
-// 输入框占位符 - 暗黑模式
+.ant-select-focused .ant-select-selector {
+  border-color: var(--billadm-color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.1) !important;
+}
+
+// Placeholder - Dark mode
 [data-theme='dark'] {
   .ant-input,
   .ant-select-selector,
   .ant-picker {
     &::placeholder {
-      color: rgba(255, 255, 255, 0.45) !important;
+      color: var(--billadm-color-text-disabled) !important;
       opacity: 1;
     }
 
     &::-webkit-input-placeholder {
-      color: rgba(255, 255, 255, 0.45) !important;
+      color: var(--billadm-color-text-disabled) !important;
     }
 
     .ant-select-selection-placeholder {
-      color: rgba(255, 255, 255, 0.45) !important;
+      color: var(--billadm-color-text-disabled) !important;
     }
   }
 }
 
-// 表格
+// Tables
 .ant-table {
+  font-family: var(--billadm-font-body);
+
   .ant-table-thead > tr > th {
+    font-family: var(--billadm-font-body);
+    font-size: var(--billadm-size-text-caption);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--billadm-color-text-secondary);
     background-color: var(--billadm-color-minor-background);
-    color: var(--billadm-color-text-minor);
-    font-weight: var(--billadm-weight-medium);
     border-bottom: 1px solid var(--billadm-color-window-border);
+    padding: var(--billadm-space-md) var(--billadm-space-lg);
   }
 
   .ant-table-tbody > tr > td {
-    border-bottom: 1px solid var(--billadm-color-window-border);
+    border-bottom: 1px solid var(--billadm-color-divider);
+    padding: var(--billadm-space-md) var(--billadm-space-lg);
   }
 
   .ant-table-tbody > tr:hover > td {
-    background-color: var(--billadm-color-icon-hover-bg);
+    background-color: var(--billadm-color-hover-bg);
+  }
+
+  .ant-table-tbody > tr.ant-table-row-selected > td {
+    background-color: var(--billadm-color-active-bg);
   }
 }
 
-// 标签
+// Tags
 .ant-tag {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
   border-radius: var(--billadm-radius-sm);
+  padding: 2px 8px;
+  border: none;
+
+  // Income tag
+  &-income {
+    background-color: rgba(45, 125, 70, 0.1);
+    color: var(--billadm-color-income);
+  }
+
+  // Expense tag
+  &-expense {
+    background-color: rgba(199, 62, 58, 0.1);
+    color: var(--billadm-color-expense);
+  }
+
+  // Transfer tag
+  &-transfer {
+    background-color: rgba(90, 127, 170, 0.1);
+    color: var(--billadm-color-transfer);
+  }
 }
 
-// 分页
+// Pagination
 .ant-pagination {
+  font-family: var(--billadm-font-body);
+
   .ant-pagination-item-active {
+    border-color: var(--billadm-color-primary);
+
+    a {
+      color: var(--billadm-color-primary);
+    }
+  }
+
+  .ant-pagination-item:hover {
     border-color: var(--billadm-color-primary);
 
     a {
@@ -208,14 +343,18 @@ body {
   }
 }
 
-// 标签页
+// Tabs
 .ant-tabs {
+  font-family: var(--billadm-font-body);
+
   &-nav {
-    margin-bottom: var(--billadm-space-lg);
+    margin-bottom: var(--billadm-space-xl);
   }
 
   &-tab {
-    color: var(--billadm-color-text-minor);
+    font-weight: 500;
+    color: var(--billadm-color-text-secondary);
+    padding: var(--billadm-space-sm) 0;
 
     &:hover {
       color: var(--billadm-color-primary);
@@ -223,32 +362,131 @@ body {
 
     &-active .ant-tabs-tab-btn {
       color: var(--billadm-color-primary);
+      font-weight: 600;
     }
   }
 
   &-ink-bar {
     background-color: var(--billadm-color-primary);
+    height: 2px;
   }
 }
 
-// 浮层
+// Popover
 .ant-popover {
   .ant-popover-inner {
-    border-radius: var(--billadm-radius-md);
+    border-radius: var(--billadm-radius-lg);
+    box-shadow: var(--billadm-shadow-lg);
   }
 }
 
-// 消息提示
+// Message
 .ant-message {
+  font-family: var(--billadm-font-body);
+
   &-notice-content {
-    border-radius: var(--billadm-radius-md);
+    border-radius: var(--billadm-radius-lg);
+    box-shadow: var(--billadm-shadow-lg);
+    padding: var(--billadm-space-md) var(--billadm-space-xl);
   }
 }
 
-// 通知
+// Notification
 .ant-notification {
+  font-family: var(--billadm-font-body);
+
   &-notice {
+    border-radius: var(--billadm-radius-lg);
+    box-shadow: var(--billadm-shadow-lg);
+  }
+}
+
+// Segmented Control
+.ant-segmented {
+  font-family: var(--billadm-font-body);
+  border-radius: var(--billadm-radius-md);
+
+  .ant-segmented-item {
     border-radius: var(--billadm-radius-md);
+
+    &:hover {
+      color: var(--billadm-color-primary);
+    }
+  }
+
+  .ant-segmented-item-selected {
+    background-color: var(--billadm-color-primary);
+    color: #fff;
+  }
+}
+
+// Switch
+.ant-switch {
+  border-radius: var(--billadm-radius-full);
+
+  &:checked {
+    background-color: var(--billadm-color-primary);
+  }
+}
+
+// Radio Button Group
+.ant-radio-group-solid .ant-radio-button-wrapper {
+  &:hover {
+    color: var(--billadm-color-primary);
+  }
+
+  &.ant-radio-button-wrapper-checked {
+    background-color: var(--billadm-color-primary);
+    border-color: var(--billadm-color-primary);
+
+    &:hover {
+      background-color: var(--billadm-color-primary-light);
+      border-color: var(--billadm-color-primary-light);
+    }
+  }
+}
+
+// Checkbox
+.ant-checkbox {
+  &:checked .ant-checkbox-inner {
+    background-color: var(--billadm-color-primary);
+    border-color: var(--billadm-color-primary);
+  }
+
+  &:hover:not(.ant-checkbox-disabled) .ant-checkbox-inner {
+    border-color: var(--billadm-color-primary);
+  }
+}
+
+// Drawer
+.ant-drawer {
+  &-header {
+    border-bottom: 1px solid var(--billadm-color-divider);
+    padding: var(--billadm-space-lg) var(--billadm-space-xl);
+  }
+
+  &-title {
+    font-family: var(--billadm-font-display);
+    font-size: var(--billadm-size-text-title-sm);
+    font-weight: 500;
+    color: var(--billadm-color-text-major);
+  }
+
+  &-body {
+    padding: var(--billadm-space-xl);
+  }
+}
+
+// Float Button
+.ant-float-button {
+  border-radius: var(--billadm-radius-lg);
+
+  &-primary {
+    background-color: var(--billadm-color-primary);
+
+    &:hover {
+      background-color: var(--billadm-color-primary-light);
+    }
   }
 }
 
@@ -256,23 +494,38 @@ body {
 // Utility Classes
 // ============================================
 
-// 文字
+// Text colors
 .text {
   &-primary {
-    color: var(--billadm-color-positive);
+    color: var(--billadm-color-primary);
   }
-  &-danger {
-    color: var(--billadm-color-negative);
+  &-positive,
+  &-income {
+    color: var(--billadm-color-income);
+  }
+  &-negative,
+  &-expense {
+    color: var(--billadm-color-expense);
+  }
+  &-transfer {
+    color: var(--billadm-color-transfer);
   }
   &-secondary {
-    color: var(--billadm-color-text-minor);
+    color: var(--billadm-color-text-secondary);
   }
   &-success {
     color: var(--billadm-color-success);
   }
+  &-danger,
+  &-error {
+    color: var(--billadm-color-negative);
+  }
+  &-warning {
+    color: var(--billadm-color-warning);
+  }
 }
 
-// 背景
+// Background
 .bg {
   &-major {
     background-color: var(--billadm-color-major-background);
@@ -280,9 +533,12 @@ body {
   &-minor {
     background-color: var(--billadm-color-minor-background);
   }
+  &-elevated {
+    background-color: var(--billadm-color-elevated);
+  }
 }
 
-// 间距
+// Spacing utilities
 .m {
   &-0 { margin: 0; }
   &-auto { margin: auto; }
@@ -294,14 +550,85 @@ body {
   &b-md { margin-bottom: var(--billadm-space-md); }
   &l-md { margin-left: var(--billadm-space-md); }
   &r-md { margin-right: var(--billadm-space-md); }
+  &t-lg { margin-top: var(--billadm-space-lg); }
+  &b-lg { margin-bottom: var(--billadm-space-lg); }
+  &l-lg { margin-left: var(--billadm-space-lg); }
+  &r-lg { margin-right: var(--billadm-space-lg); }
+  &t-xl { margin-top: var(--billadm-space-xl); }
+  &b-xl { margin-bottom: var(--billadm-space-xl); }
 }
 
 .p {
   &-0 { padding: 0; }
   &-sm { padding: var(--billadm-space-sm); }
   &-md { padding: var(--billadm-space-md); }
+  &-lg { padding: var(--billadm-space-lg); }
+  &-xl { padding: var(--billadm-space-xl); }
   &t-sm { padding-top: var(--billadm-space-sm); }
   &b-sm { padding-bottom: var(--billadm-space-sm); }
   &l-sm { padding-left: var(--billadm-space-sm); }
   &r-sm { padding-right: var(--billadm-space-sm); }
+  &t-md { padding-top: var(--billadm-space-md); }
+  &b-md { padding-bottom: var(--billadm-space-md); }
+  &l-md { padding-left: var(--billadm-space-md); }
+  &r-md { padding-right: var(--billadm-space-md); }
+  &t-lg { padding-top: var(--billadm-space-lg); }
+  &b-lg { padding-bottom: var(--billadm-space-lg); }
+  &l-lg { padding-left: var(--billadm-space-lg); }
+  &r-lg { padding-right: var(--billadm-space-lg); }
+}
+
+// ============================================
+// Transaction Type Colors
+// ============================================
+
+.tr-type {
+  &-income {
+    color: var(--billadm-color-income);
+    font-weight: 500;
+  }
+
+  &-expense {
+    color: var(--billadm-color-expense);
+    font-weight: 500;
+  }
+
+  &-transfer {
+    color: var(--billadm-color-transfer);
+    font-weight: 500;
+  }
+}
+
+// ============================================
+// Animations
+// ============================================
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+.fade-enter-active {
+  animation: fadeIn var(--billadm-transition-normal);
+}
+
+.fade-leave-active {
+  animation: fadeOut var(--billadm-transition-fast);
 }

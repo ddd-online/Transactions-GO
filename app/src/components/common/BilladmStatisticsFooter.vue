@@ -1,28 +1,24 @@
 <template>
   <div class="statistics-footer">
     <div class="statistics-footer-item">
-      <a-typography-text class="statistics-footer-item-label">
-        收入
-      </a-typography-text>
-      <a-typography-text class="statistics-footer-item-value income">
+      <span class="statistics-footer-item-label">收入</span>
+      <span class="statistics-footer-item-value income">
         {{ centsToYuan(appDataStore.income) }}
-      </a-typography-text>
+      </span>
     </div>
+    <div class="statistics-footer-divider"></div>
     <div class="statistics-footer-item">
-      <a-typography-text class="statistics-footer-item-label">
-        支出
-      </a-typography-text>
-      <a-typography-text class="statistics-footer-item-value expense">
+      <span class="statistics-footer-item-label">支出</span>
+      <span class="statistics-footer-item-value expense">
         {{ centsToYuan(appDataStore.expense) }}
-      </a-typography-text>
+      </span>
     </div>
+    <div class="statistics-footer-divider"></div>
     <div class="statistics-footer-item">
-      <a-typography-text class="statistics-footer-item-label">
-        转账
-      </a-typography-text>
-      <a-typography-text class="statistics-footer-item-value transfer">
+      <span class="statistics-footer-item-label">转账</span>
+      <span class="statistics-footer-item-value transfer">
         {{ centsToYuan(appDataStore.transfer) }}
-      </a-typography-text>
+      </span>
     </div>
   </div>
 </template>
@@ -39,37 +35,49 @@ const appDataStore = useAppDataStore();
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 24px;
+  gap: 20px;
 }
 
 .statistics-footer-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .statistics-footer-item-label {
+  font-family: var(--billadm-font-body);
   font-size: var(--billadm-size-text-caption);
-  color: var(--billadm-color-text-minor);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--billadm-color-text-secondary);
   margin: 0;
 }
 
 .statistics-footer-item-value {
+  font-family: var(--billadm-font-mono);
   font-size: var(--billadm-size-text-body);
-  font-weight: 600;
-  font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
 .statistics-footer-item-value.income {
-  color: #52c41a;
+  color: var(--billadm-color-income);
 }
 
 .statistics-footer-item-value.expense {
-  color: #f5222d;
+  color: var(--billadm-color-expense);
 }
 
 .statistics-footer-item-value.transfer {
-  color: #1677ff;
+  color: var(--billadm-color-transfer);
+}
+
+.statistics-footer-divider {
+  width: 1px;
+  height: 16px;
+  background-color: var(--billadm-color-window-border);
 }
 </style>

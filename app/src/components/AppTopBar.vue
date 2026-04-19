@@ -1,29 +1,26 @@
 <template>
   <div class="menu-bar">
     <div class="menu-bar-left">
-      <a-typography-text class="app-title">
-        Transactions
-      </a-typography-text>
+      <span class="app-title">Transactions</span>
     </div>
     <div class="menu-bar-right">
       <a-switch
           v-model:checked="isDark"
           size="small"
-          checked-children="暗"
-          un-checked-children="亮"
+          class="theme-switch"
           @change="toggleTheme"
       />
-      <a-button type="text" @click="onMinimize">
+      <a-button type="text" class="window-btn" @click="onMinimize">
         <template #icon>
           <LineOutlined/>
         </template>
       </a-button>
-      <a-button type="text" @click="onMaximize">
+      <a-button type="text" class="window-btn" @click="onMaximize">
         <template #icon>
           <BorderOutlined/>
         </template>
       </a-button>
-      <a-button class="close-button" type="text" @click="onClose">
+      <a-button class="window-btn close-btn" type="text" @click="onClose">
         <template #icon>
           <CloseOutlined/>
         </template>
@@ -67,6 +64,7 @@ const onClose = () => {
   height: 100%;
   width: 100%;
   padding: 0 12px;
+  background-color: var(--billadm-color-major-background);
 }
 
 .menu-bar > * {
@@ -76,19 +74,43 @@ const onClose = () => {
 .menu-bar-left {
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .app-title {
-  font-size: var(--billadm-size-text-title);
-  font-weight: var(--billadm-weight-medium);
+  font-family: var(--billadm-font-display);
+  font-size: 16px;
+  font-weight: 500;
   color: var(--billadm-color-text-major);
   margin: 0;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.02em;
 }
 
 .menu-bar-right {
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+.theme-switch {
+  margin-right: 8px;
+}
+
+.window-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--billadm-radius-md);
+  color: var(--billadm-color-icon);
+  transition: all var(--billadm-transition-fast);
+}
+
+.window-btn:hover {
+  background-color: var(--billadm-color-hover-bg);
+  color: var(--billadm-color-primary);
+}
+
+.close-btn:hover {
+  background-color: rgba(199, 62, 58, 0.1);
+  color: var(--billadm-color-expense);
 }
 </style>

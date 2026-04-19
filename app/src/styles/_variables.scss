@@ -1,165 +1,293 @@
 // ============================================
 // Billadm Theme Variables
-// 支持主题切换的CSS变量系统
+// "Warm Editorial Precision" Design System
 // ============================================
 @use 'sass:map';
 
-// 主题颜色
+// ============================================
+// Design Tokens - Light Mode
+// ============================================
+
+// Theme colors - Warm Editorial Palette
 $theme-colors: (
-  'primary': #1677ff,
-  'positive': #1677ff,
-  'negative': #f5222d,
-  'warning': #faad14,
-  'success': #52c41a,
+  'primary': #2D5A27,
+  'primary-light': #4A7A42,
+  'secondary': #8B7355,
+  'accent': #C9A227,
+  'positive': #2D7D46,
+  'negative': #C73E3A,
+  'warning': #B8860B,
+  'success': #2D7D46,
 ) !default;
 
-// 背景色
+// Semantic colors for transactions
+$semantic-colors: (
+  'income': #2D7D46,
+  'expense': #C73E3A,
+  'transfer': #5A7FAA,
+  'outlier': #B8860B,
+) !default;
+
+// Background colors - Warm tints
 $background-colors: (
-  'major': #ffffff,
-  'minor': #f5f5f5,
-  'window-border': #e0e0e0,
+  'major': #FFFFFF,
+  'major-warm': #FAFAF8,
+  'minor': #F5F5F2,
+  'elevated': #FFFFFF,
+  'window-border': #E5E5E0,
+  'divider': #E8E8E3,
 ) !default;
 
-// 文字颜色
+// Text colors - Warm neutrals
 $text-colors: (
-  'major': #333333,
-  'secondary': #7b7b7b,
-  'disabled': #bfbfbf,
+  'major': #1A1A18,
+  'secondary': #6B6B66,
+  'disabled': #A8A8A3,
+  'inverse': #FFFFFF,
 ) !default;
 
-// 字号层级 (记账软件需要清晰的层次感)
+// Icon colors
+$icon-colors: (
+  'default': #6B6B66,
+  'hover': #1A1A18,
+  'active': #2D5A27,
+) !default;
+
+// Shadow palette - Warm and soft
+$shadow-colors: (
+  'sm': rgba(45, 90, 39, 0.06),
+  'md': rgba(45, 90, 39, 0.10),
+  'lg': rgba(45, 90, 39, 0.15),
+  'xl': rgba(45, 90, 39, 0.20),
+) !default;
+
+// ============================================
+// Typography Scale
+// ============================================
+
 $font-sizes: (
-  'display': 24px,    // 大标题/页面主标题
-  'title': 18px,       // 区块标题/卡片标题
-  'section': 16px,    // 小节标题/表单标题
-  'body': 14px,        // 正文内容
-  'caption': 13px,     // 辅助说明/时间戳
-  'small': 12px,       // 最小文字/徽标
+  'display': 28px,
+  'display-sm': 24px,
+  'title': 20px,
+  'title-sm': 18px,
+  'section': 16px,
+  'body': 14px,
+  'body-sm': 13px,
+  'caption': 12px,
+  'small': 11px,
 ) !default;
 
-// 字重层级
 $font-weights: (
-  'bold': 600,
-  'medium': 500,
   'regular': 400,
+  'medium': 500,
+  'semibold': 600,
+  'bold': 700,
 ) !default;
 
-// 间距系统 (基于8px网格)
+$line-heights: (
+  'tight': 1.2,
+  'snug': 1.4,
+  'normal': 1.6,
+  'relaxed': 1.8,
+) !default;
+
+// ============================================
+// Spacing System (8px base)
+// ============================================
+
 $spacing: (
+  '2xs': 2px,
   'xs': 4px,
   'sm': 8px,
   'md': 12px,
   'lg': 16px,
   'xl': 24px,
-  'xxl': 32px,
-) !default;
-
-// 布局尺寸
-$layout-sizes: (
-  'header-height': 40px,
-  'sider-width': 48px,
-  'menu-width': 40px,
-  'content-padding': 16px,
-) !default;
-
-// 圆角
-$border-radius: (
-  'sm': 4px,
-  'md': 8px,
-  'lg': 12px,
+  '2xl': 32px,
+  '3xl': 48px,
 ) !default;
 
 // ============================================
-// CSS Variables (用于运行时主题切换)
+// Layout Sizes
+// ============================================
+
+$layout-sizes: (
+  'header-height': 48px,
+  'sider-width': 56px,
+  'footer-height': 44px,
+  'content-padding': 20px,
+) !default;
+
+// ============================================
+// Border Radius
+// ============================================
+
+$border-radius: (
+  'sm': 4px,
+  'md': 6px,
+  'lg': 10px,
+  'xl': 16px,
+  'full': 9999px,
+) !default;
+
+// ============================================
+// Transitions
+// ============================================
+
+$transitions: (
+  'fast': 150ms ease,
+  'normal': 200ms ease,
+  'slow': 300ms ease,
+  'bounce': 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+) !default;
+
+// ============================================
+// CSS Variables (Runtime Theme)
 // ============================================
 
 :root {
-  // 主题色
+  // Theme colors
   --billadm-color-primary: #{map.get($theme-colors, 'primary')};
-  --billadm-color-positive: #{map.get($theme-colors, 'positive')};
-  --billadm-color-negative: #{map.get($theme-colors, 'negative')};
-  --billadm-color-warning: #{map.get($theme-colors, 'warning')};
-  --billadm-color-success: #{map.get($theme-colors, 'success')};
+  --billadm-color-primary-light: #{map.get($theme-colors, 'primary-light')};
+  --billadm-color-secondary: #{map.get($theme-colors, 'secondary')};
+  --billadm-color-accent: #{map.get($theme-colors, 'accent')};
 
-  // 背景色
+  // Semantic colors
+  --billadm-color-positive: #{map.get($semantic-colors, 'income')};
+  --billadm-color-negative: #{map.get($semantic-colors, 'expense')};
+  --billadm-color-warning: #{map.get($semantic-colors, 'outlier')};
+  --billadm-color-success: #{map.get($semantic-colors, 'success')};
+  --billadm-color-income: #{map.get($semantic-colors, 'income')};
+  --billadm-color-expense: #{map.get($semantic-colors, 'expense')};
+  --billadm-color-transfer: #{map.get($semantic-colors, 'transfer')};
+  --billadm-color-outlier: #{map.get($semantic-colors, 'outlier')};
+
+  // Backgrounds
   --billadm-color-major-background: #{map.get($background-colors, 'major')};
+  --billadm-color-major-warm: #{map.get($background-colors, 'major-warm')};
   --billadm-color-minor-background: #{map.get($background-colors, 'minor')};
+  --billadm-color-elevated: #{map.get($background-colors, 'elevated')};
   --billadm-color-window-border: #{map.get($background-colors, 'window-border')};
+  --billadm-color-divider: #{map.get($background-colors, 'divider')};
 
-  // 按钮悬停
-  --billadm-color-icon-hover-bg: #e4e4e4;
-
-  // 文字色
+  // Text colors
   --billadm-color-text-major: #{map.get($text-colors, 'major')};
-  --billadm-color-text-minor: #{map.get($text-colors, 'secondary')};
+  --billadm-color-text-secondary: #{map.get($text-colors, 'secondary')};
   --billadm-color-text-disabled: #{map.get($text-colors, 'disabled')};
+  --billadm-color-text-inverse: #{map.get($text-colors, 'inverse')};
 
-  // 图标颜色
-  --billadm-color-icon: #7b7b7b;
-  --billadm-color-icon-active: #1677ff;
+  // Icon colors
+  --billadm-color-icon: #{map.get($icon-colors, 'default')};
+  --billadm-color-icon-hover: #{map.get($icon-colors, 'hover')};
+  --billadm-color-icon-active: #{map.get($icon-colors, 'active')};
 
-  // 字号
+  // Shadows
+  --billadm-shadow-sm: 0 1px 2px #{map.get($shadow-colors, 'sm')};
+  --billadm-shadow-md: 0 4px 12px #{map.get($shadow-colors, 'md')};
+  --billadm-shadow-lg: 0 8px 24px #{map.get($shadow-colors, 'lg')};
+  --billadm-shadow-xl: 0 12px 36px #{map.get($shadow-colors, 'xl')};
+
+  // Typography
   --billadm-size-text-display: #{map.get($font-sizes, 'display')};
+  --billadm-size-text-display-sm: #{map.get($font-sizes, 'display-sm')};
   --billadm-size-text-title: #{map.get($font-sizes, 'title')};
+  --billadm-size-text-title-sm: #{map.get($font-sizes, 'title-sm')};
   --billadm-size-text-section: #{map.get($font-sizes, 'section')};
   --billadm-size-text-body: #{map.get($font-sizes, 'body')};
+  --billadm-size-text-body-sm: #{map.get($font-sizes, 'body-sm')};
   --billadm-size-text-caption: #{map.get($font-sizes, 'caption')};
   --billadm-size-text-small: #{map.get($font-sizes, 'small')};
 
-  // 字重
-  --billadm-weight-bold: #{map.get($font-weights, 'bold')};
-  --billadm-weight-medium: #{map.get($font-weights, 'medium')};
   --billadm-weight-regular: #{map.get($font-weights, 'regular')};
+  --billadm-weight-medium: #{map.get($font-weights, 'medium')};
+  --billadm-weight-semibold: #{map.get($font-weights, 'semibold')};
+  --billadm-weight-bold: #{map.get($font-weights, 'bold')};
 
-  // 间距
+  --billadm-height-tight: #{map.get($line-heights, 'tight')};
+  --billadm-height-snug: #{map.get($line-heights, 'snug')};
+  --billadm-height-normal: #{map.get($line-heights, 'normal')};
+  --billadm-height-relaxed: #{map.get($line-heights, 'relaxed')};
+
+  // Spacing
+  --billadm-space-2xs: #{map.get($spacing, '2xs')};
   --billadm-space-xs: #{map.get($spacing, 'xs')};
   --billadm-space-sm: #{map.get($spacing, 'sm')};
   --billadm-space-md: #{map.get($spacing, 'md')};
   --billadm-space-lg: #{map.get($spacing, 'lg')};
   --billadm-space-xl: #{map.get($spacing, 'xl')};
-  --billadm-space-xxl: #{map.get($spacing, 'xxl')};
+  --billadm-space-2xl: #{map.get($spacing, '2xl')};
+  --billadm-space-3xl: #{map.get($spacing, '3xl')};
 
-  // 布局尺寸
+  // Layout
   --billadm-size-header-height: #{map.get($layout-sizes, 'header-height')};
   --billadm-size-sider-width: #{map.get($layout-sizes, 'sider-width')};
-  --billadm-ui-size-menu-width: #{map.get($layout-sizes, 'menu-width')};
+  --billadm-size-footer-height: #{map.get($layout-sizes, 'footer-height')};
+  --billadm-size-content-padding: #{map.get($layout-sizes, 'content-padding')};
 
-  // 圆角
+  // Border radius
   --billadm-radius-sm: #{map.get($border-radius, 'sm')};
   --billadm-radius-md: #{map.get($border-radius, 'md')};
   --billadm-radius-lg: #{map.get($border-radius, 'lg')};
+  --billadm-radius-xl: #{map.get($border-radius, 'xl')};
+  --billadm-radius-full: #{map.get($border-radius, 'full')};
+
+  // Transitions
+  --billadm-transition-fast: #{map.get($transitions, 'fast')};
+  --billadm-transition-normal: #{map.get($transitions, 'normal')};
+  --billadm-transition-slow: #{map.get($transitions, 'slow')};
+  --billadm-transition-bounce: #{map.get($transitions, 'bounce')};
+
+  // Hover backgrounds
+  --billadm-color-hover-bg: rgba(45, 90, 39, 0.06);
+  --billadm-color-active-bg: rgba(45, 90, 39, 0.10);
 }
 
 // ============================================
-// Dark Theme (可选)
+// Dark Theme
 // ============================================
 
 [data-theme='dark'] {
-  // 背景色 - 柔和的深灰色调，避免纯黑
-  --billadm-color-major-background: #1a1a2e;
-  --billadm-color-minor-background: #252538;
-  --billadm-color-window-border: #3a3a52;
+  // Theme colors - Adjusted for dark mode
+  --billadm-color-primary: #5A8F4E;
+  --billadm-color-primary-light: #6BA35E;
+  --billadm-color-secondary: #A89078;
+  --billadm-color-accent: #D4B44A;
 
-  // 悬停效果
-  --billadm-color-icon-hover-bg: #323248;
+  // Semantic colors - Adjusted for dark backgrounds
+  --billadm-color-positive: #4CAF50;
+  --billadm-color-negative: #E57373;
+  --billadm-color-warning: #D4A84B;
+  --billadm-color-success: #4CAF50;
+  --billadm-color-income: #4CAF50;
+  --billadm-color-expense: #E57373;
+  --billadm-color-transfer: #64B5F6;
+  --billadm-color-outlier: #D4A84B;
 
-  // 文字色 - 柔和的高对比度
-  --billadm-color-text-major: #e8e8f0;
-  --billadm-color-text-minor: #a0a0b8;
-  --billadm-color-text-disabled: #606078;
+  // Backgrounds - Warm dark tones
+  --billadm-color-major-background: #1A1A18;
+  --billadm-color-major-warm: #1E1E1C;
+  --billadm-color-minor-background: #252522;
+  --billadm-color-elevated: #2A2A28;
+  --billadm-color-window-border: #3A3A38;
+  --billadm-color-divider: #333330;
 
-  // 主题色 - 柔和的蓝色
-  --billadm-color-primary: #7c9cff;
-  --billadm-color-positive: #6bc77b;
-  --billadm-color-negative: #e06c75;
-  --billadm-color-warning: #e5b95d;
-  --billadm-color-success: #6bc77b;
+  // Text colors
+  --billadm-color-text-major: #F5F5F3;
+  --billadm-color-text-secondary: #A0A09A;
+  --billadm-color-text-disabled: #606058;
+  --billadm-color-text-inverse: #1A1A18;
 
-  // 边框和分割线
-  --billadm-color-border: #3a3a52;
-  --billadm-color-divider: #2e2e42;
+  // Icon colors
+  --billadm-color-icon: #90908A;
+  --billadm-color-icon-hover: #F5F5F3;
+  --billadm-color-icon-active: #5A8F4E;
 
-  // 图标颜色
-  --billadm-color-icon: #9090a8;
-  --billadm-color-icon-active: #7c9cff;
+  // Shadows - Darker for dark mode
+  --billadm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --billadm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --billadm-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --billadm-shadow-xl: 0 12px 36px rgba(0, 0, 0, 0.5);
+
+  // Hover backgrounds
+  --billadm-color-hover-bg: rgba(90, 143, 78, 0.12);
+  --billadm-color-active-bg: rgba(90, 143, 78, 0.18);
 }

@@ -1,10 +1,15 @@
 <template>
   <div class="tr-view">
+    <!-- 页面标题 -->
+    <h1 class="page-title">交易记录</h1>
+
     <!-- 工具栏 -->
     <div class="tr-toolbar">
       <div class="tr-toolbar-left">
-        <BilladmTimeRangePicker v-model:time-range="trQueryConditionStore.timeRange"
-          v-model:time-range-type="trQueryConditionStore.timeRangeType" />
+        <BilladmTimeRangePicker
+          v-model:time-range="trQueryConditionStore.timeRange"
+          v-model:time-range-type="trQueryConditionStore.timeRangeType"
+        />
       </div>
       <div class="tr-toolbar-right">
         <billadm-ledger-select />
@@ -18,18 +23,27 @@
 
     <!-- 底部分页 -->
     <div class="tr-footer">
-      <a-pagination v-model:current="currentPage" v-model:pageSize="pageSize" :total="trTotal"
-        :show-total="total => `共${total}记录`" :pageSizeOptions="['15', '30', '50', '100']" show-size-changer />
+      <a-pagination
+        v-model:current="currentPage"
+        v-model:pageSize="pageSize"
+        :total="trTotal"
+        :show-total="(total: number) => `共 ${total} 条记录`"
+        :pageSizeOptions="['15', '30', '50', '100']"
+        show-size-changer
+      />
     </div>
 
-    <!-- 悬浮按钮 -->
+    <!-- 悬浮按钮组 -->
     <a-float-button type="primary" class="float-primary" @click="createTr">
       <template #icon>
         <PlusOutlined />
       </template>
     </a-float-button>
-    <a-float-button class="float-secondary" @click="openTrFilterModal = true"
-      :badge="{ count: trQueryConditionStore.conditionLen, color: 'blue' }">
+    <a-float-button
+      class="float-secondary"
+      @click="openTrFilterModal = true"
+      :badge="{ count: trQueryConditionStore.conditionLen, color: 'blue' }"
+    >
       <template #icon>
         <FilterOutlined />
       </template>
@@ -46,12 +60,22 @@
       <div class="sort-list">
         <div v-for="(item, index) in sortItems" :key="index" class="sort-item">
           <span class="sort-priority">{{ index + 1 }}</span>
-          <a-select v-model:value="item.field" :options="getAvailableFields(index)" placeholder="选择字段" style="width: 120px" />
+          <a-select
+            v-model:value="item.field"
+            :options="getAvailableFields(index)"
+            placeholder="选择字段"
+            style="width: 120px"
+          />
           <a-select v-model:value="item.order" style="width: 100px">
             <a-select-option value="asc">升序</a-select-option>
             <a-select-option value="desc">降序</a-select-option>
           </a-select>
-          <a-button type="text" danger :disabled="sortItems.length <= 1" @click="removeSortItem(index)">
+          <a-button
+            type="text"
+            danger
+            :disabled="sortItems.length <= 1"
+            @click="removeSortItem(index)"
+          >
             <DeleteOutlined />
           </a-button>
         </div>
@@ -69,15 +93,32 @@
     <TransactionRecordFilter v-model="openTrFilterModal" />
 
     <!-- 编辑/新建弹窗 -->
-    <a-modal :title="trModalTitle" :open="openTrModal" width="800px" @ok="confirmTrModal" ok-text="确认"
-      @cancel="closeTrModal" cancel-text="取消" centered>
-
+    <a-modal
+      :title="trModalTitle"
+      :open="openTrModal"
+      width="800px"
+      @ok="confirmTrModal"
+      ok-text="确认"
+      @cancel="closeTrModal"
+      cancel-text="取消"
+      centered
+    >
       <a-form :model="trForm" :rules="rules">
         <a-form-item label="模板">
           <div style="display: flex; gap: 8px; align-items: center;">
-            <a-select v-model:value="selectedTemplateId" :options="templateOptions" placeholder="选择模板自动填充"
-              style="flex: 1;" allowClear />
-            <a-button @click="saveAsTemplate" :disabled="!trForm.type || !trForm.category">保存为模板</a-button>
+            <a-select
+              v-model:value="selectedTemplateId"
+              :options="templateOptions"
+              placeholder="选择模板自动填充"
+              style="flex: 1;"
+              allowClear
+            />
+            <a-button
+              @click="saveAsTemplate"
+              :disabled="!trForm.type || !trForm.category"
+            >
+              保存为模板
+            </a-button>
           </div>
         </a-form-item>
 
@@ -98,7 +139,12 @@
         </a-form-item>
 
         <a-form-item label="标签" name="tags">
-          <a-select v-model:value="trForm.tags" :options="tags" mode="multiple" placeholder="选择一个或多个标签" />
+          <a-select
+            v-model:value="trForm.tags"
+            :options="tags"
+            mode="multiple"
+            placeholder="选择一个或多个标签"
+          />
         </a-form-item>
 
         <a-form-item label="标记" name="flags">
@@ -116,8 +162,14 @@
     </a-modal>
 
     <!-- 保存模板弹窗 -->
-    <a-modal v-model:open="openSaveTemplateModal" title="保存为模板" @ok="confirmSaveTemplate" ok-text="保存"
-      cancel-text="取消" centered>
+    <a-modal
+      v-model:open="openSaveTemplateModal"
+      title="保存为模板"
+      @ok="confirmSaveTemplate"
+      ok-text="保存"
+      cancel-text="取消"
+      centered
+    >
       <a-form>
         <a-form-item label="模板名称">
           <a-input v-model:value="templateName" placeholder="请输入模板名称" />
@@ -149,7 +201,13 @@ import dayjs from "dayjs";
 import { trDtoToTrForm, trFormToTrDto } from "@/backend/dto-utils.ts";
 import type { DefaultOptionType } from "ant-design-vue/es/vc-cascader";
 import type { Rule } from "ant-design-vue/es/form";
-import { FilterOutlined, PlusOutlined, SortAscendingOutlined, SortDescendingOutlined, DeleteOutlined } from "@ant-design/icons-vue";
+import {
+  FilterOutlined,
+  PlusOutlined,
+  SortAscendingOutlined,
+  SortDescendingOutlined,
+  DeleteOutlined
+} from "@ant-design/icons-vue";
 import { message } from "ant-design-vue";
 
 const ledgerStore = useLedgerStore();
@@ -228,7 +286,6 @@ const getAvailableFields = (currentIndex: number) => {
 
 const addSortItem = () => {
   if (sortItems.value.length >= 4) return;
-  // 找一个未使用的字段
   const usedFields = sortItems.value.map(item => item.field);
   const availableField = sortFieldOptions.find(opt => !usedFields.includes(opt.value));
   if (availableField) {
@@ -256,14 +313,14 @@ const createTr = () => {
     trForm.value.time = trQueryConditionStore.timeRange[1];
   }
   trModalTitle.value = '新增消费记录';
-  selectedTemplateId.value = undefined; // 清空模板选择
+  selectedTemplateId.value = undefined;
   openTrModal.value = true;
 };
 
 const updateTr = (tr: TransactionRecord) => {
   trModalTitle.value = '编辑消费记录';
   trForm.value = trDtoToTrForm(tr);
-  selectedTemplateId.value = undefined; // 清空模板选择（编辑时不应使用模板）
+  selectedTemplateId.value = undefined;
   openTrModal.value = true;
 };
 
@@ -342,7 +399,6 @@ watch(() => trForm.value.type, async () => {
 
 watch(() => trForm.value.category, async () => {
   if (trForm.value.category === '' || !trForm.value.type) return;
-  // 组合分类和交易类型，格式为"分类:交易类型"
   const categoryTransactionType = `${trForm.value.category}:${trForm.value.type}`;
   const tagList = await getTagsByCategory(categoryTransactionType);
   tags.value = tagList.map(t => ({ value: t.name }));
@@ -414,83 +470,100 @@ watch(() => ledgerStore.currentLedgerId, () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 16px;
-  gap: 16px;
+  padding: var(--billadm-space-xl);
+  gap: var(--billadm-space-lg);
+}
+
+.page-title {
+  font-family: var(--billadm-font-display);
+  font-size: var(--billadm-size-text-display-sm);
+  font-weight: 500;
+  color: var(--billadm-color-text-major);
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .tr-toolbar {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
-  flex-shrink: 0;
+  align-items: center;
+  gap: var(--billadm-space-lg);
+  padding: var(--billadm-space-lg);
+  background-color: var(--billadm-color-major-background);
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-lg);
 }
 
 .tr-toolbar-left {
   display: flex;
-  gap: 8px;
+  gap: var(--billadm-space-md);
 }
 
 .tr-toolbar-right {
   display: flex;
-  gap: 8px;
+  gap: var(--billadm-space-md);
 }
 
 .tr-content {
   flex: 1;
   overflow-y: auto;
+  background-color: var(--billadm-color-major-background);
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-lg);
 }
 
 .tr-footer {
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  padding-top: 16px;
+  padding-top: var(--billadm-space-lg);
 }
 
 .float-primary {
-  right: 50px;
+  right: 48px;
   bottom: 80px;
 }
 
 .float-secondary {
-  right: 110px;
+  right: 112px;
   bottom: 80px;
 }
 
 .float-sort {
-  right: 170px;
+  right: 176px;
   bottom: 80px;
 }
 
 .sort-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--billadm-space-lg);
+  margin-bottom: var(--billadm-space-xl);
 }
 
 .sort-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--billadm-space-md);
 }
 
 .sort-priority {
   width: 24px;
   height: 24px;
-  border-radius: 50%;
+  border-radius: var(--billadm-radius-full);
   background-color: var(--billadm-color-primary);
   color: white;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: var(--billadm-size-text-caption);
+  font-weight: 600;
   flex-shrink: 0;
 }
 
 .sort-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--billadm-space-md);
 }
 </style>

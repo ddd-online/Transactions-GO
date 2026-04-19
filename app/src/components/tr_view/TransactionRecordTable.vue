@@ -1,42 +1,71 @@
 <template>
-  <a-table :columns="columns" :data-source="items" :pagination="false" :sticky="true" size="small">
+  <a-table
+    :columns="columns"
+    :data-source="items"
+    :pagination="false"
+    :sticky="true"
+    size="middle"
+    class="transaction-table"
+  >
     <template #bodyCell="{ column, record }">
       <template v-if="column.dataIndex==='transactionAt'">
-        <a-typography-text class="typography-caption">
-          {{ formatTimestamp(record.transactionAt, 'YYYY-MM-DD') }}
-        </a-typography-text>
+        <span class="cell-date">
+          {{ formatTimestamp(record.transactionAt, 'MM-DD') }}
+        </span>
       </template>
 
       <template v-else-if="column.dataIndex==='transactionType'">
-        <a-typography-text :style="{color: TransactionTypeToColor.get(record.transactionType)}">
+        <span class="cell-type" :class="`type-${record.transactionType}`">
           {{ TransactionTypeToLabel.get(record.transactionType) || record.transactionType }}
-        </a-typography-text>
+        </span>
+      </template>
+
+      <template v-else-if="column.dataIndex === 'category'">
+        <span class="cell-category">{{ record.category }}</span>
       </template>
 
       <template v-else-if="column.dataIndex === 'tags'">
-        <a-tag v-for="tag in record.tags" :key="tag" color="green">
-          {{ tag }}
-        </a-tag>
+        <div class="cell-tags">
+          <a-tag v-for="tag in record.tags" :key="tag" class="tag-item">
+            {{ tag }}
+          </a-tag>
+        </div>
       </template>
 
       <template v-else-if="column.dataIndex === 'flags'">
-        <a-tag v-if="record.outlier" key="outlier" color="orange">
+        <a-tag v-if="record.outlier" key="outlier" class="tag-outlier">
           离群值
         </a-tag>
       </template>
 
+      <template v-else-if="column.dataIndex === 'description'">
+        <span class="cell-description">{{ record.description || '-' }}</span>
+      </template>
+
       <template v-else-if="column.dataIndex === 'price'">
-        {{ centsToYuan(record.price) }}
+        <span class="cell-price" :class="`price-${record.transactionType}`">
+          <template v-if="record.transactionType === 'expense'">-</template>
+          <template v-else-if="record.transactionType === 'income'">+</template>
+          {{ centsToYuan(record.price) }}
+        </span>
       </template>
 
       <template v-else-if="column.dataIndex === 'action'">
-        <a-button type="text" class="btn-primary" @click="handleEdit(record as TransactionRecord)">编辑</a-button>
-        <a-popconfirm title="确认删除吗"
-                      ok-text="确认"
-                      @confirm="handleDelete(record as TransactionRecord)"
-                      :showCancel="false">
-          <a-button type="text" class="btn-danger">删除</a-button>
-        </a-popconfirm>
+        <div class="cell-actions">
+          <a-button type="text" class="action-btn" @click="handleEdit(record as TransactionRecord)">
+            <EditOutlined /> 编辑
+          </a-button>
+          <a-popconfirm
+            title="确认删除此记录吗？"
+            ok-text="确认"
+            @confirm="handleDelete(record as TransactionRecord)"
+            :showCancel="false"
+          >
+            <a-button type="text" class="action-btn danger">
+              <DeleteOutlined /> 删除
+            </a-button>
+          </a-popconfirm>
+        </div>
       </template>
     </template>
   </a-table>
@@ -45,50 +74,49 @@
 <script setup lang="ts">
 import type {TransactionRecord} from '@/types/billadm';
 import {centsToYuan, formatTimestamp} from "@/backend/functions";
-import {TransactionTypeToColor, TransactionTypeToLabel} from "@/backend/constant";
+import {TransactionTypeToLabel} from "@/backend/constant";
 import type {ColumnsType} from "ant-design-vue/es/table";
+import {EditOutlined, DeleteOutlined} from "@ant-design/icons-vue";
 
 const columns: ColumnsType = [
   {
-    title: '消费时间',
+    title: '日期',
     dataIndex: 'transactionAt',
-    width: 120,
+    width: 80,
     align: 'center'
   },
   {
-    title: '交易类型',
+    title: '类型',
     dataIndex: 'transactionType',
-    width: 120,
+    width: 80,
     align: 'center'
   },
   {
-    title: '消费类型',
+    title: '分类',
     dataIndex: 'category',
-    width: 120,
+    width: 100,
     align: 'center'
   },
   {
     title: '标签',
-    dataIndex: 'tags'
-  },
-  {
-    title: '标记',
-    dataIndex: 'flags'
+    dataIndex: 'tags',
+    width: 180
   },
   {
     title: '描述',
-    dataIndex: 'description'
+    dataIndex: 'description',
+    ellipsis: true
   },
   {
-    title: '价格',
+    title: '金额',
     dataIndex: 'price',
-    width: 150,
-    align: 'center'
+    width: 120,
+    align: 'right'
   },
   {
     title: '操作',
     dataIndex: 'action',
-    width: 150,
+    width: 140,
     align: 'center'
   }
 ];
@@ -112,3 +140,143 @@ const handleDelete = (record: TransactionRecord) => {
   emit('delete', record);
 };
 </script>
+
+<style scoped>
+.transaction-table {
+  border-radius: var(--billadm-radius-lg);
+  overflow: hidden;
+}
+
+.transaction-table :deep(.ant-table) {
+  background: transparent;
+}
+
+.transaction-table :deep(.ant-table-thead > tr > th) {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--billadm-color-text-secondary);
+  background-color: var(--billadm-color-minor-background);
+  border-bottom: 1px solid var(--billadm-color-window-border);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
+}
+
+.transaction-table :deep(.ant-table-tbody > tr > td) {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-major);
+  border-bottom: 1px solid var(--billadm-color-divider);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
+}
+
+.transaction-table :deep(.ant-table-tbody > tr:hover > td) {
+  background-color: var(--billadm-color-hover-bg);
+}
+
+.cell-date {
+  font-family: var(--billadm-font-mono);
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-type {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cell-type.type-income {
+  color: var(--billadm-color-income);
+}
+
+.cell-type.type-expense {
+  color: var(--billadm-color-expense);
+}
+
+.cell-type.type-transfer {
+  color: var(--billadm-color-transfer);
+}
+
+.cell-category {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-major);
+}
+
+.cell-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.tag-item {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
+  background-color: var(--billadm-color-minor-background);
+  border: none;
+  color: var(--billadm-color-text-secondary);
+}
+
+.tag-outlier {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
+  background-color: rgba(184, 134, 11, 0.1);
+  color: var(--billadm-color-warning);
+  border: none;
+}
+
+.cell-description {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-major);
+}
+
+.cell-price {
+  font-family: var(--billadm-font-mono);
+  font-size: var(--billadm-size-text-body);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.cell-price.price-income {
+  color: var(--billadm-color-income);
+}
+
+.cell-price.price-expense {
+  color: var(--billadm-color-expense);
+}
+
+.cell-price.price-transfer {
+  color: var(--billadm-color-transfer);
+}
+
+.cell-actions {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.action-btn {
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
+  border-radius: var(--billadm-radius-md);
+  transition: all var(--billadm-transition-fast);
+}
+
+.action-btn:hover {
+  color: var(--billadm-color-primary);
+  background-color: var(--billadm-color-hover-bg);
+}
+
+.action-btn.danger:hover {
+  color: var(--billadm-color-expense);
+  background-color: rgba(199, 62, 58, 0.1);
+}
+</style>

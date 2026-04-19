@@ -1,16 +1,16 @@
 // ============================================
 // Billadm Layout
-// 通用布局样式
+// "Warm Editorial Precision" Design System
 // ============================================
 
 @use 'variables' as *;
 @use 'mixins' as *;
 
 // ============================================
-// 页面区块布局
+// Page Sections
 // ============================================
 
-// 内容区域
+// Content area
 .layout-content {
   background-color: var(--billadm-color-major-background);
   overflow-y: auto;
@@ -18,17 +18,17 @@
   @include custom-scrollbar;
 }
 
-// 头部区域
+// Header area
 .layout-header {
   height: auto;
   background-color: var(--billadm-color-major-background);
   padding: 0 0 var(--billadm-space-lg) 0;
   @include flex-start;
   flex-wrap: wrap;
-  gap: var(--billadm-space-sm);
+  gap: var(--billadm-space-md);
 }
 
-// 底部区域
+// Footer area
 .layout-footer {
   height: auto;
   background-color: var(--billadm-color-major-background);
@@ -37,7 +37,7 @@
   justify-content: flex-end;
 }
 
-// 侧边栏区域
+// Sider
 .layout-sider {
   background-color: var(--billadm-color-minor-background) !important;
 
@@ -49,14 +49,20 @@
 }
 
 // ============================================
-// 工具条布局 (LedgerView, TransactionRecordView等头部)
+// Toolbar Layout
 // ============================================
 
 .toolbar {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: var(--billadm-space-md);
+  padding: var(--billadm-space-lg);
+  background-color: var(--billadm-color-major-background);
+  border-bottom: 1px solid var(--billadm-color-divider);
+
   &-left {
-    margin-right: auto;
     @include flex-start;
-    gap: var(--billadm-space-sm);
+    gap: var(--billadm-space-md);
   }
 
   &-center {
@@ -64,28 +70,28 @@
     left: 50%;
     transform: translateX(-50%);
     @include flex-start;
-    gap: var(--billadm-space-sm);
+    gap: var(--billadm-space-md);
   }
 
   &-right {
-    @include flex-start;
-    gap: var(--billadm-space-sm);
+    @include flex-end;
+    gap: var(--billadm-space-md);
   }
 }
 
 // ============================================
-// 卡片网格
+// Card Grid
 // ============================================
 
 .card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: var(--billadm-space-lg);
-  padding: var(--billadm-space-lg);
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--billadm-space-xl);
+  padding: var(--billadm-space-xl);
 }
 
 // ============================================
-// 菜单栏 (AppTopBar)
+// Menu Bar (AppTopBar)
 // ============================================
 
 .menu-bar {
@@ -111,20 +117,17 @@
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    font-size: var(--billadm-size-text-section);
-    font-weight: var(--billadm-weight-medium);
-    color: var(--billadm-color-text-major);
   }
 
   &-right {
     @include flex-center;
-    gap: var(--billadm-space-sm);
+    gap: var(--billadm-space-xs);
     margin-right: var(--billadm-space-sm);
   }
 }
 
 // ============================================
-// 侧边图标导航 (AppLeftBar)
+// Icon Navigation (AppLeftBar)
 // ============================================
 
 .icon-nav {
@@ -133,98 +136,144 @@
   height: 100%;
   align-items: center;
   justify-content: center;
-  padding: var(--billadm-space-sm) 0;
-  gap: var(--billadm-space-sm);
+  padding: var(--billadm-space-md) var(--billadm-space-xs);
+  gap: var(--billadm-space-md);
 
   &-top {
     @include flex-column;
-    gap: var(--billadm-space-sm);
+    gap: var(--billadm-space-md);
     margin-bottom: auto;
   }
 
   &-bottom {
     @include flex-column;
-    gap: var(--billadm-space-sm);
+    gap: var(--billadm-space-md);
   }
 }
 
 // ============================================
-// 统计页脚 (BilladmStatisticsFooter)
+// Statistics Footer (BilladmStatisticsFooter)
 // ============================================
 
 .statistics-footer {
   @include flex-start;
-  gap: var(--billadm-space-lg);
+  gap: var(--billadm-space-2xl);
 
   &-item {
     @include flex-start;
-    gap: var(--billadm-space-sm);
+    gap: var(--billadm-space-md);
 
     &-label {
+      font-family: var(--billadm-font-body);
       font-size: var(--billadm-size-text-caption);
-      color: var(--billadm-color-text-minor);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--billadm-color-text-secondary);
       margin: 0;
     }
 
     &-value {
+      font-family: var(--billadm-font-mono);
       font-size: var(--billadm-size-text-body);
-      font-weight: var(--billadm-weight-medium);
-      font-family: 'PingFang SC', 'Microsoft YaHei', monospace;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
       margin: 0;
 
       &.income {
-        color: var(--billadm-color-positive);
+        color: var(--billadm-color-income);
       }
 
       &.expense {
-        color: var(--billadm-color-negative);
+        color: var(--billadm-color-expense);
       }
 
       &.transfer {
-        color: var(--billadm-color-text-major);
+        color: var(--billadm-color-transfer);
       }
     }
   }
 }
 
 // ============================================
-// 模态框内表单
+// Modal Form
 // ============================================
 
 .modal-form {
   &-item {
-    margin-bottom: var(--billadm-space-md);
+    margin-bottom: var(--billadm-space-lg);
   }
 
   &-label {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-section);
-    font-weight: var(--billadm-weight-medium);
+    font-weight: 500;
     color: var(--billadm-color-text-major);
-    margin: 0 0 var(--billadm-space-xs) 0;
+    margin: 0 0 var(--billadm-space-sm) 0;
   }
 }
 
 // ============================================
-// 浮动按钮位置
+// Float Actions
 // ============================================
 
 .float-actions {
   &-primary {
-    right: 50px;
+    right: 48px;
     bottom: 80px;
   }
 
   &-secondary {
-    right: 110px;
+    right: 112px;
+    bottom: 80px;
+  }
+
+  &-sort {
+    right: 176px;
     bottom: 80px;
   }
 }
 
 // ============================================
-// 分页器
+// Pagination
 // ============================================
 
 .pagination-wrapper {
   @include flex-center;
-  padding-top: var(--billadm-space-lg);
+  padding-top: var(--billadm-space-xl);
+}
+
+// ============================================
+// Page Title (for views)
+// ============================================
+
+.page-title {
+  font-family: var(--billadm-font-display);
+  font-size: var(--billadm-size-text-display-sm);
+  font-weight: 500;
+  color: var(--billadm-color-text-major);
+  margin: 0 0 var(--billadm-space-lg) 0;
+  letter-spacing: -0.01em;
+}
+
+// ============================================
+// Section Header
+// ============================================
+
+.section-header {
+  @include flex-between;
+  margin-bottom: var(--billadm-space-lg);
+
+  &-title {
+    font-family: var(--billadm-font-body);
+    font-size: var(--billadm-size-text-section);
+    font-weight: 600;
+    color: var(--billadm-color-text-major);
+    margin: 0;
+  }
+
+  &-action {
+    @include flex-start;
+    gap: var(--billadm-space-sm);
+  }
 }

@@ -1,122 +1,143 @@
 // ============================================
 // Billadm Components
-// 组件特定样式
+// "Warm Editorial Precision" Design System
 // ============================================
 
 @use 'variables' as *;
 @use 'mixins' as *;
 
 // ============================================
-// 按钮样式
+// Button Styles
 // ============================================
 
-// 主要操作按钮
+// Primary action button
 .btn-primary {
-  color: var(--billadm-color-positive);
+  color: var(--billadm-color-primary);
 }
 
-// 危险操作按钮
+// Danger action button
 .btn-danger {
-  color: var(--billadm-color-negative);
+  color: var(--billadm-color-expense);
 }
 
-// 关闭按钮悬停效果
+// Close button hover effect
 .close-button {
   &.ant-btn:hover {
-    background-color: var(--billadm-color-negative);
-    color: white;
-    border-color: var(--billadm-color-negative);
+    background-color: rgba(199, 62, 58, 0.1);
+    color: var(--billadm-color-expense);
+    border-color: var(--billadm-color-expense);
   }
 }
 
 // ============================================
-// 卡片样式
+// Card Styles
 // ============================================
 
 .card {
   @include card-base;
   height: 100%;
-  padding: var(--billadm-space-lg);
+  padding: var(--billadm-space-xl);
 
   &-title {
-    font-size: var(--billadm-size-text-title);
-    font-weight: var(--billadm-weight-medium);
+    font-family: var(--billadm-font-display);
+    font-size: var(--billadm-size-text-title-sm);
+    font-weight: 500;
     color: var(--billadm-color-text-major);
     margin: 0 0 var(--billadm-space-md) 0;
   }
 
   &-subtitle {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-caption);
-    color: var(--billadm-color-text-minor);
+    color: var(--billadm-color-text-secondary);
     margin: 0 0 var(--billadm-space-sm) 0;
   }
 
   &-content {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-body);
     color: var(--billadm-color-text-major);
   }
 
   &-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: var(--billadm-space-lg);
-    padding: var(--billadm-space-lg);
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: var(--billadm-space-xl);
+    padding: var(--billadm-space-xl);
   }
 }
 
 // ============================================
-// 标签样式
+// Tag Styles (Transaction Types)
 // ============================================
 
 .tag {
+  // Income - warm green
   &-income {
-    background-color: rgba(22, 119, 255, 0.1);
-    color: var(--billadm-color-positive);
+    background-color: rgba(45, 125, 70, 0.1);
+    color: var(--billadm-color-income);
+    border: none;
+    font-weight: 500;
   }
 
+  // Expense - warm red
   &-expense {
-    background-color: rgba(245, 34, 45, 0.1);
-    color: var(--billadm-color-negative);
+    background-color: rgba(199, 62, 58, 0.1);
+    color: var(--billadm-color-expense);
+    border: none;
+    font-weight: 500;
   }
 
+  // Transfer - muted blue
   &-transfer {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: var(--billadm-color-text-major);
+    background-color: rgba(90, 127, 170, 0.1);
+    color: var(--billadm-color-transfer);
+    border: none;
+    font-weight: 500;
   }
 
+  // Outlier - golden amber
   &-outlier {
-    background-color: rgba(250, 173, 20, 0.1);
+    background-color: rgba(184, 134, 11, 0.1);
     color: var(--billadm-color-warning);
+    border: none;
+    font-weight: 500;
   }
 }
 
 // ============================================
-// 表格增强
+// Table Enhancements
 // ============================================
 
 .table-wrapper {
   .ant-table {
-    // 标题行
+    // Header row
     .ant-table-thead > tr > th {
+      font-family: var(--billadm-font-body);
       font-size: var(--billadm-size-text-caption);
-      font-weight: var(--billadm-weight-medium);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
       background-color: var(--billadm-color-minor-background);
+      color: var(--billadm-color-text-secondary);
     }
 
-    // 内容行
+    // Body rows
     .ant-table-tbody > tr > td {
+      font-family: var(--billadm-font-body);
       font-size: var(--billadm-size-text-body);
+      color: var(--billadm-color-text-major);
     }
 
-    // 悬停效果
+    // Hover effect
     .ant-table-tbody > tr:hover > td {
-      background-color: var(--billadm-color-icon-hover-bg);
+      background-color: var(--billadm-color-hover-bg);
     }
   }
 }
 
 // ============================================
-// 表单增强
+// Form Enhancements
 // ============================================
 
 .form-wrapper {
@@ -125,8 +146,9 @@
   }
 
   .ant-form-item-label > label {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-section);
-    font-weight: var(--billadm-weight-medium);
+    font-weight: 500;
     color: var(--billadm-color-text-major);
     height: auto;
   }
@@ -134,7 +156,7 @@
   .ant-input,
   .ant-select-selector,
   .ant-picker {
-    border-radius: var(--billadm-radius-sm);
+    border-radius: var(--billadm-radius-md);
 
     &:hover {
       border-color: var(--billadm-color-primary);
@@ -143,90 +165,98 @@
     &:focus,
     &.ant-input-focused {
       border-color: var(--billadm-color-primary);
-      box-shadow: 0 0 0 2px rgba(22, 119, 255, 0.1);
+      box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.1);
     }
   }
 }
 
 // ============================================
-// 模态框增强
+// Modal Enhancements
 // ============================================
 
 .modal-wrapper {
   .ant-modal-header {
-    border-bottom: 1px solid var(--billadm-color-window-border);
-    padding: var(--billadm-space-lg);
+    border-bottom: 1px solid var(--billadm-color-divider);
+    padding: var(--billadm-space-lg) var(--billadm-space-xl);
   }
 
   .ant-modal-title {
-    font-size: var(--billadm-size-text-title);
-    font-weight: var(--billadm-weight-medium);
+    font-family: var(--billadm-font-display);
+    font-size: var(--billadm-size-text-title-sm);
+    font-weight: 500;
     color: var(--billadm-color-text-major);
   }
 
   .ant-modal-body {
-    padding: var(--billadm-space-lg);
+    padding: var(--billadm-space-xl);
   }
 
   .ant-modal-footer {
-    border-top: 1px solid var(--billadm-color-window-border);
-    padding: var(--billadm-space-md) var(--billadm-space-lg);
+    border-top: 1px solid var(--billadm-color-divider);
+    padding: var(--billadm-space-lg) var(--billadm-space-xl);
   }
 }
 
 // ============================================
-// 筛选条件卡片
+// Filter Card
 // ============================================
 
 .filter-card {
   border: 1px solid var(--billadm-color-window-border);
-  border-radius: var(--billadm-radius-sm);
+  border-radius: var(--billadm-radius-lg);
+  background-color: var(--billadm-color-major-background);
 
   .ant-card-head {
+    font-family: var(--billadm-font-body);
     font-size: var(--billadm-size-text-body);
+    font-weight: 500;
+    color: var(--billadm-color-text-major);
     min-height: auto;
-    padding: var(--billadm-space-sm) var(--billadm-space-md);
-    border-bottom: 1px solid var(--billadm-color-window-border);
+    padding: var(--billadm-space-md) var(--billadm-space-lg);
+    border-bottom: 1px solid var(--billadm-color-divider);
   }
 
   .ant-card-body {
-    padding: var(--billadm-space-md);
+    padding: var(--billadm-space-lg);
   }
 }
 
 // ============================================
-// 空状态
+// Empty State
 // ============================================
 
 .empty-state {
   @include flex-center;
   flex-direction: column;
-  padding: var(--billadm-space-xxl);
-  color: var(--billadm-color-text-minor);
+  padding: var(--billadm-space-3xl);
+  color: var(--billadm-color-text-secondary);
 
   &-icon {
     font-size: 48px;
-    margin-bottom: var(--billadm-space-lg);
-    opacity: 0.5;
+    margin-bottom: var(--billadm-space-xl);
+    opacity: 0.4;
+    color: var(--billadm-color-primary);
   }
 
   &-text {
-    font-size: var(--billadm-size-text-caption);
-    color: var(--billadm-color-text-minor);
+    font-family: var(--billadm-font-body);
+    font-size: var(--billadm-size-text-body);
+    color: var(--billadm-color-text-secondary);
+    text-align: center;
   }
 }
 
 // ============================================
-// 加载状态
+// Loading State
 // ============================================
 
 .loading-state {
   @include flex-center;
-  padding: var(--billadm-space-xxl);
+  padding: var(--billadm-space-3xl);
 }
 
 // ============================================
-// 标签页样式
+// Tabs Wrapper
 // ============================================
 
 .tabs-wrapper {
@@ -239,5 +269,103 @@
 
   .ant-tabs-nav {
     margin-bottom: 0;
+  }
+}
+
+// ============================================
+// Amount Display (Monospace)
+// ============================================
+
+.amount {
+  font-family: var(--billadm-font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+
+  &-large {
+    font-size: var(--billadm-size-text-display);
+    font-weight: 600;
+  }
+
+  &-medium {
+    font-size: var(--billadm-size-text-title);
+    font-weight: 500;
+  }
+
+  &-small {
+    font-size: var(--billadm-size-text-body);
+    font-weight: 500;
+  }
+
+  &-income {
+    color: var(--billadm-color-income);
+  }
+
+  &-expense {
+    color: var(--billadm-color-expense);
+  }
+
+  &-transfer {
+    color: var(--billadm-color-transfer);
+  }
+}
+
+// ============================================
+// Ledger Card
+// ============================================
+
+.ledger-card {
+  @include card-elevated;
+  cursor: pointer;
+
+  &-name {
+    font-family: var(--billadm-font-display);
+    font-size: var(--billadm-size-text-title-sm);
+    font-weight: 500;
+    color: var(--billadm-color-text-major);
+    margin: 0 0 var(--billadm-space-sm) 0;
+  }
+
+  &-description {
+    font-family: var(--billadm-font-body);
+    font-size: var(--billadm-size-text-body);
+    color: var(--billadm-color-text-secondary);
+    margin: 0 0 var(--billadm-space-lg) 0;
+  }
+
+  &-meta {
+    display: flex;
+    gap: var(--billadm-space-lg);
+    font-family: var(--billadm-font-body);
+    font-size: var(--billadm-size-text-caption);
+    color: var(--billadm-color-text-secondary);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+// ============================================
+// Chart Container
+// ============================================
+
+.chart-container {
+  background-color: var(--billadm-color-major-background);
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-lg);
+  padding: var(--billadm-space-xl);
+  box-shadow: var(--billadm-shadow-sm);
+
+  &-header {
+    @include flex-between;
+    margin-bottom: var(--billadm-space-lg);
+
+    &-title {
+      font-family: var(--billadm-font-display);
+      font-size: var(--billadm-size-text-title-sm);
+      font-weight: 500;
+      color: var(--billadm-color-text-major);
+      margin: 0;
+    }
   }
 }
