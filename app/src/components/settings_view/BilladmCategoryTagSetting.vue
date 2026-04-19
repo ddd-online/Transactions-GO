@@ -1,44 +1,409 @@
 <template>
   <div class="category-tag-setting">
-    <!-- Tab切换：收入、支出、转账 -->
-    <a-tabs v-model:activeKey="activeTab" class="setting-tabs">
-      <a-tab-pane key="expense">
-        <template #tab>
-          <span :style="{ color: expenseColor }">支出</span>
-        </template>
-        <div class="tab-content">
-          <category-tag-panel transaction-type="expense" :active-color="expenseColor"/>
+    <!-- 顶部：交易类型 + 标题 -->
+    <header class="setting-header">
+      <div class="header-left">
+        <h1 class="setting-title">分类与标签</h1>
+        <nav class="type-nav">
+          <button
+            v-for="type in transactionTypes"
+            :key="type.value"
+            class="type-pill"
+            :class="{ 'is-active': activeType === type.value }"
+            :style="{ '--c': type.color }"
+            @click="activeType = type.value"
+          >
+            <span class="pill-dot"></span>
+            {{ type.label }}
+          </button>
+        </nav>
+      </div>
+      <div class="header-right">
+        <button
+          v-if="selectedCategory"
+          class="add-btn add-btn--secondary"
+          @click="openAddTagModal"
+        >
+          <svg class="add-btn__icon" viewBox="0 0 20 20" fill="none">
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>添加标签</span>
+        </button>
+        <button
+          class="add-btn add-btn--primary"
+          @click="openAddCategoryModal"
+          :disabled="!ledgerStore.currentLedgerId"
+        >
+          <svg class="add-btn__icon" viewBox="0 0 20 20" fill="none">
+            <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          <span>添加分类</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 主体：分类列表 + 标签列表 -->
+    <div class="setting-main">
+      <!-- 分类列 -->
+      <section class="column column-categories">
+        <div class="column-header">
+          <span class="column-title">分类</span>
+          <span class="column-count">{{ categories.length }}</span>
         </div>
-      </a-tab-pane>
-      <a-tab-pane key="income">
-        <template #tab>
-          <span :style="{ color: incomeColor }">收入</span>
-        </template>
-        <div class="tab-content">
-          <category-tag-panel transaction-type="income" :active-color="incomeColor"/>
+        <div class="column-body category-list" v-if="categories.length > 0">
+          <div
+            v-for="(category, index) in categories"
+            :key="category.name"
+            class="list-item"
+            :class="{ 'is-active': selectedCategory === category.name }"
+            @click="selectCategory(category.name)"
+          >
+            <div class="item-main">
+              <span class="item-name">{{ category.name }}</span>
+              <span class="item-badge" v-if="category.recordCount">{{ category.recordCount }}</span>
+            </div>
+            <div class="item-actions">
+              <button
+                class="action-icon"
+                @click.stop="moveCategory(index, -1)"
+                :disabled="index === 0"
+                title="上移"
+              >
+                <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2L8 14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button
+                class="action-icon"
+                @click.stop="moveCategory(index, 1)"
+                :disabled="index === categories.length - 1"
+                title="下移"
+              >
+                <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 14L8 2M8 14L4 10M8 14L12 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button
+                class="action-icon delete"
+                @click.stop="confirmDeleteCategory(category.name)"
+                title="删除"
+              >
+                <svg class="delete-icon" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M12 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
-      </a-tab-pane>
-      <a-tab-pane key="transfer">
-        <template #tab>
-          <span :style="{ color: transferColor }">转账</span>
-        </template>
-        <div class="tab-content">
-          <category-tag-panel transaction-type="transfer" :active-color="transferColor"/>
+        <div class="column-empty" v-else>
+          <span>暂无分类</span>
         </div>
-      </a-tab-pane>
-    </a-tabs>
+      </section>
+
+      <!-- 标签列 -->
+      <section class="column column-tags">
+        <div class="column-header">
+          <span class="column-title">{{ selectedCategory || '标签' }}</span>
+          <span class="column-count">{{ selectedTags.length }}</span>
+        </div>
+        <div class="column-body tag-list" v-if="selectedTags.length > 0">
+          <div
+            v-for="(tag, index) in selectedTags"
+            :key="tag.name"
+            class="list-item"
+          >
+            <div class="item-main">
+              <span class="item-name">{{ tag.name }}</span>
+              <span class="item-badge" v-if="tag.recordCount">{{ tag.recordCount }}</span>
+            </div>
+            <div class="item-actions">
+              <button
+                class="action-icon"
+                @click="moveTag(index, -1)"
+                :disabled="index === 0"
+                title="上移"
+              >
+                <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 2L8 14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button
+                class="action-icon"
+                @click="moveTag(index, 1)"
+                :disabled="index === selectedTags.length - 1"
+                title="下移"
+              >
+                <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
+                  <path d="M8 14L8 2M8 14L4 10M8 14L12 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button
+                class="action-icon delete"
+                @click="confirmDeleteTag(tag.name)"
+                title="删除"
+              >
+                <svg class="delete-icon" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M12 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="column-empty" v-else>
+          <span>{{ selectedCategory ? '暂无标签' : '选择分类查看标签' }}</span>
+        </div>
+      </section>
+    </div>
+
+    <!-- 添加分类弹窗 -->
+    <a-modal
+      v-model:open="openCategoryModal"
+      title="新增分类"
+      @ok="confirmAddCategory"
+      ok-text="确认"
+      cancel-text="取消"
+      centered
+      :width="360"
+    >
+      <div class="modal-form">
+        <label class="form-label">名称</label>
+        <a-input v-model:value="categoryForm.name" placeholder="输入分类名称" size="large" :maxlength="20" />
+      </div>
+    </a-modal>
+
+    <!-- 添加标签弹窗 -->
+    <a-modal
+      v-model:open="openTagModal"
+      title="新增标签"
+      @ok="confirmAddTag"
+      ok-text="确认"
+      cancel-text="取消"
+      centered
+      :width="360"
+    >
+      <div class="modal-form">
+        <label class="form-label">名称</label>
+        <a-input v-model:value="tagForm.name" placeholder="输入标签名称" size="large" :maxlength="20" />
+      </div>
+    </a-modal>
+
+    <!-- 删除确认弹窗 -->
+    <a-modal
+      v-model:open="openDeleteModal"
+      :title="deleteTarget.type === 'category' ? '删除分类' : '删除标签'"
+      @ok="executeDelete"
+      ok-text="删除"
+      ok-type="danger"
+      cancel-text="取消"
+      centered
+      :width="360"
+    >
+      <p>{{ deleteTarget.message }}</p>
+    </a-modal>
   </div>
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import {ref, watch, computed} from 'vue';
+import type {TransactionType, Category, Tag} from '@/types/billadm';
+import {useLedgerStore} from '@/stores/ledgerStore';
+import {
+  getCategoryByType, getTagsByCategory,
+  addCategory, removeCategory, addTag, removeTag,
+  reorderCategory, reorderTag
+} from '@/backend/functions';
 import {TransactionTypeToColor} from "@/backend/constant.ts";
-import CategoryTagPanel from './CategoryTagPanel.vue';
+import {message} from "ant-design-vue";
 
-const activeTab = ref('expense');
-const incomeColor = TransactionTypeToColor.get('income') || '#52c41a';
-const expenseColor = TransactionTypeToColor.get('expense') || '#f5222d';
-const transferColor = TransactionTypeToColor.get('transfer') || '#faad14';
+interface CategoryWithTags extends Category {
+  tags: Tag[];
+}
+
+const props = defineProps<{
+  activeColor?: string;
+}>();
+
+const ledgerStore = useLedgerStore();
+
+const transactionTypes = [
+  { value: 'expense' as TransactionType, label: '支出', color: TransactionTypeToColor.get('expense') || '#C73E3A' },
+  { value: 'income' as TransactionType, label: '收入', color: TransactionTypeToColor.get('income') || '#2D7D46' },
+  { value: 'transfer' as TransactionType, label: '转账', color: TransactionTypeToColor.get('transfer') || '#5A7FAA' },
+];
+
+const activeType = ref<TransactionType>('expense');
+
+const categories = ref<CategoryWithTags[]>([]);
+const selectedCategory = ref<string>('');
+const selectedTags = ref<Tag[]>([]);
+
+// 添加分类弹窗
+const openCategoryModal = ref(false);
+const categoryForm = ref({name: ''});
+
+// 添加标签弹窗
+const openTagModal = ref(false);
+const tagForm = ref({name: ''});
+
+// 删除确认弹窗
+const openDeleteModal = ref(false);
+const deleteTarget = ref<{type: 'category' | 'tag', name: string, message: string}>({
+  type: 'category',
+  name: '',
+  message: ''
+});
+
+const openAddCategoryModal = () => {
+  categoryForm.value.name = '';
+  openCategoryModal.value = true;
+};
+
+const openAddTagModal = () => {
+  tagForm.value.name = '';
+  openTagModal.value = true;
+};
+
+const confirmAddCategory = async () => {
+  const name = categoryForm.value.name.trim();
+  if (!name) return;
+  if (categories.value.some(c => c.name === name)) {
+    message.error('该分类已存在');
+    return;
+  }
+  try {
+    await addCategory(ledgerStore.currentLedgerId!, name, activeType.value);
+    message.success('分类已添加');
+    openCategoryModal.value = false;
+    await loadCategories();
+    selectCategory(name);
+  } catch { /* error handled in backend */ }
+};
+
+const confirmAddTag = async () => {
+  const name = tagForm.value.name.trim();
+  if (!name) return;
+  if (selectedTags.value.some(t => t.name === name)) {
+    message.error('该标签已存在');
+    return;
+  }
+  const categoryTransactionType = `${selectedCategory.value}:${activeType.value}`;
+  try {
+    await addTag(name, categoryTransactionType);
+    message.success('标签已添加');
+    openTagModal.value = false;
+    await loadCategories();
+    selectCategory(selectedCategory.value);
+  } catch { /* error handled in backend */ }
+};
+
+const confirmDeleteCategory = (name: string) => {
+  deleteTarget.value = {
+    type: 'category',
+    name,
+    message: `确定删除分类「${name}」及其所有标签？`
+  };
+  openDeleteModal.value = true;
+};
+
+const confirmDeleteTag = (name: string) => {
+  deleteTarget.value = {
+    type: 'tag',
+    name,
+    message: `确定删除标签「${name}」？`
+  };
+  openDeleteModal.value = true;
+};
+
+const executeDelete = async () => {
+  try {
+    if (deleteTarget.value.type === 'category') {
+      await removeCategory(deleteTarget.value.name, activeType.value, ledgerStore.currentLedgerId!);
+      message.success('分类已删除');
+      if (selectedCategory.value === deleteTarget.value.name) {
+        selectedCategory.value = '';
+        selectedTags.value = [];
+      }
+    } else {
+      const categoryTransactionType = `${selectedCategory.value}:${activeType.value}`;
+      await removeTag(deleteTarget.value.name, categoryTransactionType, ledgerStore.currentLedgerId!);
+      message.success('标签已删除');
+    }
+    openDeleteModal.value = false;
+    await loadCategories();
+    if (deleteTarget.value.type === 'tag') {
+      selectCategory(selectedCategory.value);
+    }
+  } catch { /* error handled in backend */ }
+};
+
+const moveCategory = async (index: number, direction: number) => {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= categories.value.length) return;
+  const category = categories.value[index];
+  const targetCategory = categories.value[newIndex];
+  if (!category || !targetCategory) return;
+  const categorySortOrder = category.sortOrder || 0;
+  const targetSortOrder = targetCategory.sortOrder || 0;
+  try {
+    await reorderCategory(category.name, activeType.value, targetSortOrder);
+    await reorderCategory(targetCategory.name, activeType.value, categorySortOrder);
+    await loadCategories();
+  } catch { /* error handled in backend */ }
+};
+
+const moveTag = async (index: number, direction: number) => {
+  const newIndex = index + direction;
+  if (newIndex < 0 || newIndex >= selectedTags.value.length) return;
+  const tag = selectedTags.value[index];
+  const targetTag = selectedTags.value[newIndex];
+  if (!tag || !targetTag) return;
+  const categoryTransactionType = `${selectedCategory.value}:${activeType.value}`;
+  const tagSortOrder = tag.sortOrder || 0;
+  const targetSortOrder = targetTag.sortOrder || 0;
+  try {
+    await reorderTag(tag.name, categoryTransactionType, targetSortOrder);
+    await reorderTag(targetTag.name, categoryTransactionType, tagSortOrder);
+    await loadCategories();
+    selectCategory(selectedCategory.value);
+  } catch { /* error handled in backend */ }
+};
+
+const loadCategories = async () => {
+  const categoryList = await getCategoryByType(activeType.value, ledgerStore.currentLedgerId!);
+  categories.value = categoryList.map(c => ({
+    name: c.name,
+    transactionType: c.transactionType,
+    sortOrder: c.sortOrder,
+    recordCount: c.recordCount,
+    tags: []
+  }));
+  for (const category of categories.value) {
+    const categoryTransactionType = `${category.name}:${activeType.value}`;
+    const tags = await getTagsByCategory(categoryTransactionType, ledgerStore.currentLedgerId!);
+    category.tags = tags.map(t => ({
+      name: t.name,
+      categoryTransactionType: t.categoryTransactionType,
+      sortOrder: t.sortOrder,
+      recordCount: t.recordCount
+    }));
+  }
+};
+
+const selectCategory = (categoryName: string) => {
+  selectedCategory.value = categoryName;
+  const category = categories.value.find(c => c.name === categoryName);
+  selectedTags.value = category ? category.tags : [];
+};
+
+watch(
+  () => [ledgerStore.currentLedgerId, activeType.value],
+  () => {
+    selectedCategory.value = '';
+    selectedTags.value = [];
+    loadCategories();
+  },
+  {immediate: true}
+);
 </script>
 
 <style scoped>
@@ -48,26 +413,328 @@ const transferColor = TransactionTypeToColor.get('transfer') || '#faad14';
   flex-direction: column;
 }
 
-.setting-tabs {
-  height: 100%;
+/* ========== Header ========== */
+.setting-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  padding: var(--billadm-space-lg);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--billadm-space-xl);
+}
+
+.setting-title {
+  font-size: var(--billadm-size-text-display-sm);
+  font-weight: var(--billadm-weight-semibold);
+  color: var(--billadm-color-text-major);
+  margin: 0;
+}
+
+.type-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--billadm-space-xs);
+}
+
+.type-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  font-size: var(--billadm-size-text-body-sm);
+  font-weight: var(--billadm-weight-medium);
+  color: var(--billadm-color-text-secondary);
+  background: transparent;
+  border: 1.5px solid transparent;
+  border-radius: var(--billadm-radius-full);
+  cursor: pointer;
+  transition: all var(--billadm-transition-fast);
+}
+
+.type-pill:hover:not(.is-active) {
+  color: var(--billadm-color-text-major);
+  background-color: var(--billadm-color-hover-bg);
+}
+
+.type-pill.is-active {
+  color: var(--c);
+  border-color: var(--c);
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--c);
+  opacity: 0.5;
+  transition: opacity var(--billadm-transition-fast);
+}
+
+.type-pill.is-active .pill-dot {
+  opacity: 1;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--billadm-space-sm);
+}
+
+/* ========== Add Button ========== */
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: var(--billadm-size-text-body-sm);
+  font-weight: var(--billadm-weight-medium);
+  border-radius: var(--billadm-radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all var(--billadm-transition-fast);
+  white-space: nowrap;
+}
+
+.add-btn__icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+.add-btn--primary {
+  color: var(--billadm-color-text-inverse);
+  background-color: var(--billadm-color-primary);
+}
+
+.add-btn--primary:hover:not(:disabled) {
+  background-color: var(--billadm-color-primary-light);
+  transform: translateY(-1px);
+  box-shadow: var(--billadm-shadow-sm);
+}
+
+.add-btn--primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.add-btn--secondary {
+  color: var(--billadm-color-primary);
+  background-color: transparent;
+  border: 1.5px solid var(--billadm-color-primary);
+}
+
+.add-btn--secondary:hover:not(:disabled) {
+  background-color: var(--billadm-color-primary);
+  color: var(--billadm-color-text-inverse);
+}
+
+.add-btn--secondary:hover:not(:disabled) .add-btn__icon {
+  color: var(--billadm-color-text-inverse);
+}
+
+.add-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ========== Main Grid ========== */
+.setting-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 0;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ========== Column ========== */
+.column {
   display: flex;
   flex-direction: column;
-}
-
-.setting-tabs :deep(.ant-tabs-content-holder) {
-  flex: 1;
   overflow: hidden;
+  background-color: var(--billadm-color-major-background);
+  border: 1px solid var(--billadm-color-divider);
 }
 
-.setting-tabs :deep(.ant-tabs-content) {
-  height: 100%;
+.column-categories {
+  border-radius: var(--billadm-radius-lg) 0 0 var(--billadm-radius-lg);
 }
 
-.setting-tabs :deep(.ant-tabs-tabpane) {
-  height: 100%;
+.column-tags {
+  border-radius: 0 var(--billadm-radius-lg) var(--billadm-radius-lg) 0;
+  border-left: none;
 }
 
-.tab-content {
-  height: 100%;
+.column-header {
+  display: flex;
+  align-items: center;
+  gap: var(--billadm-space-sm);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  border-bottom: 1px solid var(--billadm-color-divider);
+  flex-shrink: 0;
+}
+
+.column-title {
+  font-size: var(--billadm-size-text-body);
+  font-weight: var(--billadm-weight-semibold);
+  color: var(--billadm-color-text-major);
+}
+
+.column-count {
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
+  background-color: var(--billadm-color-minor-background);
+  padding: 2px 8px;
+  border-radius: var(--billadm-radius-full);
+}
+
+.column-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--billadm-space-sm);
+}
+
+.column-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-disabled);
+}
+
+/* ========== List Item ========== */
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--billadm-space-md) var(--billadm-space-md);
+  border-radius: var(--billadm-radius-md);
+  cursor: pointer;
+  transition: background-color var(--billadm-transition-fast);
+}
+
+.list-item:hover {
+  background-color: var(--billadm-color-hover-bg);
+}
+
+.list-item.is-active {
+  background-color: var(--billadm-color-active-bg);
+}
+
+.list-item.is-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background-color: var(--billadm-color-primary);
+  border-radius: 0 2px 2px 0;
+}
+
+.item-main {
+  display: flex;
+  align-items: center;
+  gap: var(--billadm-space-sm);
+  min-width: 0;
+}
+
+.item-name {
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-major);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-badge {
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
+  background-color: var(--billadm-color-minor-background);
+  padding: 1px 6px;
+  border-radius: var(--billadm-radius-full);
+  flex-shrink: 0;
+}
+
+.item-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--billadm-transition-fast);
+}
+
+.list-item:hover .item-actions {
+  opacity: 1;
+}
+
+/* ========== Action Icon ========== */
+.action-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--billadm-color-text-secondary);
+  background: transparent;
+  border: none;
+  border-radius: var(--billadm-radius-sm);
+  cursor: pointer;
+  transition: all var(--billadm-transition-fast);
+}
+
+.action-icon .arrow-icon,
+.action-icon .delete-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.action-icon:hover:not(:disabled) {
+  color: var(--billadm-color-text-major);
+  background-color: var(--billadm-color-hover-bg);
+}
+
+.action-icon.delete:hover:not(:disabled) {
+  color: var(--billadm-color-negative);
+  background-color: rgba(199, 62, 58, 0.08);
+}
+
+.action-icon:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ========== Modal Form ========== */
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--billadm-space-xs);
+}
+
+.form-label {
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-secondary);
+}
+
+/* ========== Scrollbar ========== */
+.column-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.column-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.column-body::-webkit-scrollbar-thumb {
+  background-color: var(--billadm-color-divider);
+  border-radius: 2px;
 }
 </style>
