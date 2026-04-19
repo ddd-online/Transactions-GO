@@ -28,11 +28,11 @@ $semantic-colors: (
   'outlier': #B8860B,
 ) !default;
 
-// Background colors - Warm tints
+// Background colors - Warm Editorial Hierarchy
 $background-colors: (
   'major': #FFFFFF,
   'major-warm': #FAFAF8,
-  'minor': #F5F5F2,
+  'minor': #F0F0EC,
   'elevated': #FFFFFF,
   'window-border': #E5E5E0,
   'divider': #E8E8E3,
@@ -262,11 +262,11 @@ $transitions: (
   --billadm-color-transfer: #64B5F6;
   --billadm-color-outlier: #D4A84B;
 
-  // Backgrounds - Warm dark tones
+  // Backgrounds - Warm dark tones with clear hierarchy
   --billadm-color-major-background: #1A1A18;
-  --billadm-color-major-warm: #1E1E1C;
-  --billadm-color-minor-background: #252522;
-  --billadm-color-elevated: #2A2A28;
+  --billadm-color-major-warm: #1C1C1A;
+  --billadm-color-minor-background: #252523;
+  --billadm-color-elevated: #2E2E2C;
   --billadm-color-window-border: #3A3A38;
   --billadm-color-divider: #333330;
 

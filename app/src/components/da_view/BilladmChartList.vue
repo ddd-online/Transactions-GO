@@ -143,12 +143,11 @@ const handleDelete = async (chart: ChartDto) => {
 .chart-list {
   display: flex;
   flex-direction: column;
-  gap: var(--billadm-space-sm);
-  padding: var(--billadm-space-lg);
+  padding: var(--billadm-space-sm) 0;
 }
 
 .chart-list-add {
-  padding: 0 var(--billadm-space-sm);
+  padding: 0 var(--billadm-space-md);
   margin-bottom: var(--billadm-space-md);
 }
 
@@ -161,9 +160,9 @@ const handleDelete = async (chart: ChartDto) => {
   font-size: var(--billadm-size-text-caption);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
   color: var(--billadm-color-text-secondary);
-  padding: var(--billadm-space-xs) var(--billadm-space-sm);
+  padding: var(--billadm-space-xs) var(--billadm-space-md);
   margin-bottom: var(--billadm-space-xs);
 }
 
@@ -172,7 +171,6 @@ const handleDelete = async (chart: ChartDto) => {
   align-items: center;
   gap: var(--billadm-space-md);
   padding: var(--billadm-space-md);
-  border-radius: var(--billadm-radius-md);
   cursor: pointer;
   transition: all var(--billadm-transition-fast);
   color: var(--billadm-color-text-secondary);
@@ -198,12 +196,12 @@ const handleDelete = async (chart: ChartDto) => {
 }
 
 .chart-list-item.active {
-  background-color: rgba(45, 90, 39, 0.1);
+  background-color: var(--billadm-color-hover-bg);
   color: var(--billadm-color-primary);
 }
 
 .chart-list-item.active::before {
-  height: 24px;
+  height: 20px;
 }
 
 .chart-list-item-icon {
@@ -239,6 +237,6 @@ const handleDelete = async (chart: ChartDto) => {
 }
 
 .chart-list-item.active .chart-list-item-actions :deep(.ant-btn:hover) {
-  background-color: rgba(199, 62, 58, 0.1);
+  background-color: rgba(199, 62, 58, 0.08);
 }
 </style>

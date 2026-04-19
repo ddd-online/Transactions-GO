@@ -26,8 +26,6 @@ const showStatistics = computed(() => {
   height: 100%;
   width: 100%;
   padding: 0 16px;
-  background-color: var(--billadm-color-minor-background);
-  border-top: 1px solid var(--billadm-color-divider);
 }
 
 .bottom-bar > * {

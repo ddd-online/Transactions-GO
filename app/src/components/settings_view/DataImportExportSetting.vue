@@ -3,7 +3,11 @@
     <a-row :gutter="16">
       <!-- 导出区域 -->
       <a-col :span="12">
-        <a-card title="数据导出" :bordered="false" class="section-card">
+        <div class="section-card">
+          <div class="section-header">
+            <DownloadOutlined class="section-icon" />
+            <span>数据导出</span>
+          </div>
           <p class="section-desc">将一段时间内的消费记录导出为 JSON 文件</p>
 
           <a-form layout="vertical">
@@ -29,12 +33,16 @@
               导出消费记录
             </a-button>
           </div>
-        </a-card>
+        </div>
       </a-col>
 
       <!-- 导入区域 -->
       <a-col :span="12">
-        <a-card title="数据导入" :bordered="false" class="section-card">
+        <div class="section-card">
+          <div class="section-header">
+            <UploadOutlined class="section-icon" />
+            <span>数据导入</span>
+          </div>
           <p class="section-desc">从 JSON 文件导入消费记录到当前账本</p>
 
           <input
@@ -53,7 +61,7 @@
               选择文件导入
             </a-button>
           </div>
-        </a-card>
+        </div>
       </a-col>
     </a-row>
 
@@ -354,37 +362,50 @@ const confirmImport = async () => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: var(--billadm-color-minor-background);
+  border-radius: var(--billadm-radius-lg);
+  padding: var(--billadm-space-lg);
 }
 
-.section-card :deep(.ant-card-body) {
-  flex: 1;
+.section-header {
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  gap: var(--billadm-space-sm);
+  font-size: var(--billadm-size-text-body);
+  font-weight: 600;
+  color: var(--billadm-color-text-major);
+  margin-bottom: var(--billadm-space-sm);
+}
+
+.section-icon {
+  font-size: 16px;
+  color: var(--billadm-color-primary);
 }
 
 .section-desc {
-  color: var(--billadm-color-text-minor);
-  margin-bottom: 16px;
+  color: var(--billadm-color-text-secondary);
+  margin-bottom: var(--billadm-space-md);
+  font-size: var(--billadm-size-text-body-sm);
 }
 
 .card-footer {
   display: flex;
   justify-content: flex-end;
   margin-top: auto;
-  padding-top: 16px;
+  padding-top: var(--billadm-space-md);
 }
 
 .import-preview {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--billadm-space-md);
 }
 
 .preview-footer {
   display: flex;
   justify-content: flex-end;
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--billadm-color-window-border);
+  margin-top: var(--billadm-space-md);
+  padding-top: var(--billadm-space-md);
+  border-top: 1px solid var(--billadm-color-divider);
 }
 </style>

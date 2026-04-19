@@ -1,5 +1,5 @@
 <template>
-  <a-select @change="handleChange" style="width: 150px" :value="ledgerStore.currentLedgerName">
+  <a-select @change="handleChange" class="ledger-select" style="width: 150px" :value="ledgerStore.currentLedgerName">
     <a-select-option
         v-for="option in options"
         :key="option.value"
@@ -30,3 +30,30 @@ const handleChange = (value: SelectValue, _: DefaultOptionType | DefaultOptionTy
   ledgerStore.setCurrentLedger(value as string);
 };
 </script>
+
+<style scoped>
+.ledger-select :deep(.ant-select-selector) {
+  background-color: var(--billadm-color-primary);
+  border-color: var(--billadm-color-primary);
+  color: var(--billadm-color-text-inverse);
+}
+
+.ledger-select :deep(.ant-select-arrow) {
+  color: var(--billadm-color-text-inverse);
+}
+
+.ledger-select :deep(.ant-select-selection-item) {
+  color: var(--billadm-color-text-inverse);
+}
+
+.ledger-select :deep(.ant-select:not(.ant-select-disabled):hover .ant-select-selector) {
+  background-color: var(--billadm-color-primary-light);
+  border-color: var(--billadm-color-primary-light);
+}
+
+.ledger-select :deep(.ant-select-focused .ant-select-selector) {
+  background-color: var(--billadm-color-primary);
+  border-color: var(--billadm-color-primary) !important;
+  box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.2) !important;
+}
+</style>

@@ -107,30 +107,37 @@ const handleToggle = async (checked: boolean | string | number) => {
 .mcp-setting {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--billadm-space-lg);
 }
 
 .setting-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
+  gap: var(--billadm-space-xl);
+  padding: var(--billadm-space-md) 0;
+  border-bottom: 1px solid var(--billadm-color-divider);
+}
+
+.setting-row:last-child {
+  border-bottom: none;
 }
 
 .setting-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: var(--billadm-space-xs);
 }
 
 .info-label {
-  font-size: 14px;
+  font-size: var(--billadm-size-text-body);
+  font-weight: 500;
   color: var(--billadm-color-text-major);
 }
 
 .info-desc {
-  font-size: 12px;
-  color: var(--billadm-color-text-minor);
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
 }
 
 .status-indicator {
@@ -139,47 +146,47 @@ const handleToggle = async (checked: boolean | string | number) => {
 }
 
 .port-display {
-  font-size: 14px;
+  font-size: var(--billadm-size-text-body);
   font-family: monospace;
-  padding: 6px 12px;
+  padding: var(--billadm-space-xs) var(--billadm-space-md);
   background-color: var(--billadm-color-minor-background);
-  border-radius: 4px;
+  border-radius: var(--billadm-radius-md);
 }
 
 .config-section {
-  margin-top: 12px;
-  padding: 16px;
+  margin-top: var(--billadm-space-md);
+  padding: var(--billadm-space-lg);
   background-color: var(--billadm-color-minor-background);
-  border-radius: 8px;
+  border-radius: var(--billadm-radius-lg);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--billadm-space-md);
 }
 
 .config-title {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: var(--billadm-size-text-body);
+  font-weight: 600;
   color: var(--billadm-color-text-major);
 }
 
 .config-desc {
-  font-size: 12px;
-  color: var(--billadm-color-text-minor);
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
 }
 
 .config-desc code {
   font-family: monospace;
-  background-color: var(--billadm-color-icon-hover-bg);
-  padding: 2px 4px;
-  border-radius: 3px;
+  background-color: var(--billadm-color-hover-bg);
+  padding: 2px var(--billadm-space-xs);
+  border-radius: var(--billadm-radius-sm);
 }
 
 .config-code {
   background-color: #1e1e1e;
   color: #d4d4d4;
-  padding: 12px;
-  border-radius: 6px;
-  font-size: 12px;
+  padding: var(--billadm-space-md);
+  border-radius: var(--billadm-radius-md);
+  font-size: var(--billadm-size-text-caption);
   font-family: 'Consolas', 'Monaco', monospace;
   overflow-x: auto;
   margin: 0;
@@ -190,68 +197,68 @@ const handleToggle = async (checked: boolean | string | number) => {
 }
 
 .config-tip {
-  font-size: 12px;
-  color: var(--billadm-color-text-minor);
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
 }
 
 .tools-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--billadm-space-md);
 }
 
 .tool-item {
-  padding: 12px;
-  background-color: var(--billadm-color-icon-hover-bg);
-  border-radius: 6px;
+  padding: var(--billadm-space-md);
+  background-color: var(--billadm-color-hover-bg);
+  border-radius: var(--billadm-radius-md);
 }
 
 .tool-name {
-  font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 13px;
+  font-family: monospace;
+  font-size: var(--billadm-size-text-body-sm);
   font-weight: 500;
-  color: var(--billadm-color-text-major);
-  margin-bottom: 4px;
+  color: var(--billadm-color-primary);
+  margin-bottom: var(--billadm-space-xs);
 }
 
 .tool-desc {
-  font-size: 12px;
-  color: var(--billadm-color-text-minor);
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
 }
 
 .tool-params {
-  font-size: 11px;
-  color: var(--billadm-color-text-minor);
-  margin-top: 6px;
+  font-size: var(--billadm-size-text-small);
+  color: var(--billadm-color-text-secondary);
+  margin-top: var(--billadm-space-sm);
   line-height: 1.6;
 }
 
 .tool-params code {
-  font-family: 'Consolas', 'Monaco', monospace;
-  background-color: rgba(0, 0, 0, 0.1);
-  padding: 1px 4px;
-  border-radius: 3px;
+  font-family: monospace;
+  background-color: rgba(0, 0, 0, 0.08);
+  padding: 1px var(--billadm-space-xs);
+  border-radius: var(--billadm-radius-sm);
 }
 
 .tool-example {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  margin-top: var(--billadm-space-sm);
+  padding-top: var(--billadm-space-sm);
+  border-top: 1px dashed var(--billadm-color-divider);
 }
 
 .example-label {
-  font-size: 11px;
-  color: var(--billadm-color-text-minor);
-  margin-bottom: 4px;
+  font-size: var(--billadm-size-text-small);
+  color: var(--billadm-color-text-secondary);
+  margin-bottom: var(--billadm-space-xs);
 }
 
 .example-output {
   background-color: #1e1e1e;
   color: #d4d4d4;
-  padding: 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-family: 'Consolas', 'Monaco', monospace;
+  padding: var(--billadm-space-sm);
+  border-radius: var(--billadm-radius-md);
+  font-size: var(--billadm-size-text-small);
+  font-family: monospace;
   overflow-x: auto;
   margin: 0;
   line-height: 1.5;

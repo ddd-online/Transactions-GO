@@ -59,7 +59,6 @@ const navigate = (path: string) => {
   height: 100%;
   width: 100%;
   padding: 12px 8px;
-  background-color: var(--billadm-color-minor-background);
 }
 
 .app-left-bar-top {

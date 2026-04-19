@@ -77,36 +77,53 @@ const activeComponent = ref('category-tag');
 .settings-sidebar {
   flex: 0 0 200px;
   background-color: var(--billadm-color-minor-background);
-  border-right: 1px solid var(--billadm-color-window-border);
+  border-right: 1px solid var(--billadm-color-divider);
   overflow-y: auto;
-  padding: 12px 8px;
+  padding: var(--billadm-space-md) 0;
 }
 
 .settings-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .settings-list-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: 6px;
+  gap: var(--billadm-space-md);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all var(--billadm-transition-fast);
   color: var(--billadm-color-text-secondary);
+  position: relative;
+}
+
+.settings-list-item::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 0;
+  background-color: var(--billadm-color-primary);
+  border-radius: 0 2px 2px 0;
+  transition: height var(--billadm-transition-fast);
 }
 
 .settings-list-item:hover {
-  background-color: var(--billadm-color-icon-hover-bg);
+  background-color: var(--billadm-color-hover-bg);
+  color: var(--billadm-color-text-major);
 }
 
 .settings-list-item.active {
-  background-color: #ffffff;
+  background-color: var(--billadm-color-hover-bg);
   color: var(--billadm-color-primary);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.settings-list-item.active::before {
+  height: 20px;
 }
 
 .settings-list-item-icon {
@@ -114,11 +131,12 @@ const activeComponent = ref('category-tag');
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .settings-list-item-title {
-  font-size: 13px;
+  font-size: var(--billadm-size-text-body);
+  font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -127,7 +145,8 @@ const activeComponent = ref('category-tag');
 .settings-content {
   flex: 1;
   min-width: 0;
-  padding: 20px;
+  padding: var(--billadm-space-lg);
   overflow-y: auto;
+  background-color: var(--billadm-color-major-background);
 }
 </style>

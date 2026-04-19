@@ -39,7 +39,7 @@
     <a-float-button
       class="float-secondary"
       @click="openTrFilterModal = true"
-      :badge="{ count: trQueryConditionStore.conditionLen, color: 'blue' }"
+      :badge="{ count: trQueryConditionStore.conditionLen, color: 'var(--billadm-color-primary)' }"
     >
       <template #icon>
         <FilterOutlined />
@@ -467,44 +467,45 @@ watch(() => ledgerStore.currentLedgerId, () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--billadm-space-lg) var(--billadm-space-xl);
-  gap: var(--billadm-space-lg);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  gap: var(--billadm-space-md);
 }
 
 .tr-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--billadm-space-lg);
-  padding: var(--billadm-space-md) var(--billadm-space-lg);
-  background-color: var(--billadm-color-major-background);
-  border: 1px solid var(--billadm-color-window-border);
-  border-radius: var(--billadm-radius-lg);
+  gap: var(--billadm-space-md);
+  padding: var(--billadm-space-sm) 0;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--billadm-color-divider);
 }
 
 .tr-toolbar-left {
   display: flex;
-  gap: var(--billadm-space-md);
+  gap: var(--billadm-space-sm);
+  align-items: center;
 }
 
 .tr-toolbar-right {
   display: flex;
-  gap: var(--billadm-space-md);
+  gap: var(--billadm-space-sm);
+  align-items: center;
 }
 
 .tr-content {
   flex: 1;
   overflow-y: auto;
-  background-color: var(--billadm-color-major-background);
-  border: 1px solid var(--billadm-color-window-border);
-  border-radius: var(--billadm-radius-lg);
+  overflow-x: hidden;
+  min-height: 0;
 }
 
 .tr-footer {
   flex-shrink: 0;
   display: flex;
   justify-content: center;
-  padding-top: var(--billadm-space-lg);
+  padding-top: var(--billadm-space-md);
+  padding-bottom: var(--billadm-space-sm);
 }
 
 .float-primary {
@@ -529,6 +530,10 @@ watch(() => ledgerStore.currentLedgerId, () => {
   margin-bottom: var(--billadm-space-xl);
 }
 
+.sort-list :deep(.ant-btn-link) {
+  color: var(--billadm-color-primary);
+}
+
 .sort-item {
   display: flex;
   align-items: center;
@@ -540,7 +545,7 @@ watch(() => ledgerStore.currentLedgerId, () => {
   height: 24px;
   border-radius: var(--billadm-radius-full);
   background-color: var(--billadm-color-primary);
-  color: white;
+  color: var(--billadm-color-text-inverse);
   display: flex;
   align-items: center;
   justify-content: center;

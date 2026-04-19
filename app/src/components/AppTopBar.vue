@@ -7,25 +7,20 @@
       <h1 class="page-title">{{ currentPageTitle }}</h1>
     </div>
     <div class="menu-bar-right">
-      <a-switch
-          v-model:checked="isDark"
-          size="small"
-          class="theme-switch"
-          @change="toggleTheme"
-      />
+      <a-switch v-model:checked="isDark" size="small" class="theme-switch" @change="toggleTheme" />
       <a-button type="text" class="window-btn" @click="onMinimize">
         <template #icon>
-          <LineOutlined/>
+          <LineOutlined />
         </template>
       </a-button>
       <a-button type="text" class="window-btn" @click="onMaximize">
         <template #icon>
-          <BorderOutlined/>
+          <BorderOutlined />
         </template>
       </a-button>
       <a-button class="window-btn close-btn" type="text" @click="onClose">
         <template #icon>
-          <CloseOutlined/>
+          <CloseOutlined />
         </template>
       </a-button>
     </div>
@@ -33,10 +28,10 @@
 </template>
 
 <script setup lang="ts">
-import {computed} from 'vue';
-import {BorderOutlined, CloseOutlined, LineOutlined} from "@ant-design/icons-vue";
-import {useThemeStore} from "@/stores/themeStore.ts";
-import {useRoute} from "vue-router";
+import { computed } from 'vue';
+import { BorderOutlined, CloseOutlined, LineOutlined } from "@ant-design/icons-vue";
+import { useThemeStore } from "@/stores/themeStore.ts";
+import { useRoute } from "vue-router";
 
 const themeStore = useThemeStore();
 const route = useRoute();
@@ -75,10 +70,17 @@ const onClose = () => {
   height: 100%;
   width: 100%;
   padding: 0 12px;
-  background-color: var(--billadm-color-major-background);
+  background-color: var(--billadm-color-elevated);
 }
 
-.menu-bar > * {
+.menu-bar-left,
+.menu-bar-center,
+.menu-bar-right {
+  -webkit-app-region: drag;
+  pointer-events: auto;
+}
+
+.menu-bar-right>* {
   -webkit-app-region: no-drag;
 }
 

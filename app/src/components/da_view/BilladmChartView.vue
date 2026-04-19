@@ -332,23 +332,22 @@ const formatAmount = (amount: number) => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  border-radius: 8px;
-  overflow: hidden;
 }
 
 .chart-view-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--billadm-color-window-border);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  border-bottom: 1px solid var(--billadm-color-divider);
   flex-shrink: 0;
+  background-color: var(--billadm-color-major-background);
 }
 
 .chart-view-title {
   margin: 0;
-  font-size: 16px;
-  font-weight: 500;
+  font-size: var(--billadm-size-text-title-sm);
+  font-weight: 600;
   color: var(--billadm-color-text-major);
 }
 
@@ -364,7 +363,7 @@ const formatAmount = (amount: number) => {
 
 .chart-view-content {
   flex: 1;
-  padding: 16px;
+  padding: var(--billadm-space-lg);
   min-height: 0;
   display: flex;
   align-items: center;
@@ -390,20 +389,20 @@ const formatAmount = (amount: number) => {
 .chart-view-footer {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  padding: 12px 16px;
-  border-top: 1px solid var(--billadm-color-window-border);
-  background-color: var(--billadm-color-minor-background);
+  gap: var(--billadm-space-lg);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  border-top: 1px solid var(--billadm-color-divider);
+  background-color: var(--billadm-color-major-background);
 }
 
 .line-sum-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--billadm-space-sm);
 }
 
 .line-sum-value {
-  font-size: 14px;
+  font-size: var(--billadm-size-text-body);
   font-weight: 500;
   color: var(--billadm-color-text-major);
 }

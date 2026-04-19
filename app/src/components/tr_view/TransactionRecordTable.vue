@@ -82,13 +82,13 @@ const columns: ColumnsType = [
   {
     title: '日期',
     dataIndex: 'transactionAt',
-    width: 80,
+    width: 100,
     align: 'center'
   },
   {
     title: '类型',
     dataIndex: 'transactionType',
-    width: 80,
+    width: 100,
     align: 'center'
   },
   {
@@ -110,13 +110,19 @@ const columns: ColumnsType = [
   {
     title: '金额',
     dataIndex: 'price',
-    width: 120,
+    width: 110,
     align: 'right'
+  },
+  {
+    title: '标记',
+    dataIndex: 'flags',
+    width: 100,
+    align: 'center'
   },
   {
     title: '操作',
     dataIndex: 'action',
-    width: 140,
+    width: 160,
     align: 'center'
   }
 ];
@@ -143,12 +149,16 @@ const handleDelete = (record: TransactionRecord) => {
 
 <style scoped>
 .transaction-table {
-  border-radius: var(--billadm-radius-lg);
-  overflow: hidden;
+  width: 100%;
+  overflow-x: hidden;
 }
 
 .transaction-table :deep(.ant-table) {
   background: transparent;
+}
+
+.transaction-table :deep(.ant-table-wrapper) {
+  padding: var(--billadm-space-md) 0 0 0;
 }
 
 .transaction-table :deep(.ant-table-thead > tr > th) {
@@ -159,8 +169,16 @@ const handleDelete = (record: TransactionRecord) => {
   letter-spacing: 0.04em;
   color: var(--billadm-color-text-secondary);
   background-color: var(--billadm-color-minor-background);
-  border-bottom: 1px solid var(--billadm-color-window-border);
-  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  border-bottom: 1px solid var(--billadm-color-divider);
+  border-right: 1px solid var(--billadm-color-divider);
+  padding: var(--billadm-space-sm) var(--billadm-space-md);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.transaction-table :deep(.ant-table-thead > tr > th:last-child) {
+  border-right: none;
 }
 
 .transaction-table :deep(.ant-table-tbody > tr > td) {
@@ -168,7 +186,7 @@ const handleDelete = (record: TransactionRecord) => {
   font-size: var(--billadm-size-text-body);
   color: var(--billadm-color-text-major);
   border-bottom: 1px solid var(--billadm-color-divider);
-  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  padding: var(--billadm-space-sm) var(--billadm-space-md);
 }
 
 .transaction-table :deep(.ant-table-tbody > tr:hover > td) {

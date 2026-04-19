@@ -14,7 +14,7 @@
     </div>
 
     <!-- 主内容区 -->
-    <a-card class="da-main" :body-style="{ padding: '0', display: 'flex', height: '100%' }">
+    <div class="da-main">
       <!-- 左侧图表列表 -->
       <div class="da-sidebar">
         <billadm-chart-list
@@ -43,7 +43,7 @@
           <a-empty description="请选择一个图表" />
         </div>
       </div>
-    </a-card>
+    </div>
   </div>
 </template>
 
@@ -348,43 +348,43 @@ watch(
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--billadm-space-lg) var(--billadm-space-xl);
-  gap: var(--billadm-space-lg);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  gap: var(--billadm-space-md);
 }
 
 .da-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: var(--billadm-space-lg);
-  padding: var(--billadm-space-md) var(--billadm-space-lg);
-  background-color: var(--billadm-color-major-background);
-  border: 1px solid var(--billadm-color-window-border);
-  border-radius: var(--billadm-radius-lg);
+  gap: var(--billadm-space-md);
+  padding: var(--billadm-space-sm) 0;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--billadm-color-divider);
 }
 
 .da-toolbar-left {
   display: flex;
-  gap: var(--billadm-space-md);
+  gap: var(--billadm-space-sm);
+  align-items: center;
 }
 
 .da-toolbar-right {
   display: flex;
-  gap: var(--billadm-space-md);
+  gap: var(--billadm-space-sm);
+  align-items: center;
 }
 
 .da-main {
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  border-radius: var(--billadm-radius-lg);
-  border: 1px solid var(--billadm-color-window-border);
+  display: flex;
 }
 
 .da-sidebar {
   flex: 0 0 220px;
   background-color: var(--billadm-color-minor-background);
-  border-right: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-lg) 0 0 var(--billadm-radius-lg);
   overflow-y: auto;
 }
 
@@ -393,6 +393,7 @@ watch(
   min-width: 0;
   overflow-y: auto;
   background-color: var(--billadm-color-major-background);
+  border-radius: 0 var(--billadm-radius-lg) var(--billadm-radius-lg) 0;
 }
 
 .da-empty {

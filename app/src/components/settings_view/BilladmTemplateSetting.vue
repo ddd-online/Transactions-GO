@@ -158,57 +158,50 @@ onMounted(() => {
 }
 
 .setting-header {
-  margin-bottom: 16px;
+  margin-bottom: var(--billadm-space-md);
 }
 
 .setting-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--billadm-color-text-primary);
+  font-size: var(--billadm-size-text-title-sm);
+  font-weight: 600;
+  color: var(--billadm-color-text-major);
 }
 
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--billadm-space-xs);
 }
 
 .action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   font-size: 12px;
   cursor: pointer;
   color: var(--billadm-color-text-secondary);
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 4px;
-  transition: all 0.2s;
+  border-radius: var(--billadm-radius-md);
+  transition: all var(--billadm-transition-fast);
 }
 
 .action-btn:hover:not(.disabled) {
-  color: var(--billadm-color-primary, #1890ff);
-  background-color: var(--billadm-color-icon-hover-bg);
-  border-color: var(--billadm-color-primary, #1890ff);
+  color: var(--billadm-color-primary);
+  background-color: var(--billadm-color-hover-bg);
 }
 
 .action-btn.disabled {
-  color: var(--billadm-color-text-disabled, #ccc);
+  color: var(--billadm-color-text-disabled);
   cursor: not-allowed;
   border-color: transparent;
   background: transparent;
 }
 
-.action-btn.delete-btn {
-  color: #ff4d4f;
-  border-color: transparent;
-}
-
 .action-btn.delete-btn:hover {
-  color: #fff;
-  background-color: #ff4d4f;
-  border-color: #ff4d4f;
+  color: var(--billadm-color-expense);
+  background-color: rgba(199, 62, 58, 0.08);
 }
 </style>

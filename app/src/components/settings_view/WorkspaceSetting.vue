@@ -57,32 +57,35 @@ const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
 .workspace-setting {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--billadm-space-lg);
 }
 
 .workspace-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--billadm-space-sm);
 }
 
 .info-label {
-  font-size: 14px;
-  color: var(--billadm-color-text-minor);
+  font-size: var(--billadm-size-text-caption);
+  font-weight: 500;
+  color: var(--billadm-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .info-value {
-  font-size: 16px;
+  font-size: var(--billadm-size-text-body);
   color: var(--billadm-color-text-major);
   word-break: break-all;
-  padding: 12px;
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
   background-color: var(--billadm-color-minor-background);
-  border-radius: 6px;
+  border-radius: var(--billadm-radius-md);
   font-family: monospace;
 }
 
 .workspace-actions {
   display: flex;
-  gap: 12px;
+  gap: var(--billadm-space-md);
 }
 </style>
