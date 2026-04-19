@@ -1,32 +1,47 @@
 <template>
   <div class="data-import-export">
-    <a-row :gutter="16">
+    <div class="setting-header">
+      <span class="setting-title">数据导入导出</span>
+      <span class="setting-desc">将消费记录导出为 JSON 文件，或从 JSON 文件导入</span>
+    </div>
+
+    <a-row :gutter="20" class="content-row">
       <!-- 导出区域 -->
       <a-col :span="12">
         <div class="section-card">
-          <div class="section-header">
-            <DownloadOutlined class="section-icon" />
-            <span>数据导出</span>
+          <div class="card-header">
+            <div class="card-icon-wrap export">
+              <DownloadOutlined class="card-icon" />
+            </div>
+            <span class="card-title">数据导出</span>
           </div>
-          <p class="section-desc">将一段时间内的消费记录导出为 JSON 文件</p>
 
-          <a-form layout="vertical">
-            <a-row :gutter="8">
-              <a-col :span="12">
-                <a-form-item label="开始时间">
-                  <a-date-picker v-model:value="exportStartTime" style="width: 100%" />
-                </a-form-item>
-              </a-col>
-              <a-col :span="12">
-                <a-form-item label="结束时间">
-                  <a-date-picker v-model:value="exportEndTime" style="width: 100%" />
-                </a-form-item>
-              </a-col>
-            </a-row>
-          </a-form>
+          <p class="card-desc">将一段时间内的消费记录导出为 JSON 文件</p>
+
+          <div class="form-area">
+            <a-form layout="vertical">
+              <a-row :gutter="12">
+                <a-col :span="12">
+                  <a-form-item label="开始时间" class="custom-label">
+                    <a-date-picker v-model:value="exportStartTime" style="width: 100%" />
+                  </a-form-item>
+                </a-col>
+                <a-col :span="12">
+                  <a-form-item label="结束时间" class="custom-label">
+                    <a-date-picker v-model:value="exportEndTime" style="width: 100%" />
+                  </a-form-item>
+                </a-col>
+              </a-row>
+            </a-form>
+          </div>
 
           <div class="card-footer">
-            <a-button type="primary" :loading="exportLoading" @click="handleExport">
+            <a-button
+              type="primary"
+              :loading="exportLoading"
+              :disabled="!ledgerStore.currentLedgerId"
+              @click="handleExport"
+            >
               <template #icon>
                 <DownloadOutlined />
               </template>
@@ -39,24 +54,35 @@
       <!-- 导入区域 -->
       <a-col :span="12">
         <div class="section-card">
-          <div class="section-header">
-            <UploadOutlined class="section-icon" />
-            <span>数据导入</span>
+          <div class="card-header">
+            <div class="card-icon-wrap import">
+              <UploadOutlined class="card-icon" />
+            </div>
+            <span class="card-title">数据导入</span>
           </div>
-          <p class="section-desc">从 JSON 文件导入消费记录到当前账本</p>
 
-          <input
-            type="file"
-            ref="fileInputRef"
-            accept=".json"
-            style="display: none"
-            @change="handleFileChange"
-          />
+          <p class="card-desc">从 JSON 文件导入消费记录到当前账本</p>
+
+          <div class="file-area">
+            <input
+              type="file"
+              ref="fileInputRef"
+              accept=".json"
+              style="display: none"
+              @change="handleFileChange"
+            />
+
+            <div class="file-drop-zone" @click="handleImportSelect">
+              <CloudUploadOutlined class="drop-icon" />
+              <span class="drop-text">点击选择 JSON 文件</span>
+              <span class="drop-hint">支持 .json 格式</span>
+            </div>
+          </div>
 
           <div class="card-footer">
-            <a-button type="primary" @click="handleImportSelect">
+            <a-button @click="handleImportSelect">
               <template #icon>
-                <UploadOutlined />
+                <FileSearchOutlined />
               </template>
               选择文件导入
             </a-button>
@@ -113,7 +139,12 @@
         <div class="preview-footer">
           <a-space>
             <a-button @click="importPreviewVisible = false">取消</a-button>
-            <a-button type="primary" :loading="importLoading" @click="confirmImport">
+            <a-button
+              type="primary"
+              :loading="importLoading"
+              :disabled="!ledgerStore.currentLedgerId"
+              @click="confirmImport"
+            >
               确认导入
             </a-button>
           </a-space>
@@ -125,7 +156,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { DownloadOutlined, UploadOutlined } from '@ant-design/icons-vue'
+import {
+  DownloadOutlined,
+  UploadOutlined,
+  CloudUploadOutlined,
+  FileSearchOutlined
+} from '@ant-design/icons-vue'
 import { message } from 'ant-design-vue'
 import type { TransactionRecord } from '@/types/billadm'
 import { useLedgerStore } from '@/stores/ledgerStore'
@@ -177,9 +213,9 @@ const getTypeColor = (type: string) => {
   const colorMap: Record<string, string> = {
     income: 'green',
     expense: 'red',
-    transfer: 'orange',
+    transfer: 'blue',
   }
-  return colorMap[type] || 'blue'
+  return colorMap[type] || 'default'
 }
 
 const getTypeLabel = (type: string) => {
@@ -355,44 +391,145 @@ const confirmImport = async () => {
 
 <style scoped>
 .data-import-export {
+  display: flex;
+  flex-direction: column;
+  gap: var(--billadm-space-xl);
+}
+
+.setting-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--billadm-space-xs);
+}
+
+.setting-title {
+  font-size: var(--billadm-size-text-title-sm);
+  font-weight: 600;
+  color: var(--billadm-color-text-major);
+}
+
+.setting-desc {
+  font-size: var(--billadm-size-text-body-sm);
+  color: var(--billadm-color-text-secondary);
+}
+
+.content-row {
   width: 100%;
 }
 
 .section-card {
-  height: 100%;
   display: flex;
   flex-direction: column;
+  gap: var(--billadm-space-md);
+  height: 100%;
+  min-height: 320px;
   background-color: var(--billadm-color-minor-background);
   border-radius: var(--billadm-radius-lg);
   padding: var(--billadm-space-lg);
 }
 
-.section-header {
+.card-header {
   display: flex;
   align-items: center;
-  gap: var(--billadm-space-sm);
-  font-size: var(--billadm-size-text-body);
-  font-weight: 600;
-  color: var(--billadm-color-text-major);
-  margin-bottom: var(--billadm-space-sm);
+  gap: var(--billadm-space-md);
 }
 
-.section-icon {
-  font-size: 16px;
+.card-icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--billadm-radius-md);
+}
+
+.card-icon-wrap.export {
+  background-color: rgba(45, 90, 39, 0.1);
   color: var(--billadm-color-primary);
 }
 
-.section-desc {
-  color: var(--billadm-color-text-secondary);
-  margin-bottom: var(--billadm-space-md);
+.card-icon-wrap.import {
+  background-color: rgba(201, 162, 39, 0.1);
+  color: var(--billadm-color-accent);
+}
+
+.card-icon {
+  font-size: 18px;
+}
+
+.card-title {
+  font-size: var(--billadm-size-text-body);
+  font-weight: 600;
+  color: var(--billadm-color-text-major);
+}
+
+.card-desc {
   font-size: var(--billadm-size-text-body-sm);
+  color: var(--billadm-color-text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.form-area {
+  flex: 1;
+}
+
+.form-area :deep(.ant-form-item) {
+  margin-bottom: 0;
+}
+
+.form-area :deep(.ant-form-item-label > label) {
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
+}
+
+.file-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.file-drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--billadm-space-sm);
+  width: 100%;
+  padding: var(--billadm-space-xl);
+  background-color: var(--billadm-color-major-background);
+  border: 2px dashed var(--billadm-color-divider);
+  border-radius: var(--billadm-radius-md);
+  cursor: pointer;
+  transition: all var(--billadm-transition-fast);
+}
+
+.file-drop-zone:hover {
+  border-color: var(--billadm-color-primary);
+  background-color: var(--billadm-color-hover-bg);
+}
+
+.drop-icon {
+  font-size: 32px;
+  color: var(--billadm-color-text-disabled);
+}
+
+.drop-text {
+  font-size: var(--billadm-size-text-body);
+  color: var(--billadm-color-text-major);
+}
+
+.drop-hint {
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
 }
 
 .card-footer {
   display: flex;
   justify-content: flex-end;
-  margin-top: auto;
   padding-top: var(--billadm-space-md);
+  margin-top: auto;
 }
 
 .import-preview {
@@ -407,5 +544,14 @@ const confirmImport = async () => {
   margin-top: var(--billadm-space-md);
   padding-top: var(--billadm-space-md);
   border-top: 1px solid var(--billadm-color-divider);
+}
+
+/* 表头列间分割线 */
+:deep(.ant-table-thead > tr > th) {
+  border-right: 1px solid var(--billadm-color-divider);
+}
+
+:deep(.ant-table-thead > tr > th:last-child) {
+  border-right: none;
 }
 </style>
