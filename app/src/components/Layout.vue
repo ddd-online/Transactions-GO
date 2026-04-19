@@ -19,14 +19,12 @@
 
         <!-- 内容区域 -->
         <main class="app-content">
-          <router-view />
+          <router-view class="app-router-view" />
+          <footer class="app-footer">
+            <app-bottom-bar />
+          </footer>
         </main>
       </div>
-
-      <!-- 底部状态栏 -->
-      <footer class="app-footer">
-        <app-bottom-bar />
-      </footer>
     </div>
   </div>
 </template>
@@ -117,11 +115,16 @@ onMounted(initWorkspace);
 
 /* 内容区域 - 主工作区，温暖的工作桌面 */
 .app-content {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   background-color: var(--billadm-color-major-warm);
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+}
+
+.app-router-view {
+  flex: 1;
+  overflow: auto;
 }
 
 /* 底部状态栏 - 信息汇总 */
