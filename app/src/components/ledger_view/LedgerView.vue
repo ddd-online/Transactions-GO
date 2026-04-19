@@ -177,8 +177,8 @@ const handleOk = async () => {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: var(--billadm-space-xl) var(--billadm-space-2xl);
-  gap: var(--billadm-space-xl);
+  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  gap: var(--billadm-space-md);
 }
 
 /* ========== View Header ========== */
