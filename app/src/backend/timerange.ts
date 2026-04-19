@@ -16,20 +16,6 @@ export function setToEndOfDay(date: Dayjs): Dayjs {
 }
 
 /**
- * 获取本月第一天
- */
-export function getStartDayOfMonth(date: Dayjs): Dayjs {
-    return date.startOf('month');
-}
-
-/**
- * 获取本月最后一天
- */
-export function getLastDayOfMonth(date: Dayjs): Dayjs {
-    return date.endOf('month');
-}
-
-/**
  * 获取今天的时间范围 [开始, 结束]
  */
 export function getTodayRange(): [Dayjs, Dayjs] {

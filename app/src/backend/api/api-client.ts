@@ -39,7 +39,7 @@ function checkSuccess(result: Result, prefix?: string): void {
     }
 }
 
-export const api = {
+const api = {
     async get<T = any>(url: string, errorPrefix?: string): Promise<T> {
         try {
             const client = await getApiClient();
