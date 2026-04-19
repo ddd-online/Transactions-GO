@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>欢迎使用 Transactions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
   <script src="https://unpkg.com/ant-design-vue@4.2.6/dist/antd.min.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/ant-design-vue@4.2.6/dist/reset.css">
@@ -25,9 +28,12 @@
       --billadm-shadow-sm: 0 1px 2px rgba(45, 90, 39, 0.06);
       --billadm-shadow-md: 0 4px 12px rgba(45, 90, 39, 0.10);
       --billadm-shadow-lg: 0 8px 24px rgba(45, 90, 39, 0.15);
+      --billadm-shadow-xl: 0 16px 48px rgba(45, 90, 39, 0.20);
       --billadm-radius-md: 6px;
       --billadm-radius-lg: 10px;
+      --billadm-radius-xl: 16px;
       --billadm-transition-fast: 150ms ease;
+      --billadm-transition-normal: 250ms ease;
       --billadm-color-hover-bg: rgba(45, 90, 39, 0.06);
     }
 
@@ -37,70 +43,206 @@
       box-sizing: border-box;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--billadm-color-major-warm);
-      height: 100vh;
+      min-height: 100vh;
       overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
+    }
+
+    /* Atmospheric background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(45, 90, 39, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(139, 115, 85, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Subtle grain texture */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.015;
+      pointer-events: none;
+      z-index: 0;
     }
 
     #app {
       width: 100%;
       height: 100%;
       overflow: hidden;
+      position: relative;
+      z-index: 1;
     }
 
-    .welcome-card {
-      background: var(--billadm-color-major-background);
-      border: 1px solid var(--billadm-color-window-border);
-      border-radius: var(--billadm-radius-lg);
-      box-shadow: var(--billadm-shadow-lg);
-      padding: 48px 56px;
-      text-align: center;
-      height: 100%;
-      max-height: 600px;
-      overflow: hidden;
+    .welcome-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      height: 100vh;
+      opacity: 0;
+      animation: fadeIn 0.6s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Left panel - branding */
+    .branding-panel {
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
+      padding: 64px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .logo {
-      width: 72px;
-      height: 72px;
-      margin-bottom: 20px;
+    .branding-panel::before {
+      content: '';
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(45, 90, 39, 0.06) 0%, transparent 70%);
+      pointer-events: none;
     }
 
-    .welcome-title {
-      font-size: 28px;
+    .logo-mark {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 32px;
+      animation: floatIn 0.8s ease 0.2s both;
+    }
+
+    @keyframes floatIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .brand-title {
+      font-size: 32px;
       font-weight: 600;
       color: var(--billadm-color-text-major);
-      margin-bottom: 8px;
-      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+      letter-spacing: -1px;
+      animation: floatIn 0.8s ease 0.3s both;
     }
 
-    .welcome-subtitle {
-      font-size: 14px;
+    .brand-tagline {
+      font-size: 15px;
       color: var(--billadm-color-text-secondary);
-      margin-bottom: 32px;
+      line-height: 1.6;
+      max-width: 320px;
+      animation: floatIn 0.8s ease 0.4s both;
     }
 
-    .features {
+    /* Visual accent bars */
+    .accent-bars {
       display: flex;
+      gap: 8px;
+      margin-top: 48px;
+      animation: floatIn 0.8s ease 0.5s both;
+    }
+
+    .accent-bar {
+      width: 48px;
+      height: 4px;
+      border-radius: 2px;
+    }
+
+    .accent-bar:nth-child(1) { background: var(--billadm-color-primary); }
+    .accent-bar:nth-child(2) { background: var(--billadm-color-negative); }
+    .accent-bar:nth-child(3) { background: var(--billadm-color-accent); }
+    .accent-bar:nth-child(4) { background: var(--billadm-color-secondary); }
+
+    /* Right panel - action */
+    .action-panel {
+      display: flex;
+      flex-direction: column;
       justify-content: center;
-      gap: 40px;
-      margin-bottom: 36px;
+      padding: 64px;
+      background: var(--billadm-color-major-background);
+      border-left: 1px solid var(--billadm-color-divider);
     }
 
-    .feature-item {
-      text-align: center;
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--billadm-color-text-secondary);
+      margin-bottom: 16px;
+      opacity: 0;
+      animation: fadeIn 0.6s ease 0.6s forwards;
     }
 
-    .feature-icon {
+    .workspace-box {
+      position: relative;
+      padding: 28px 32px;
+      border: 1px solid var(--billadm-color-window-border);
+      border-radius: var(--billadm-radius-xl);
+      cursor: pointer;
+      transition:
+        transform var(--billadm-transition-normal),
+        box-shadow var(--billadm-transition-normal),
+        border-color var(--billadm-transition-fast);
+      background: var(--billadm-color-major-background);
+      max-width: 420px;
+      opacity: 0;
+      animation: fadeIn 0.6s ease 0.7s forwards;
+    }
+
+    .workspace-box:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--billadm-shadow-lg);
+      border-color: var(--billadm-color-primary);
+    }
+
+    .workspace-box:active {
+      transform: translateY(0);
+    }
+
+    .workspace-box-inner {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .workspace-icon {
       width: 44px;
       height: 44px;
       background: var(--billadm-color-minor-background);
@@ -108,82 +250,113 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      margin: 0 auto 10px;
-      font-size: 20px;
+      flex-shrink: 0;
+      transition: background var(--billadm-transition-fast);
+    }
+
+    .workspace-box:hover .workspace-icon {
+      background: var(--billadm-color-hover-bg);
+    }
+
+    .workspace-content {
+      flex: 1;
+      text-align: left;
+    }
+
+    .workspace-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--billadm-color-text-major);
+      margin-bottom: 4px;
+      transition: color var(--billadm-transition-fast);
+    }
+
+    .workspace-box:hover .workspace-title {
+      color: var(--billadm-color-primary);
+    }
+
+    .workspace-desc {
+      font-size: 13px;
+      color: var(--billadm-color-text-secondary);
+    }
+
+    .workspace-arrow {
+      width: 20px;
+      height: 20px;
+      opacity: 0;
+      transform: translateX(-8px);
+      transition:
+        opacity var(--billadm-transition-normal),
+        transform var(--billadm-transition-normal);
+    }
+
+    .workspace-box:hover .workspace-arrow {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .workspace-path {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--billadm-color-divider);
+      font-size: 12px;
+      color: var(--billadm-color-text-secondary);
+      word-break: break-all;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      background: var(--billadm-color-minor-background);
+      padding: 10px 12px;
+      border-radius: var(--billadm-radius-md);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-top: 32px;
+      max-width: 420px;
+      opacity: 0;
+      animation: fadeIn 0.6s ease 0.8s forwards;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--billadm-color-minor-background);
+      border-radius: var(--billadm-radius-md);
+      transition: background var(--billadm-transition-fast);
+    }
+
+    .feature-item:hover {
+      background: var(--billadm-color-hover-bg);
+    }
+
+    .feature-icon {
+      font-size: 18px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--billadm-color-major-background);
+      border-radius: var(--billadm-radius-sm);
     }
 
     .feature-text {
       font-size: 13px;
-      color: var(--billadm-color-text-secondary);
-    }
-
-    .workspace-section {
-      margin-top: 28px;
-      width: 100%;
-      max-width: 360px;
-    }
-
-    .workspace-label {
-      font-size: 14px;
       color: var(--billadm-color-text-major);
-      margin-bottom: 12px;
       font-weight: 500;
     }
 
-    .workspace-box {
-      padding: 16px 24px;
-      border: 1px dashed var(--billadm-color-window-border);
-      border-radius: var(--billadm-radius-md);
-      cursor: pointer;
-      transition: all var(--billadm-transition-fast);
-      background: var(--billadm-color-major-background);
-    }
-
-    .workspace-box:hover {
-      border-color: var(--billadm-color-primary);
-      background: var(--billadm-color-hover-bg);
-    }
-
-    .workspace-box-inner {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-
-    .workspace-box-text {
-      font-size: 14px;
-      color: var(--billadm-color-text-secondary);
-      transition: color var(--billadm-transition-fast);
-    }
-
-    .workspace-box:hover .workspace-box-text {
-      color: var(--billadm-color-primary);
-    }
-
-    .workspace-path {
-      font-size: 13px;
-      color: var(--billadm-color-text-secondary);
-      margin-top: 10px;
-      text-align: center;
-      word-break: break-all;
-      opacity: 0.8;
-    }
-
-    .intro-text {
-      font-size: 13px;
-      color: var(--billadm-color-text-secondary);
-      margin-top: 24px;
-      line-height: 1.6;
-      opacity: 0.8;
-    }
-
+    /* Window controls */
     .window-control {
       position: fixed;
-      top: 16px;
-      right: 16px;
+      top: 20px;
+      right: 20px;
       display: flex;
       gap: 8px;
+      z-index: 100;
     }
 
     .window-btn {
@@ -192,76 +365,124 @@
       border-radius: 50%;
       border: none;
       cursor: pointer;
-      transition: transform 0.15s ease;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+      opacity: 0.9;
     }
 
     .window-btn:hover {
-      transform: scale(1.1);
+      transform: scale(1.15);
+      opacity: 1;
     }
 
     .window-btn.minimize { background: #febc2e; }
     .window-btn.maximize { background: #28c840; }
     .window-btn.close { background: #ff5f57; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .welcome-container {
+        grid-template-columns: 1fr;
+      }
+
+      .branding-panel {
+        padding: 48px 32px 32px;
+        justify-content: flex-end;
+      }
+
+      .action-panel {
+        border-left: none;
+        border-top: 1px solid var(--billadm-color-divider);
+        padding: 32px;
+        justify-content: flex-start;
+      }
+
+      .accent-bars {
+        margin-top: 32px;
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
   </style>
 </head>
 <body>
   <div id="app">
-    <div class="welcome-card">
-      <svg class="logo" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="1024" height="1024" rx="200" fill="#F5F5F2"/>
-        <g transform="translate(160, 160)">
-          <rect x="32" y="100" width="640" height="112" rx="20" fill="#2D5A27"/>
-          <rect x="32" y="260" width="640" height="112" rx="20" fill="#C73E3A"/>
-          <rect x="32" y="420" width="640" height="112" rx="20" fill="#5A7FAA"/>
-          <g transform="translate(-47.871643, 54.561707)">
-            <polyline points="120,680 260,600 400,680 540,560 680,640" fill="none" stroke="#8B7355" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="77.87" cy="681" r="16" fill="#8B7355"/>
-            <circle cx="217.87" cy="601" r="16" fill="#8B7355"/>
-            <circle cx="357.87" cy="681" r="16" fill="#8B7355"/>
-            <circle cx="497.87" cy="561" r="16" fill="#8B7355"/>
-            <circle cx="637.87" cy="641" r="16" fill="#8B7355"/>
+    <div class="welcome-container">
+      <!-- Left: Branding -->
+      <div class="branding-panel">
+        <svg class="logo-mark" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="1024" height="1024" rx="200" fill="#F5F5F2"/>
+          <g transform="translate(160, 160)">
+            <rect x="32" y="100" width="640" height="112" rx="20" fill="#2D5A27"/>
+            <rect x="32" y="260" width="640" height="112" rx="20" fill="#C73E3A"/>
+            <rect x="32" y="420" width="640" height="112" rx="20" fill="#5A7FAA"/>
+            <g transform="translate(-47.871643, 54.561707)">
+              <polyline points="120,680 260,600 400,680 540,560 680,640" fill="none" stroke="#8B7355" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="77.87" cy="681" r="16" fill="#8B7355"/>
+              <circle cx="217.87" cy="601" r="16" fill="#8B7355"/>
+              <circle cx="357.87" cy="681" r="16" fill="#8B7355"/>
+              <circle cx="497.87" cy="561" r="16" fill="#8B7355"/>
+              <circle cx="637.87" cy="641" r="16" fill="#8B7355"/>
+            </g>
           </g>
-        </g>
-      </svg>
-      <h1 class="welcome-title">欢迎使用 Transactions</h1>
-      <p class="welcome-subtitle">简洁高效的个人财务管理工具</p>
+        </svg>
 
-      <div class="features">
-        <div class="feature-item">
-          <div class="feature-icon">📒</div>
-          <div class="feature-text">多账本管理</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">🏷️</div>
-          <div class="feature-text">分类标签</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">📊</div>
-          <div class="feature-text">数据分析</div>
-        </div>
-        <div class="feature-item">
-          <div class="feature-icon">🔒</div>
-          <div class="feature-text">本地存储</div>
+        <h1 class="brand-title">Transactions</h1>
+        <p class="brand-tagline">
+          简洁高效的个人财务管理工具<br>
+          多账本 · 分类标签 · 数据分析
+        </p>
+
+        <div class="accent-bars">
+          <div class="accent-bar"></div>
+          <div class="accent-bar"></div>
+          <div class="accent-bar"></div>
+          <div class="accent-bar"></div>
         </div>
       </div>
 
-      <div class="workspace-section">
-        <div class="workspace-label">请选择工作目录</div>
+      <!-- Right: Action -->
+      <div class="action-panel">
+        <div class="section-label">开始使用</div>
+
         <div class="workspace-box" @click="selectWorkspace">
           <div class="workspace-box-inner">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M2 4.5C2 3.67 2.67 3 3.5 3H7.5L9 5H16.5C17.33 5 18 5.67 18 6.5V14.5C18 15.33 17.33 16 16.5 16H3.5C2.67 16 2 15.33 2 14.5V4.5Z" stroke="#6B6B66" stroke-width="1.5" fill="none"/>
+            <div class="workspace-icon">
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+                <path d="M3 6C3 5.17 3.67 4.5 4.5 4.5H8.5L10 6H17.5C18.33 6 19 6.67 19 7.5V15.5C19 16.33 18.33 17 17.5 17H4.5C3.67 17 3 16.33 3 15.5V6Z" stroke="#6B6B66" stroke-width="1.5" fill="none"/>
+              </svg>
+            </div>
+            <div class="workspace-content">
+              <div class="workspace-title">选择工作目录</div>
+              <div class="workspace-desc">存储您的账本数据</div>
+            </div>
+            <svg class="workspace-arrow" viewBox="0 0 20 20" fill="none">
+              <path d="M7.5 5L12.5 10L7.5 15" stroke="#2D5A27" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
-            <span class="workspace-box-text">点击选择工作目录</span>
           </div>
           <div v-if="workspacePath" class="workspace-path">{{ workspacePath }}</div>
         </div>
-      </div>
 
-      <p class="intro-text">
-        工作目录用于存储您的账本数据<br>
-        选择一个空目录即可创建新的工作空间
-      </p>
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-icon">📒</div>
+            <span class="feature-text">多账本管理</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🏷️</div>
+            <span class="feature-text">分类标签</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📊</div>
+            <span class="feature-text">数据分析</span>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🔒</div>
+            <span class="feature-text">本地存储</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
