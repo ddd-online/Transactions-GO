@@ -1,19 +1,5 @@
 <template>
   <div class="ledger-view">
-    <!-- 页面标题区 -->
-    <header class="view-header">
-      <div class="view-header-left">
-        <h1 class="view-title">账本</h1>
-        <span class="view-count">{{ ledgerStore.ledgers.length }} 个账本</span>
-      </div>
-      <button class="create-btn" @click="openCreateModal">
-        <svg class="create-btn-icon" viewBox="0 0 20 20" fill="none">
-          <path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
-        </svg>
-        <span>新建账本</span>
-      </button>
-    </header>
-
     <!-- 账本网格 -->
     <div class="ledger-grid" v-if="ledgerStore.ledgers.length > 0">
       <article v-for="(ledger, index) in ledgerStore.ledgers" :key="ledger.id" class="ledger-card">
@@ -88,8 +74,15 @@
         </svg>
       </div>
       <h3 class="empty-state-title">暂无账本</h3>
-      <p class="empty-state-desc">点击右上角按钮创建你的第一个账本</p>
+      <p class="empty-state-desc">点击下方按钮创建你的第一个账本</p>
     </div>
+
+    <!-- 悬浮按钮 -->
+    <a-float-button type="primary" class="float-primary" @click="openCreateModal">
+      <template #icon>
+        <PlusOutlined />
+      </template>
+    </a-float-button>
 
     <!-- 新建/编辑账本弹窗 -->
     <a-modal :title="modalTitle" :open="modalVisible" :confirm-loading="confirmLoading" ok-text="确认" cancel-text="取消"
@@ -112,6 +105,7 @@ import { ref, reactive } from 'vue';
 import { useLedgerStore } from "@/stores/ledgerStore";
 import { formatTimestamp } from "@/backend/functions";
 import type { Ledger } from '@/types/billadm';
+import { PlusOutlined } from "@ant-design/icons-vue";
 
 const ledgerStore = useLedgerStore();
 
@@ -179,64 +173,6 @@ const handleOk = async () => {
   height: 100%;
   padding: var(--billadm-space-md) var(--billadm-space-lg);
   gap: var(--billadm-space-md);
-}
-
-/* ========== View Header ========== */
-.view-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-}
-
-.view-header-left {
-  display: flex;
-  align-items: baseline;
-  gap: var(--billadm-space-md);
-}
-
-.view-title {
-  font-size: var(--billadm-size-text-display-sm);
-  font-weight: var(--billadm-weight-semibold);
-  color: var(--billadm-color-text-major);
-  margin: 0;
-}
-
-.view-count {
-  font-size: var(--billadm-size-text-body-sm);
-  color: var(--billadm-color-text-secondary);
-}
-
-/* ========== Create Button ========== */
-.create-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 18px;
-  font-size: var(--billadm-size-text-body-sm);
-  font-weight: var(--billadm-weight-medium);
-  color: var(--billadm-color-text-inverse);
-  background-color: var(--billadm-color-primary);
-  border: none;
-  border-radius: var(--billadm-radius-md);
-  cursor: pointer;
-  transition: all var(--billadm-transition-fast);
-}
-
-.create-btn-icon {
-  width: 16px;
-  height: 16px;
-}
-
-.create-btn:hover {
-  background-color: var(--billadm-color-primary-light);
-  transform: translateY(-1px);
-  box-shadow: var(--billadm-shadow-sm);
-}
-
-.create-btn:active {
-  transform: translateY(0);
-  box-shadow: none;
 }
 
 /* ========== Ledger Grid ========== */
@@ -438,5 +374,11 @@ const handleOk = async () => {
 .ledger-form :deep(.ant-form-item-label > label) {
   font-weight: 500;
   color: var(--billadm-color-text-major);
+}
+
+/* ========== Floating Button ========== */
+.float-primary {
+  right: 48px;
+  bottom: 80px;
 }
 </style>
