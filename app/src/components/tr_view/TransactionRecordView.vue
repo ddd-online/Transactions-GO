@@ -1,18 +1,15 @@
 <template>
   <div class="tr-view">
-    <!-- 页面标题 + 工具栏同行 -->
-    <div class="page-header">
-      <h1 class="page-title">交易记录</h1>
-      <div class="tr-toolbar">
-        <div class="tr-toolbar-left">
-          <BilladmTimeRangePicker
-            v-model:time-range="trQueryConditionStore.timeRange"
-            v-model:time-range-type="trQueryConditionStore.timeRangeType"
-          />
-        </div>
-        <div class="tr-toolbar-right">
-          <billadm-ledger-select />
-        </div>
+    <!-- 工具栏 -->
+    <div class="tr-toolbar">
+      <div class="tr-toolbar-left">
+        <BilladmTimeRangePicker
+          v-model:time-range="trQueryConditionStore.timeRange"
+          v-model:time-range-type="trQueryConditionStore.timeRangeType"
+        />
+      </div>
+      <div class="tr-toolbar-right">
+        <billadm-ledger-select />
       </div>
     </div>
 
@@ -474,25 +471,7 @@ watch(() => ledgerStore.currentLedgerId, () => {
   gap: var(--billadm-space-lg);
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: var(--billadm-space-xl);
-  flex-shrink: 0;
-}
-
-.page-title {
-  font-family: var(--billadm-font-display);
-  font-size: var(--billadm-size-text-title);
-  font-weight: 600;
-  color: var(--billadm-color-text-major);
-  margin: 0;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-
 .tr-toolbar {
-  flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -501,7 +480,6 @@ watch(() => ledgerStore.currentLedgerId, () => {
   background-color: var(--billadm-color-major-background);
   border: 1px solid var(--billadm-color-window-border);
   border-radius: var(--billadm-radius-lg);
-  min-width: 0;
 }
 
 .tr-toolbar-left {

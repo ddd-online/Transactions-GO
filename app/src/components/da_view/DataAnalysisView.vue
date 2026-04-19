@@ -1,18 +1,15 @@
 <template>
   <div class="da-view">
-    <!-- 页面标题 + 工具栏同行 -->
-    <div class="page-header">
-      <h1 class="page-title">数据分析</h1>
-      <div class="da-toolbar">
-        <div class="da-toolbar-left">
-          <BilladmTimeRangePicker
-            v-model:time-range="trQueryConditionStore.timeRange"
-            v-model:time-range-type="trQueryConditionStore.timeRangeType"
-          />
-        </div>
-        <div class="da-toolbar-right">
-          <billadm-ledger-select />
-        </div>
+    <!-- 工具栏 -->
+    <div class="da-toolbar">
+      <div class="da-toolbar-left">
+        <BilladmTimeRangePicker
+          v-model:time-range="trQueryConditionStore.timeRange"
+          v-model:time-range-type="trQueryConditionStore.timeRangeType"
+        />
+      </div>
+      <div class="da-toolbar-right">
+        <billadm-ledger-select />
       </div>
     </div>
 
@@ -355,25 +352,7 @@ watch(
   gap: var(--billadm-space-lg);
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: var(--billadm-space-xl);
-  flex-shrink: 0;
-}
-
-.page-title {
-  font-family: var(--billadm-font-display);
-  font-size: var(--billadm-size-text-title);
-  font-weight: 600;
-  color: var(--billadm-color-text-major);
-  margin: 0;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-}
-
 .da-toolbar {
-  flex: 1;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -382,7 +361,6 @@ watch(
   background-color: var(--billadm-color-major-background);
   border: 1px solid var(--billadm-color-window-border);
   border-radius: var(--billadm-radius-lg);
-  min-width: 0;
 }
 
 .da-toolbar-left {

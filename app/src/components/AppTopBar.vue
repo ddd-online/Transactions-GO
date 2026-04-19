@@ -3,6 +3,9 @@
     <div class="menu-bar-left">
       <span class="app-title">Transactions</span>
     </div>
+    <div class="menu-bar-center">
+      <h1 class="page-title">{{ currentPageTitle }}</h1>
+    </div>
     <div class="menu-bar-right">
       <a-switch
           v-model:checked="isDark"
@@ -33,10 +36,18 @@
 import {computed} from 'vue';
 import {BorderOutlined, CloseOutlined, LineOutlined} from "@ant-design/icons-vue";
 import {useThemeStore} from "@/stores/themeStore.ts";
+import {useRoute} from "vue-router";
 
 const themeStore = useThemeStore();
+const route = useRoute();
 
 const isDark = computed(() => themeStore.mode === 'dark');
+
+const currentPageTitle = computed(() => {
+  const name = route.name as string | undefined;
+  if (!name) return '';
+  return name;
+});
 
 const toggleTheme = () => {
   themeStore.toggleTheme();
@@ -75,21 +86,40 @@ const onClose = () => {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1;
 }
 
 .app-title {
   font-family: var(--billadm-font-display);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
-  color: var(--billadm-color-text-major);
+  color: var(--billadm-color-text-secondary);
   margin: 0;
   letter-spacing: 0.02em;
+}
+
+.menu-bar-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.page-title {
+  font-family: var(--billadm-font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--billadm-color-text-major);
+  margin: 0;
+  letter-spacing: -0.01em;
 }
 
 .menu-bar-right {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex: 1;
+  justify-content: flex-end;
 }
 
 .theme-switch {

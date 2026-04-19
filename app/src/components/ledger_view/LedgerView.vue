@@ -1,8 +1,5 @@
 <template>
   <div class="ledger-view">
-    <!-- 页面标题 -->
-    <h1 class="page-title">我的账本</h1>
-
     <!-- 账本卡片列表 -->
     <div class="ledger-list">
       <div
@@ -164,15 +161,6 @@ const handleOk = async () => {
   padding: var(--billadm-space-xl);
   gap: var(--billadm-space-xl);
   overflow-y: auto;
-}
-
-.page-title {
-  font-family: var(--billadm-font-display);
-  font-size: var(--billadm-size-text-display-sm);
-  font-weight: 500;
-  color: var(--billadm-color-text-major);
-  margin: 0;
-  letter-spacing: -0.01em;
 }
 
 .ledger-list {
