@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>欢迎使用 Transactions</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap"
+    rel="stylesheet">
   <script src="https://unpkg.com/vue@3.4.21/dist/vue.global.prod.js"></script>
-  <script src="https://unpkg.com/ant-design-vue@4.2.6/dist/antd.min.js"></script>
-  <link rel="stylesheet" href="https://unpkg.com/ant-design-vue@4.2.6/dist/reset.css">
   <style>
     :root {
       --billadm-color-primary: #2D5A27;
@@ -43,10 +44,6 @@
       box-sizing: border-box;
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
     body {
       font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       background: var(--billadm-color-major-warm);
@@ -58,7 +55,6 @@
       position: relative;
     }
 
-    /* Atmospheric background */
     body::before {
       content: '';
       position: fixed;
@@ -67,13 +63,12 @@
       right: 0;
       bottom: 0;
       background:
-        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(45, 90, 39, 0.03) 0%, transparent 50%),
-        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(139, 115, 85, 0.04) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 60% at 20% 20%, rgba(45, 90, 39, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 80% at 80% 80%, rgba(139, 115, 85, 0.05) 0%, transparent 50%);
       pointer-events: none;
       z-index: 0;
     }
 
-    /* Subtle grain texture */
     body::after {
       content: '';
       position: fixed;
@@ -108,6 +103,7 @@
         opacity: 0;
         transform: translateY(12px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -117,36 +113,50 @@
     /* Left panel - branding */
     .branding-panel {
       display: flex;
-      flex-direction: column;
+      align-items: center;
       justify-content: center;
-      padding: 64px;
+      padding: 80px 72px;
       position: relative;
-      overflow: hidden;
     }
 
-    .branding-panel::before {
+    .branding-content {
+      display: flex;
+      flex-direction: column;
+      max-width: 400px;
+    }
+
+    /* Right panel - action with icon */
+    .action-panel {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 80px 64px;
+      background: var(--billadm-color-major-background);
+      border-left: 1px solid var(--billadm-color-divider);
+      position: relative;
+      text-align: center;
+    }
+
+    .action-panel::before {
       content: '';
       position: absolute;
-      top: -100px;
-      right: -100px;
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(45, 90, 39, 0.06) 0%, transparent 70%);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(ellipse 100% 80% at 50% 0%, rgba(45, 90, 39, 0.03) 0%, transparent 60%);
       pointer-events: none;
     }
 
-    .logo-mark {
-      width: 56px;
-      height: 56px;
-      margin-bottom: 32px;
-      animation: floatIn 0.8s ease 0.2s both;
-    }
 
     @keyframes floatIn {
       from {
         opacity: 0;
         transform: translateY(20px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -165,12 +175,11 @@
     .brand-tagline {
       font-size: 15px;
       color: var(--billadm-color-text-secondary);
-      line-height: 1.6;
-      max-width: 320px;
+      line-height: 1.7;
+      max-width: 300px;
       animation: floatIn 0.8s ease 0.4s both;
     }
 
-    /* Visual accent bars */
     .accent-bars {
       display: flex;
       gap: 8px;
@@ -184,174 +193,92 @@
       border-radius: 2px;
     }
 
-    .accent-bar:nth-child(1) { background: var(--billadm-color-primary); }
-    .accent-bar:nth-child(2) { background: var(--billadm-color-negative); }
-    .accent-bar:nth-child(3) { background: var(--billadm-color-accent); }
-    .accent-bar:nth-child(4) { background: var(--billadm-color-secondary); }
+    .accent-bar:nth-child(1) {
+      background: var(--billadm-color-primary);
+    }
 
-    /* Right panel - action */
-    .action-panel {
-      display: flex;
-      flex-direction: column;
+    .accent-bar:nth-child(2) {
+      background: var(--billadm-color-negative);
+    }
+
+    .accent-bar:nth-child(3) {
+      background: var(--billadm-color-accent);
+    }
+
+    .accent-bar:nth-child(4) {
+      background: var(--billadm-color-secondary);
+    }
+
+    /* Primary CTA Button - "开始使用" */
+    .cta-button {
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
-      padding: 64px;
-      background: var(--billadm-color-major-background);
-      border-left: 1px solid var(--billadm-color-divider);
-    }
-
-    .section-label {
-      font-size: 11px;
+      gap: 10px;
+      padding: 14px 36px;
+      background: var(--billadm-color-primary);
+      color: #fff;
+      font-size: 15px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      color: var(--billadm-color-text-secondary);
-      margin-bottom: 16px;
-      opacity: 0;
-      animation: fadeIn 0.6s ease 0.6s forwards;
-    }
-
-    .workspace-box {
-      position: relative;
-      padding: 28px 32px;
-      border: 1px solid var(--billadm-color-window-border);
-      border-radius: var(--billadm-radius-xl);
+      border: none;
+      border-radius: var(--billadm-radius-lg);
       cursor: pointer;
       transition:
         transform var(--billadm-transition-normal),
         box-shadow var(--billadm-transition-normal),
-        border-color var(--billadm-transition-fast);
-      background: var(--billadm-color-major-background);
-      max-width: 420px;
+        background var(--billadm-transition-fast);
+      box-shadow: var(--billadm-shadow-md);
       opacity: 0;
-      animation: fadeIn 0.6s ease 0.7s forwards;
+      animation: fadeIn 0.6s ease 0.6s forwards;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.3px;
     }
 
-    .workspace-box:hover {
+    .cta-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .cta-button:hover {
+      background: var(--billadm-color-primary-light);
       transform: translateY(-2px);
-      box-shadow: var(--billadm-shadow-lg);
-      border-color: var(--billadm-color-primary);
+      box-shadow: var(--billadm-shadow-lg), 0 0 24px rgba(45, 90, 39, 0.18);
     }
 
-    .workspace-box:active {
-      transform: translateY(0);
+    .cta-button:active {
+      transform: translateY(0px);
     }
 
-    .workspace-box-inner {
-      display: flex;
-      align-items: center;
-      gap: 16px;
+    .cta-button svg {
+      transition: transform var(--billadm-transition-normal);
+      flex-shrink: 0;
     }
 
-    .workspace-icon {
-      width: 44px;
-      height: 44px;
+    .cta-button:hover svg {
+      transform: translateX(4px);
+    }
+
+    /* Workspace path display */
+    .workspace-path-box {
+      margin-top: 20px;
+      padding: 12px 18px;
       background: var(--billadm-color-minor-background);
       border-radius: var(--billadm-radius-md);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: background var(--billadm-transition-fast);
-    }
-
-    .workspace-box:hover .workspace-icon {
-      background: var(--billadm-color-hover-bg);
-    }
-
-    .workspace-content {
-      flex: 1;
-      text-align: left;
-    }
-
-    .workspace-title {
-      font-size: 15px;
-      font-weight: 500;
-      color: var(--billadm-color-text-major);
-      margin-bottom: 4px;
-      transition: color var(--billadm-transition-fast);
-    }
-
-    .workspace-box:hover .workspace-title {
-      color: var(--billadm-color-primary);
-    }
-
-    .workspace-desc {
-      font-size: 13px;
-      color: var(--billadm-color-text-secondary);
-    }
-
-    .workspace-arrow {
-      width: 20px;
-      height: 20px;
-      opacity: 0;
-      transform: translateX(-8px);
-      transition:
-        opacity var(--billadm-transition-normal),
-        transform var(--billadm-transition-normal);
-    }
-
-    .workspace-box:hover .workspace-arrow {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .workspace-path {
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid var(--billadm-color-divider);
       font-size: 12px;
       color: var(--billadm-color-text-secondary);
-      word-break: break-all;
       font-family: 'SF Mono', 'Consolas', monospace;
-      background: var(--billadm-color-minor-background);
-      padding: 10px 12px;
-      border-radius: var(--billadm-radius-md);
-    }
-
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin-top: 32px;
-      max-width: 420px;
+      word-break: break-all;
+      max-width: 300px;
       opacity: 0;
       animation: fadeIn 0.6s ease 0.8s forwards;
-    }
-
-    .feature-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 14px 16px;
-      background: var(--billadm-color-minor-background);
-      border-radius: var(--billadm-radius-md);
-      transition: background var(--billadm-transition-fast);
-    }
-
-    .feature-item:hover {
-      background: var(--billadm-color-hover-bg);
-    }
-
-    .feature-icon {
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--billadm-color-major-background);
-      border-radius: var(--billadm-radius-sm);
-      flex-shrink: 0;
-    }
-
-    .feature-icon svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    .feature-text {
-      font-size: 13px;
-      color: var(--billadm-color-text-major);
-      font-weight: 500;
+      border-left: 3px solid var(--billadm-color-primary);
     }
 
     /* Window controls */
@@ -379,9 +306,17 @@
       opacity: 1;
     }
 
-    .window-btn.minimize { background: #febc2e; }
-    .window-btn.maximize { background: #28c840; }
-    .window-btn.close { background: #ff5f57; }
+    .window-btn.minimize {
+      background: #febc2e;
+    }
+
+    .window-btn.maximize {
+      background: #28c840;
+    }
+
+    .window-btn.close {
+      background: #ff5f57;
+    }
 
     /* Responsive */
     @media (max-width: 900px) {
@@ -390,138 +325,92 @@
       }
 
       .branding-panel {
-        padding: 48px 32px 32px;
-        justify-content: flex-end;
+        padding: 60px 40px 40px;
+        justify-content: center;
+        user-select: none;
+        -webkit-app-region: drag;
+        pointer-events: auto;
+      }
+
+      .branding-content {
+        align-items: center;
+        text-align: center;
+      }
+
+      .brand-tagline {
+        text-align: center;
       }
 
       .action-panel {
         border-left: none;
         border-top: 1px solid var(--billadm-color-divider);
-        padding: 32px;
-        justify-content: flex-start;
+        padding: 48px 32px;
       }
 
       .accent-bars {
-        margin-top: 32px;
+        margin-top: 40px;
       }
 
-      .features-grid {
-        grid-template-columns: repeat(2, 1fr);
+      .cta-button {
+        padding: 12px 28px;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .branding-panel {
+        padding: 40px 24px 24px;
+      }
+
+      .brand-title {
+        font-size: 26px;
+      }
+
+      .action-panel {
+        padding: 36px 24px;
+      }
+
+      .workspace-path-box {
+        max-width: 260px;
+        font-size: 11px;
       }
     }
   </style>
 </head>
+
 <body>
   <div id="app">
     <div class="welcome-container">
       <!-- Left: Branding -->
       <div class="branding-panel">
-        <svg class="logo-mark" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="1024" height="1024" rx="200" fill="#F5F5F2"/>
-          <g transform="translate(160, 160)">
-            <rect x="32" y="100" width="640" height="112" rx="20" fill="#2D5A27"/>
-            <rect x="32" y="260" width="640" height="112" rx="20" fill="#C73E3A"/>
-            <rect x="32" y="420" width="640" height="112" rx="20" fill="#5A7FAA"/>
-            <g transform="translate(-47.871643, 54.561707)">
-              <polyline points="120,680 260,600 400,680 540,560 680,640" fill="none" stroke="#8B7355" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="77.87" cy="681" r="16" fill="#8B7355"/>
-              <circle cx="217.87" cy="601" r="16" fill="#8B7355"/>
-              <circle cx="357.87" cy="681" r="16" fill="#8B7355"/>
-              <circle cx="497.87" cy="561" r="16" fill="#8B7355"/>
-              <circle cx="637.87" cy="641" r="16" fill="#8B7355"/>
-            </g>
-          </g>
-        </svg>
+        <div class="branding-content">
+          <h1 class="brand-title">Transactions</h1>
+          <p class="brand-tagline">
+            简洁高效的个人财务管理工具<br>
+            多账本 · 分类标签 · 数据分析
+          </p>
 
-        <h1 class="brand-title">Transactions</h1>
-        <p class="brand-tagline">
-          简洁高效的个人财务管理工具<br>
-          多账本 · 分类标签 · 数据分析
-        </p>
-
-        <div class="accent-bars">
-          <div class="accent-bar"></div>
-          <div class="accent-bar"></div>
-          <div class="accent-bar"></div>
-          <div class="accent-bar"></div>
+          <div class="accent-bars">
+            <div class="accent-bar"></div>
+            <div class="accent-bar"></div>
+            <div class="accent-bar"></div>
+            <div class="accent-bar"></div>
+          </div>
         </div>
       </div>
 
       <!-- Right: Action -->
       <div class="action-panel">
-        <div class="section-label">开始使用</div>
+        <button class="cta-button" @click="selectWorkspace">
+          开始使用
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <path d="M7.5 5L12.5 10L7.5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
 
-        <div class="workspace-box" @click="selectWorkspace">
-          <div class="workspace-box-inner">
-            <div class="workspace-icon">
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <path d="M3 6C3 5.17 3.67 4.5 4.5 4.5H8.5L10 6H17.5C18.33 6 19 6.67 19 7.5V15.5C19 16.33 18.33 17 17.5 17H4.5C3.67 17 3 16.33 3 15.5V6Z" stroke="#6B6B66" stroke-width="1.5" fill="none"/>
-              </svg>
-            </div>
-            <div class="workspace-content">
-              <div class="workspace-title">选择工作目录</div>
-              <div class="workspace-desc">存储您的账本数据</div>
-            </div>
-            <svg class="workspace-arrow" viewBox="0 0 20 20" fill="none">
-              <path d="M7.5 5L12.5 10L7.5 15" stroke="#2D5A27" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div v-if="workspacePath" class="workspace-path">{{ workspacePath }}</div>
-        </div>
-
-        <div class="features-grid">
-          <!-- 多账本管理 - Ledger books icon -->
-          <div class="feature-item">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#2D5A27" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="18" rx="1"/>
-                <rect x="14" y="3" width="7" height="18" rx="1"/>
-                <line x1="5" y1="7" x2="8" y2="7"/>
-                <line x1="5" y1="11" x2="8" y2="11"/>
-                <line x1="16" y1="7" x2="19" y2="7"/>
-                <line x1="16" y1="11" x2="19" y2="11"/>
-              </svg>
-            </div>
-            <span class="feature-text">多账本管理</span>
-          </div>
-
-          <!-- 分类标签 - Tags icon -->
-          <div class="feature-item">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#C9A227" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M3 9L9 3L15 9L9 15L3 9Z"/>
-                <circle cx="9" cy="9" r="2" fill="#C9A227"/>
-                <path d="M12 12L21 21"/>
-                <path d="M18 15L21 18"/>
-              </svg>
-            </div>
-            <span class="feature-text">分类标签</span>
-          </div>
-
-          <!-- 数据分析 - Chart icon -->
-          <div class="feature-item">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#5A7FAA" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="14" width="4" height="8" rx="0.5" fill="#5A7FAA"/>
-                <rect x="10" y="10" width="4" height="12" rx="0.5" fill="#5A7FAA"/>
-                <rect x="17" y="6" width="4" height="16" rx="0.5" fill="#5A7FAA"/>
-                <path d="M3 4L7 8L11 5L15 9L21 3" stroke-width="2"/>
-              </svg>
-            </div>
-            <span class="feature-text">数据分析</span>
-          </div>
-
-          <!-- 本地存储 - Lock icon -->
-          <div class="feature-item">
-            <div class="feature-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="#8B7355" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="5" y="11" width="14" height="10" rx="2"/>
-                <path d="M8 11V7C8 4.79 9.79 3 12 3C14.21 3 16 4.79 16 7V11" fill="none"/>
-                <circle cx="12" cy="16" r="2" fill="#8B7355"/>
-              </svg>
-            </div>
-            <span class="feature-text">本地存储</span>
-          </div>
+        <div v-if="workspacePath" class="workspace-path-box">
+          {{ workspacePath }}
         </div>
       </div>
     </div>
@@ -558,4 +447,5 @@
     }).mount('#app');
   </script>
 </body>
+
 </html>

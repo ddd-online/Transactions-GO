@@ -25,15 +25,24 @@
         </template>
         <template v-else-if="column.key === 'action'">
           <span class="action-buttons">
-            <button class="action-btn" @click="moveTemplate(index, -1)" :disabled="index === 0">
-              <UpOutlined />
+            <button class="action-icon" @click="moveTemplate(index, -1)" :disabled="index === 0" title="上移">
+              <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
+                <path d="M8 2L8 14M8 2L4 6M8 2L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
             </button>
-            <button class="action-btn" @click="moveTemplate(index, 1)" :disabled="index === templates.length - 1">
-              <DownOutlined />
+            <button class="action-icon" @click="moveTemplate(index, 1)" :disabled="index === templates.length - 1" title="下移">
+              <svg class="arrow-icon" viewBox="0 0 16 16" fill="none">
+                <path d="M8 14L8 2M8 14L4 10M8 14L12 10" stroke="currentColor" stroke-width="1.5"
+                  stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
             </button>
             <a-popconfirm title="确定要删除该模板吗？" @confirm="handleDelete(record.template_id)" ok-text="确定" cancel-text="取消">
-              <button class="action-btn delete-btn" @click.stop>
-                <DeleteOutlined />
+              <button class="action-icon delete" title="删除">
+                <svg class="delete-icon" viewBox="0 0 16 16" fill="none">
+                  <path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M12 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </button>
             </a-popconfirm>
           </span>
@@ -49,7 +58,6 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { message } from 'ant-design-vue';
-import { UpOutlined, DownOutlined, DeleteOutlined } from "@ant-design/icons-vue";
 import type { TransactionTemplate } from '@/types/billadm';
 import { getTemplatesByLedgerId, removeTemplate, reorderTemplate } from '@/backend/functions.ts';
 import { useLedgerStore } from '@/stores/ledgerStore.ts';
@@ -170,38 +178,50 @@ onMounted(() => {
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: var(--billadm-space-xs);
+  gap: 2px;
 }
 
-.action-btn {
+.action-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  font-size: 12px;
-  cursor: pointer;
+  width: 32px;
+  height: 32px;
   color: var(--billadm-color-text-secondary);
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: var(--billadm-radius-md);
+  border: none;
+  border-radius: var(--billadm-radius-sm);
+  cursor: pointer;
   transition: all var(--billadm-transition-fast);
 }
 
-.action-btn:hover:not(.disabled) {
-  color: var(--billadm-color-primary);
+.action-icon .arrow-icon,
+.action-icon .delete-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.action-icon:hover:not(:disabled) {
+  color: var(--billadm-color-text-major);
   background-color: var(--billadm-color-hover-bg);
 }
 
-.action-btn.disabled {
-  color: var(--billadm-color-text-disabled);
-  cursor: not-allowed;
-  border-color: transparent;
-  background: transparent;
+.action-icon.delete:hover:not(:disabled) {
+  color: var(--billadm-color-negative);
+  background-color: rgba(199, 62, 58, 0.08);
 }
 
-.action-btn.delete-btn:hover {
-  color: var(--billadm-color-expense);
-  background-color: rgba(199, 62, 58, 0.08);
+.action-icon:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* 表头列间分割线 */
+:deep(.ant-table-thead > tr > th) {
+  border-right: 1px solid var(--billadm-color-divider);
+}
+
+:deep(.ant-table-thead > tr > th:last-child) {
+  border-right: none;
 }
 </style>
