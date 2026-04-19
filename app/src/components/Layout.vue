@@ -130,7 +130,7 @@ onMounted(initWorkspace);
 /* 底部状态栏 - 信息汇总 */
 .app-footer {
   height: var(--billadm-size-footer-height);
-  background-color: var(--billadm-color-minor-background);
+  background-color: var(--billadm-color-major-warm);
   flex-shrink: 0;
   border-top: 1px solid var(--billadm-color-divider);
 }
