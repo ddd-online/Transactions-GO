@@ -20,7 +20,7 @@
         <!-- 内容区域 -->
         <main class="app-content">
           <router-view class="app-router-view" />
-          <footer class="app-footer">
+          <footer v-if="showBottomBar" class="app-footer">
             <app-bottom-bar />
           </footer>
         </main>
@@ -30,13 +30,16 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
+import { useRoute } from "vue-router";
 import { useLedgerStore } from "@/stores/ledgerStore.ts";
 import { openWorkspace } from "@/backend/api/workspace.ts";
 import NotificationUtil from "@/backend/notification.ts";
 
+const route = useRoute();
 const ledgerStore = useLedgerStore();
 const showWorkspaceSelect = ref(false);
+const showBottomBar = computed(() => route.path === '/tr_view' || route.path === '/da_view');
 
 const handleOpenWorkspace = async (workspaceDir: string) => {
   try {
