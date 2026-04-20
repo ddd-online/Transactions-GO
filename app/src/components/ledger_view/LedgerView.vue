@@ -4,7 +4,10 @@
     <div class="ledger-grid" v-if="ledgerStore.ledgers.length > 0">
       <article v-for="(ledger, index) in ledgerStore.ledgers" :key="ledger.id"
         class="ledger-card"
-        :style="{ animationDelay: `${index * 60}ms` }">
+        :style="{
+          '--ledger-accent': `var(${ledgerColorVars[index % ledgerColorVars.length]})`,
+          animationDelay: `${index * 60}ms`
+        }">
         <div class="ledger-card-inner">
           <!-- 主要内容 -->
           <div class="ledger-card-body">
@@ -193,11 +196,30 @@ const handleOk = async () => {
   border-radius: var(--billadm-radius-lg);
   background-color: var(--billadm-color-major-background);
   border: 1px solid var(--billadm-color-window-border);
-  transition: box-shadow var(--billadm-transition-normal);
+  transition: box-shadow var(--billadm-transition-normal), transform var(--billadm-transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.ledger-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background-color: var(--ledger-accent, var(--billadm-ledger-forest));
+  opacity: 0.6;
+  transition: opacity var(--billadm-transition-fast);
 }
 
 .ledger-card:hover {
-  box-shadow: var(--billadm-shadow-md);
+  box-shadow: var(--billadm-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.ledger-card:hover::before {
+  opacity: 1;
 }
 
 .ledger-card-inner {
@@ -337,14 +359,33 @@ const handleOk = async () => {
   justify-content: center;
   padding: var(--billadm-space-3xl);
   text-align: center;
+  position: relative;
+}
+
+.empty-state::before {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--billadm-color-primary) 0%, transparent 60%);
+  opacity: 0.08;
+  pointer-events: none;
 }
 
 .empty-state-visual {
-  width: 80px;
-  height: 80px;
-  margin-bottom: var(--billadm-space-lg);
+  width: 96px;
+  height: 96px;
+  margin-bottom: var(--billadm-space-xl);
   color: var(--billadm-color-primary);
-  opacity: 0.3;
+  opacity: 0.25;
+  transform: scale(1);
+  transition: transform var(--billadm-transition-slow);
+}
+
+.empty-state:hover .empty-state-visual {
+  transform: scale(1.05);
+  opacity: 0.35;
 }
 
 .empty-state-icon {
@@ -353,16 +394,18 @@ const handleOk = async () => {
 }
 
 .empty-state-title {
-  font-size: var(--billadm-size-text-title);
-  font-weight: var(--billadm-weight-semibold);
+  font-size: var(--billadm-size-text-display-sm);
+  font-weight: var(--billadm-weight-bold);
   color: var(--billadm-color-text-major);
-  margin: 0 0 var(--billadm-space-xs) 0;
+  margin: 0 0 var(--billadm-space-sm) 0;
+  letter-spacing: -0.01em;
 }
 
 .empty-state-desc {
   font-size: var(--billadm-size-text-body);
   color: var(--billadm-color-text-secondary);
   margin: 0;
+  max-width: 280px;
 }
 
 /* ========== Form ========== */
@@ -375,5 +418,12 @@ const handleOk = async () => {
 .float-primary {
   right: 40px;
   bottom: 72px;
+  box-shadow: var(--billadm-shadow-md);
+  transition: box-shadow var(--billadm-transition-normal), transform var(--billadm-transition-fast);
+}
+
+.float-primary:hover {
+  box-shadow: var(--billadm-shadow-xl);
+  transform: scale(1.08);
 }
 </style>
