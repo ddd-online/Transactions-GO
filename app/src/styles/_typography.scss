@@ -8,17 +8,17 @@
 // ============================================
 
 // Note: These packages were installed via npm:
-// npm install @fontsource/inter @fontsource/jetbrains-mono @fontsource/playfair-display
-// For Instrument Serif (commercial font), we use Playfair Display as an elegant alternative
+// npm install @fontsource/jetbrains-mono @fontsource/playfair-display @fontsource/source-serif-4
 
-@use '@fontsource/inter/400.css' as inter-400;
-@use '@fontsource/inter/500.css' as inter-500;
-@use '@fontsource/inter/600.css' as inter-600;
 @use '@fontsource/jetbrains-mono/400.css' as jb-400;
 @use '@fontsource/jetbrains-mono/500.css' as jb-500;
 @use '@fontsource/playfair-display/400.css' as pd-400;
 @use '@fontsource/playfair-display/400-italic.css' as pd-400i;
 @use '@fontsource/playfair-display/600.css' as pd-600;
+@use '@fontsource/source-serif-4/400.css' as ss4-400;
+@use '@fontsource/source-serif-4/400-italic.css' as ss4-400i;
+@use '@fontsource/source-serif-4/500.css' as ss4-500;
+@use '@fontsource/source-serif-4/600.css' as ss4-600;
 
 // ============================================
 // Font Variables
@@ -26,7 +26,7 @@
 
 :root {
   --billadm-font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
-  --billadm-font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --billadm-font-body: 'Source Serif 4', Georgia, 'Times New Roman', serif;
   --billadm-font-mono: 'JetBrains Mono', 'SF Mono', Consolas, 'Courier New', monospace;
 }
 

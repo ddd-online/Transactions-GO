@@ -172,22 +172,10 @@ const handleDelete = async (chart: ChartDto) => {
   gap: var(--billadm-space-md);
   padding: var(--billadm-space-md);
   cursor: pointer;
-  transition: all var(--billadm-transition-fast);
+  transition: background-color var(--billadm-transition-fast),
+              color var(--billadm-transition-fast);
   color: var(--billadm-color-text-secondary);
-  position: relative;
-}
-
-.chart-list-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 0;
-  background-color: var(--billadm-color-primary);
-  border-radius: 0 2px 2px 0;
-  transition: height var(--billadm-transition-fast);
+  border-radius: var(--billadm-radius-md);
 }
 
 .chart-list-item:hover {
@@ -198,10 +186,6 @@ const handleDelete = async (chart: ChartDto) => {
 .chart-list-item.active {
   background-color: var(--billadm-color-hover-bg);
   color: var(--billadm-color-primary);
-}
-
-.chart-list-item.active::before {
-  height: 20px;
 }
 
 .chart-list-item-icon {

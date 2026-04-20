@@ -13,7 +13,8 @@
       "Bash(xargs grep:*)",
       "Bash(cp:*)",
       "Bash(npx vue-tsc:*)",
-      "WebFetch(domain:minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com)"
+      "WebFetch(domain:minimax-algeng-chat-tts.oss-cn-wulanchabu.aliyuncs.com)",
+      "Bash(node .claude/skills/impeccable/scripts/cleanup-deprecated.mjs)"
     ]
   }
 }

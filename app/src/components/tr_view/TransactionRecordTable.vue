@@ -285,7 +285,14 @@ const handleDelete = (record: TransactionRecord) => {
   font-size: var(--billadm-size-text-caption);
   color: var(--billadm-color-text-secondary);
   border-radius: var(--billadm-radius-md);
-  transition: all var(--billadm-transition-fast);
+  transition: color var(--billadm-transition-fast),
+              background-color var(--billadm-transition-fast);
+  min-width: 36px;
+  min-height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 8px;
 }
 
 .action-btn:hover {

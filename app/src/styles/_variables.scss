@@ -20,6 +20,18 @@ $theme-colors: (
   'success': #2D7D46,
 ) !default;
 
+// Ledger accent palette - warm, editorial colors for ledger card icons
+$ledger-colors: (
+  'forest': #2D5A27,
+  'warm-brown': #8B7355,
+  'amber': #C9A227,
+  'vermillion': #C73E3A,
+  'slate-blue': #5A7FAA,
+  'ochre': #7A5C58,
+  'moss': #5C7A6A,
+  'camel': #8A6B5C,
+) !default;
+
 // Semantic colors for transactions
 $semantic-colors: (
   'income': #2D7D46,
@@ -137,7 +149,7 @@ $transitions: (
   'fast': 150ms ease,
   'normal': 200ms ease,
   'slow': 300ms ease,
-  'bounce': 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+  'smooth': 300ms cubic-bezier(0.25, 1, 0.5, 1),
 ) !default;
 
 // ============================================
@@ -234,11 +246,21 @@ $transitions: (
   --billadm-transition-fast: #{map.get($transitions, 'fast')};
   --billadm-transition-normal: #{map.get($transitions, 'normal')};
   --billadm-transition-slow: #{map.get($transitions, 'slow')};
-  --billadm-transition-bounce: #{map.get($transitions, 'bounce')};
+  --billadm-transition-smooth: #{map.get($transitions, 'smooth')};
 
   // Hover backgrounds
   --billadm-color-hover-bg: rgba(45, 90, 39, 0.06);
   --billadm-color-active-bg: rgba(45, 90, 39, 0.10);
+
+  // Ledger accent colors
+  --billadm-ledger-forest: #{map.get($ledger-colors, 'forest')};
+  --billadm-ledger-warm-brown: #{map.get($ledger-colors, 'warm-brown')};
+  --billadm-ledger-amber: #{map.get($ledger-colors, 'amber')};
+  --billadm-ledger-vermillion: #{map.get($ledger-colors, 'vermillion')};
+  --billadm-ledger-slate-blue: #{map.get($ledger-colors, 'slate-blue')};
+  --billadm-ledger-ochre: #{map.get($ledger-colors, 'ochre')};
+  --billadm-ledger-moss: #{map.get($ledger-colors, 'moss')};
+  --billadm-ledger-camel: #{map.get($ledger-colors, 'camel')};
 }
 
 // ============================================
@@ -290,4 +312,14 @@ $transitions: (
   // Hover backgrounds
   --billadm-color-hover-bg: rgba(90, 143, 78, 0.12);
   --billadm-color-active-bg: rgba(90, 143, 78, 0.18);
+
+  // Ledger accent colors - adjusted for dark backgrounds
+  --billadm-ledger-forest: #5A8F4E;
+  --billadm-ledger-warm-brown: #A89078;
+  --billadm-ledger-amber: #D4B44A;
+  --billadm-ledger-vermillion: #E57373;
+  --billadm-ledger-slate-blue: #64B5F6;
+  --billadm-ledger-ochre: #A89078;
+  --billadm-ledger-moss: #6B9B7A;
+  --billadm-ledger-camel: #A89078;
 }

@@ -108,7 +108,7 @@ const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
 .workspace-setting {
   display: flex;
   flex-direction: column;
-  gap: var(--billadm-space-xl);
+  gap: var(--billadm-space-2xl);
 }
 
 /* Hero Section */
@@ -117,14 +117,11 @@ const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
   align-items: center;
   justify-content: space-between;
   gap: var(--billadm-space-xl);
-  padding: var(--billadm-space-xl);
-  background: linear-gradient(135deg,
-    var(--billadm-color-minor-background) 0%,
-    color-mix(in srgb, var(--billadm-color-minor-background) 85%, var(--billadm-color-primary) 15%) 100%
-  );
+  padding: var(--billadm-space-2xl);
+  background-color: var(--billadm-color-minor-background);
   border-radius: var(--billadm-radius-xl);
   border: 1px solid var(--billadm-color-divider);
-  box-shadow: var(--billadm-shadow-sm);
+  /* Solid surface — no gradient decoration */
 }
 
 .hero-content {
@@ -154,7 +151,7 @@ const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
 
 .hero-title {
   font-size: var(--billadm-size-text-body);
-  font-weight: 500;
+  font-weight: var(--billadm-weight-medium);
   color: var(--billadm-color-text-secondary);
   margin: 0;
 }
@@ -196,8 +193,8 @@ const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
   font-size: var(--billadm-size-text-caption);
   font-weight: 600;
   color: var(--billadm-color-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  /* Lowercase — less institutional than uppercase */
+  letter-spacing: 0;
 }
 
 .info-cards {
@@ -211,15 +208,19 @@ const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
   align-items: flex-start;
   gap: var(--billadm-space-md);
   padding: var(--billadm-space-lg);
-  background-color: var(--billadm-color-minor-background);
+  background-color: var(--billadm-color-major-background);
   border-radius: var(--billadm-radius-lg);
-  border: 1px solid transparent;
-  transition: all var(--billadm-transition-fast);
+  border: 1px solid var(--billadm-color-window-border);
+  transition:
+    border-color var(--billadm-transition-fast),
+    box-shadow var(--billadm-transition-fast),
+    transform var(--billadm-transition-smooth);
 }
 
 .info-card:hover {
-  border-color: var(--billadm-color-divider);
-  box-shadow: var(--billadm-shadow-sm);
+  border-color: var(--billadm-color-primary);
+  box-shadow: var(--billadm-shadow-md);
+  transform: translateY(-2px);
 }
 
 .info-card-icon {

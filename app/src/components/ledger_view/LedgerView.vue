@@ -2,16 +2,19 @@
   <div class="ledger-view">
     <!-- 账本网格 -->
     <div class="ledger-grid" v-if="ledgerStore.ledgers.length > 0">
-      <article v-for="(ledger, index) in ledgerStore.ledgers" :key="ledger.id" class="ledger-card">
+      <article v-for="(ledger, index) in ledgerStore.ledgers" :key="ledger.id"
+        class="ledger-card"
+        :style="{ animationDelay: `${index * 60}ms` }">
         <div class="ledger-card-inner">
-          <!-- 左侧装饰条 -->
-          <div class="ledger-card-accent" :style="{ backgroundColor: ledgerColors[index % ledgerColors.length] }"></div>
-
           <!-- 主要内容 -->
           <div class="ledger-card-body">
             <div class="ledger-card-header">
               <div class="ledger-icon"
-                :style="{ backgroundColor: ledgerColors[index % ledgerColors.length] + '15', color: ledgerColors[index % ledgerColors.length] }">
+                :style="{
+                  backgroundColor: `color-mix(in srgb, var(${ledgerColorVars[index % ledgerColorVars.length]}) 15%, transparent)`,
+                  color: `var(${ledgerColorVars[index % ledgerColorVars.length]})`,
+                  '--card-index': index
+                }">
                 <svg viewBox="0 0 24 24" fill="none">
                   <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.5"
                     stroke-linecap="round" stroke-linejoin="round" />
@@ -109,16 +112,16 @@ import { PlusOutlined } from "@ant-design/icons-vue";
 
 const ledgerStore = useLedgerStore();
 
-// 账本卡片颜色池 - 暖色调配色方案
-const ledgerColors = [
-  '#2D5A27', // 森林绿
-  '#8B7355', // 暖棕
-  '#C9A227', // 琥珀金
-  '#C73E3A', // 朱红
-  '#5A7FAA', // 灰蓝
-  '#7A5C58', // 赭石
-  '#5C7A6A', // 苔绿
-  '#8A6B5C', // 驼色
+// Ledger accent colors - use CSS custom properties for token system + dark mode support
+const ledgerColorVars = [
+  '--billadm-ledger-forest',
+  '--billadm-ledger-warm-brown',
+  '--billadm-ledger-amber',
+  '--billadm-ledger-vermillion',
+  '--billadm-ledger-slate-blue',
+  '--billadm-ledger-ochre',
+  '--billadm-ledger-moss',
+  '--billadm-ledger-camel',
 ];
 
 const modalVisible = ref<boolean>(false);
@@ -178,7 +181,7 @@ const handleOk = async () => {
 /* ========== Ledger Grid ========== */
 .ledger-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--billadm-space-lg);
   flex: 1;
   overflow-y: auto;
@@ -190,12 +193,33 @@ const handleOk = async () => {
   position: relative;
   border-radius: var(--billadm-radius-lg);
   background-color: var(--billadm-color-major-background);
-  transition: all var(--billadm-transition-normal);
+  transition:
+    transform var(--billadm-transition-smooth),
+    box-shadow var(--billadm-transition-normal);
+  /* Entrance animation: fade + slide up */
+  animation: cardEntrance 400ms cubic-bezier(0.25, 1, 0.5, 1) both;
 }
 
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger delay via nth-child — applied inline via style binding */
 .ledger-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--billadm-shadow-md);
+  transform: translateY(-3px);
+  box-shadow: var(--billadm-shadow-lg);
+}
+
+.ledger-card:active {
+  transform: translateY(-1px);
+  transition-duration: 100ms;
 }
 
 .ledger-card-inner {
@@ -203,12 +227,6 @@ const handleOk = async () => {
   overflow: hidden;
   border-radius: var(--billadm-radius-lg);
   border: 1px solid var(--billadm-color-window-border);
-}
-
-/* 左侧装饰条 */
-.ledger-card-accent {
-  width: 4px;
-  flex-shrink: 0;
 }
 
 .ledger-card-body {
@@ -234,6 +252,20 @@ const handleOk = async () => {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  /* Icon entrance — subtle scale-in to complement card stagger */
+  animation: iconEntrance 350ms cubic-bezier(0.25, 1, 0.5, 1) both;
+  animation-delay: calc(var(--card-index, 0) * 60ms + 120ms);
+}
+
+@keyframes iconEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .ledger-icon svg {
@@ -315,17 +347,30 @@ const handleOk = async () => {
   border: none;
   border-radius: var(--billadm-radius-sm);
   cursor: pointer;
-  transition: all var(--billadm-transition-fast);
+  transition:
+    background-color var(--billadm-transition-fast),
+    color var(--billadm-transition-fast),
+    transform var(--billadm-transition-fast);
 }
 
 .action-btn svg {
   width: 15px;
   height: 15px;
+  transition: transform var(--billadm-transition-fast);
 }
 
 .action-btn:hover {
   color: var(--billadm-color-primary);
   background-color: var(--billadm-color-hover-bg);
+}
+
+.action-btn:hover svg {
+  transform: scale(1.15);
+}
+
+.action-btn:active {
+  transform: scale(0.92);
+  transition-duration: 80ms;
 }
 
 .action-btn--danger:hover {
@@ -350,6 +395,13 @@ const handleOk = async () => {
   margin-bottom: var(--billadm-space-xl);
   color: var(--billadm-color-primary);
   opacity: 0.25;
+  /* Gentle float animation for empty state illustration */
+  animation: emptyFloat 4s ease-in-out infinite;
+}
+
+@keyframes emptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
 
 .empty-state-icon {
@@ -380,5 +432,29 @@ const handleOk = async () => {
 .float-primary {
   right: 48px;
   bottom: 80px;
+  /* Subtle attention pulse when idle */
+  animation: fabPulse 3s ease-in-out infinite;
+}
+
+@keyframes fabPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.float-primary:hover {
+  animation: none;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ledger-card,
+  .ledger-icon,
+  .empty-state-visual,
+  .float-primary {
+    animation: none;
+  }
+  .ledger-card:hover {
+    transform: none;
+  }
 }
 </style>

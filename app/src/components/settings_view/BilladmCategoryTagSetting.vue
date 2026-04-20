@@ -355,13 +355,14 @@ watch(
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  padding: var(--billadm-space-lg);
+  padding: var(--billadm-space-xl) var(--billadm-space-xl) var(--billadm-space-md);
+  /* More space above header than below — title reads as more important */
 }
 
 .header-left {
   display: flex;
   align-items: center;
-  gap: var(--billadm-space-xl);
+  gap: var(--billadm-space-2xl);
 }
 
 .setting-title {
@@ -369,6 +370,7 @@ watch(
   font-weight: var(--billadm-weight-semibold);
   color: var(--billadm-color-text-major);
   margin: 0;
+  /* Strong title weight establishes clear page-level hierarchy */
 }
 
 .type-nav {
@@ -381,34 +383,38 @@ watch(
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+  padding: 5px 14px;
   font-size: var(--billadm-size-text-body-sm);
   font-weight: var(--billadm-weight-medium);
   color: var(--billadm-color-text-secondary);
   background: transparent;
-  border: 1.5px solid transparent;
+  border: 1.5px solid var(--billadm-color-divider);
   border-radius: var(--billadm-radius-full);
   cursor: pointer;
-  transition: all var(--billadm-transition-fast);
+  transition:
+    color var(--billadm-transition-fast),
+    border-color var(--billadm-transition-fast),
+    background-color var(--billadm-transition-fast);
 }
 
 .type-pill:hover:not(.is-active) {
   color: var(--billadm-color-text-major);
+  border-color: var(--billadm-color-text-disabled);
   background-color: var(--billadm-color-hover-bg);
 }
 
 .type-pill.is-active {
   color: var(--c);
   border-color: var(--c);
-  background-color: rgba(0, 0, 0, 0.03);
+  background-color: color-mix(in srgb, var(--c) 8%, transparent);
 }
 
 .pill-dot {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background-color: var(--c);
-  opacity: 0.5;
+  opacity: 0.4;
   transition: opacity var(--billadm-transition-fast);
 }
 
@@ -553,6 +559,7 @@ watch(
   padding: var(--billadm-space-md) var(--billadm-space-md);
   border-radius: var(--billadm-radius-md);
   cursor: pointer;
+  position: relative;
   transition: background-color var(--billadm-transition-fast);
 }
 

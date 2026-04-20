@@ -442,7 +442,8 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--billadm-space-lg) var(--billadm-space-lg);
+  padding: var(--billadm-space-xl) var(--billadm-space-xl) var(--billadm-space-md);
+  /* Tighter bottom — hierarchy should come from vertical gap in the main layout */
   border-bottom: 1px solid var(--billadm-color-divider);
 }
 
@@ -536,15 +537,16 @@ watch(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--billadm-space-lg) var(--billadm-space-xl);
+  padding: var(--billadm-space-xl) var(--billadm-space-xl) var(--billadm-space-md);
   border-bottom: 1px solid var(--billadm-color-divider);
   flex-shrink: 0;
+  /* Tighter bottom — consistent with sidebar header pattern */
 }
 
 .content-title-wrap {
   display: flex;
   align-items: baseline;
-  gap: var(--billadm-space-sm);
+  gap: var(--billadm-space-md);
 }
 
 .content-title {
@@ -555,8 +557,9 @@ watch(
 }
 
 .tag-count {
-  font-size: var(--billadm-size-text-body);
+  font-size: var(--billadm-size-text-body-sm);
   color: var(--billadm-color-text-secondary);
+  /* Body-sm matches sidebar title weight — clean reading level */
 }
 
 .content-title-wrap.is-placeholder .placeholder-text {

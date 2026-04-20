@@ -2,55 +2,61 @@
   <div class="settings-view">
     <!-- 左侧设置导航 -->
     <aside class="settings-sidebar">
-      <nav class="settings-nav">
-        <div
+      <nav class="settings-nav" aria-label="设置导航">
+        <button
           class="nav-item"
           :class="{ active: activeComponent === 'category-tag' }"
           @click="activeComponent = 'category-tag'"
+          aria-label="分类与标签"
         >
           <TagOutlined class="nav-icon"/>
           <span class="nav-text">分类与标签</span>
-        </div>
-        <div
+        </button>
+        <button
           class="nav-item"
           :class="{ active: activeComponent === 'workspace' }"
           @click="activeComponent = 'workspace'"
+          aria-label="工作空间"
         >
           <FolderOpenOutlined class="nav-icon"/>
           <span class="nav-text">工作空间</span>
-        </div>
-        <div
+        </button>
+        <button
           class="nav-item"
           :class="{ active: activeComponent === 'data-import-export' }"
           @click="activeComponent = 'data-import-export'"
+          aria-label="数据导入导出"
         >
           <CloudUploadOutlined class="nav-icon"/>
           <span class="nav-text">数据导入导出</span>
-        </div>
-        <div
+        </button>
+        <button
           class="nav-item"
           :class="{ active: activeComponent === 'template' }"
           @click="activeComponent = 'template'"
+          aria-label="消费模板"
         >
           <FileTextOutlined class="nav-icon"/>
           <span class="nav-text">消费模板</span>
-        </div>
-        <div
+        </button>
+        <button
           class="nav-item"
           :class="{ active: activeComponent === 'mcp' }"
           @click="activeComponent = 'mcp'"
+          aria-label="MCP"
         >
           <SettingOutlined class="nav-icon"/>
           <span class="nav-text">MCP</span>
-        </div>
-        <div
+        </button>
+        <button
           class="nav-item"
           :class="{ active: activeComponent === 'about' }"
           @click="activeComponent = 'about'"
+          aria-label="关于"
         >
           <InfoCircleOutlined class="nav-icon"/>
           <span class="nav-text">关于</span>
-        </div>
+        </button>
       </nav>
     </aside>
 
@@ -127,24 +133,16 @@ const currentComponent = computed(() => {
   gap: var(--billadm-space-md);
   padding: var(--billadm-space-md) var(--billadm-space-md);
   border-radius: var(--billadm-radius-md);
+  border: none;
+  background: none;
   cursor: pointer;
-  transition: all var(--billadm-transition-fast);
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  transition: background-color var(--billadm-transition-fast),
+              color var(--billadm-transition-fast);
   color: var(--billadm-color-text-secondary);
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%) scaleY(0);
-  width: 3px;
-  height: 60%;
-  background-color: var(--billadm-color-primary);
-  border-radius: 0 2px 2px 0;
-  transition: transform var(--billadm-transition-fast);
+  width: 100%;
 }
 
 .nav-item:hover {
@@ -152,13 +150,14 @@ const currentComponent = computed(() => {
   color: var(--billadm-color-text-major);
 }
 
+.nav-item:focus-visible {
+  outline: 2px solid var(--billadm-color-primary);
+  outline-offset: 2px;
+}
+
 .nav-item.active {
   background-color: var(--billadm-color-active-bg);
   color: var(--billadm-color-primary);
-}
-
-.nav-item.active::before {
-  transform: translateY(-50%) scaleY(1);
 }
 
 .nav-icon {
