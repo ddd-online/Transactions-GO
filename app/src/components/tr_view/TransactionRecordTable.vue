@@ -150,15 +150,10 @@ const handleDelete = (record: TransactionRecord) => {
 <style scoped>
 .transaction-table {
   width: 100%;
-  overflow-x: hidden;
 }
 
 .transaction-table :deep(.ant-table) {
   background: transparent;
-}
-
-.transaction-table :deep(.ant-table-wrapper) {
-  padding: var(--billadm-space-md) 0 0 0;
 }
 
 .transaction-table :deep(.ant-table-thead > tr > th) {
@@ -170,15 +165,10 @@ const handleDelete = (record: TransactionRecord) => {
   color: var(--billadm-color-text-secondary);
   background-color: var(--billadm-color-minor-background);
   border-bottom: 1px solid var(--billadm-color-divider);
-  border-right: 1px solid var(--billadm-color-divider);
   padding: var(--billadm-space-sm) var(--billadm-space-md);
   position: sticky;
   top: 0;
   z-index: 1;
-}
-
-.transaction-table :deep(.ant-table-thead > tr > th:last-child) {
-  border-right: none;
 }
 
 .transaction-table :deep(.ant-table-tbody > tr > td) {
@@ -201,7 +191,6 @@ const handleDelete = (record: TransactionRecord) => {
 }
 
 .cell-type {
-  font-family: var(--billadm-font-body);
   font-size: var(--billadm-size-text-caption);
   font-weight: 600;
   text-transform: uppercase;
@@ -221,7 +210,6 @@ const handleDelete = (record: TransactionRecord) => {
 }
 
 .cell-category {
-  font-family: var(--billadm-font-body);
   font-size: var(--billadm-size-text-body);
   color: var(--billadm-color-text-major);
 }
@@ -233,7 +221,6 @@ const handleDelete = (record: TransactionRecord) => {
 }
 
 .tag-item {
-  font-family: var(--billadm-font-body);
   font-size: var(--billadm-size-text-caption);
   background-color: var(--billadm-color-minor-background);
   border: none;
@@ -241,7 +228,6 @@ const handleDelete = (record: TransactionRecord) => {
 }
 
 .tag-outlier {
-  font-family: var(--billadm-font-body);
   font-size: var(--billadm-size-text-caption);
   background-color: rgba(184, 134, 11, 0.1);
   color: var(--billadm-color-warning);
@@ -249,7 +235,6 @@ const handleDelete = (record: TransactionRecord) => {
 }
 
 .cell-description {
-  font-family: var(--billadm-font-body);
   font-size: var(--billadm-size-text-body);
   color: var(--billadm-color-text-major);
 }
@@ -281,18 +266,15 @@ const handleDelete = (record: TransactionRecord) => {
 }
 
 .action-btn {
-  font-family: var(--billadm-font-body);
   font-size: var(--billadm-size-text-caption);
   color: var(--billadm-color-text-secondary);
   border-radius: var(--billadm-radius-md);
-  transition: color var(--billadm-transition-fast),
-              background-color var(--billadm-transition-fast);
-  min-width: 36px;
-  min-height: 36px;
+  min-width: 32px;
+  min-height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 8px;
+  padding: 0 6px;
 }
 
 .action-btn:hover {

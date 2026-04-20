@@ -111,38 +111,36 @@ const currentComponent = computed(() => {
 
 /* Sidebar */
 .settings-sidebar {
-  width: 220px;
+  width: 200px;
   flex-shrink: 0;
   background-color: var(--billadm-color-major-warm);
   border-right: 1px solid var(--billadm-color-divider);
   display: flex;
   flex-direction: column;
-  padding: 0;
 }
 
 .settings-nav {
   display: flex;
   flex-direction: column;
-  padding: var(--billadm-space-md) var(--billadm-space-sm);
+  padding: var(--billadm-space-sm);
   gap: 2px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: var(--billadm-space-md);
-  padding: var(--billadm-space-md) var(--billadm-space-md);
+  gap: var(--billadm-space-sm);
+  padding: var(--billadm-space-sm) var(--billadm-space-md);
   border-radius: var(--billadm-radius-md);
   border: none;
   background: none;
   cursor: pointer;
   text-align: left;
   font-family: inherit;
-  font-size: inherit;
-  transition: background-color var(--billadm-transition-fast),
-              color var(--billadm-transition-fast);
+  font-size: var(--billadm-size-text-body-sm);
   color: var(--billadm-color-text-secondary);
   width: 100%;
+  transition: all var(--billadm-transition-fast);
 }
 
 .nav-item:hover {
@@ -150,14 +148,10 @@ const currentComponent = computed(() => {
   color: var(--billadm-color-text-major);
 }
 
-.nav-item:focus-visible {
-  outline: 2px solid var(--billadm-color-primary);
-  outline-offset: 2px;
-}
-
 .nav-item.active {
   background-color: var(--billadm-color-active-bg);
   color: var(--billadm-color-primary);
+  font-weight: 500;
 }
 
 .nav-icon {
@@ -169,8 +163,6 @@ const currentComponent = computed(() => {
 }
 
 .nav-text {
-  font-size: var(--billadm-size-text-body);
-  font-weight: 500;
   white-space: nowrap;
 }
 
@@ -185,7 +177,6 @@ const currentComponent = computed(() => {
 
 .content-inner {
   min-height: 100%;
-  margin: 0 auto;
   padding: var(--billadm-space-md) var(--billadm-space-lg);
 }
 </style>

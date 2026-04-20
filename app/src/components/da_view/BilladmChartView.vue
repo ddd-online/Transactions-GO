@@ -96,7 +96,8 @@
     </a-drawer>
 
     <!-- 添加曲线弹窗 -->
-    <a-modal v-model:open="showAddLineModal" title="添加曲线" @ok="handleAddLine" :confirm-loading="addLineLoading" width="500px">
+    <a-modal v-model:open="showAddLineModal" title="添加曲线" @ok="handleAddLine" :confirm-loading="addLineLoading"
+      width="500px">
       <a-form :model="newLineForm" layout="vertical">
         <a-form-item label="曲线名称" name="label">
           <a-input v-model:value="newLineForm.label" placeholder="请输入曲线名称" />
@@ -109,10 +110,12 @@
           </a-select>
         </a-form-item>
         <a-form-item label="分类" name="category">
-          <a-select v-model:value="newLineForm.category" placeholder="请选择分类" :options="categoryOptions" allow-clear @change="onCategoryChange" />
+          <a-select v-model:value="newLineForm.category" placeholder="请选择分类" :options="categoryOptions" allow-clear
+            @change="onCategoryChange" />
         </a-form-item>
         <a-form-item label="标签" name="tags">
-          <a-select v-model:value="newLineForm.tags" mode="multiple" placeholder="请选择标签" :options="tagOptions" allow-clear />
+          <a-select v-model:value="newLineForm.tags" mode="multiple" placeholder="请选择标签" :options="tagOptions"
+            allow-clear />
         </a-form-item>
         <a-form-item label="标签匹配" name="tagPolicy">
           <a-select v-model:value="newLineForm.tagPolicy">
@@ -332,38 +335,57 @@ const formatAmount = (amount: number) => {
   display: flex;
   flex-direction: column;
   height: 100%;
+  position: relative;
 }
 
 .chart-view-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--billadm-space-md) var(--billadm-space-lg);
-  border-bottom: 1px solid var(--billadm-color-divider);
+  padding: var(--billadm-space-xl) var(--billadm-space-2xl);
   flex-shrink: 0;
   background-color: var(--billadm-color-major-background);
+  border-bottom: 1px solid var(--billadm-color-divider);
+  min-height: 72px;
 }
 
 .chart-view-title {
   margin: 0;
-  font-size: var(--billadm-size-text-title-sm);
+  font-size: var(--billadm-size-text-title);
   font-weight: 600;
   color: var(--billadm-color-text-major);
+  position: relative;
+  padding-left: var(--billadm-space-lg);
+}
+
+/* Accent bar - indicates active/selected state */
+.chart-view-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background-color: var(--billadm-color-primary);
+  border-radius: 2px;
 }
 
 .chart-view-actions {
   display: flex;
   align-items: center;
+  gap: var(--billadm-space-sm);
 }
 
 .drawer-actions {
   display: flex;
   align-items: center;
+  gap: var(--billadm-space-sm);
 }
 
 .chart-view-content {
   flex: 1;
-  padding: var(--billadm-space-lg);
+  padding: var(--billadm-space-2xl);
   min-height: 0;
   display: flex;
   align-items: center;
@@ -389,21 +411,65 @@ const formatAmount = (amount: number) => {
 .chart-view-footer {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--billadm-space-lg);
-  padding: var(--billadm-space-md) var(--billadm-space-lg);
+  gap: var(--billadm-space-xl);
+  padding: var(--billadm-space-lg) var(--billadm-space-2xl);
   border-top: 1px solid var(--billadm-color-divider);
-  background-color: var(--billadm-color-major-background);
+  flex-shrink: 0;
 }
 
 .line-sum-item {
   display: flex;
   align-items: center;
   gap: var(--billadm-space-sm);
+  padding: var(--billadm-space-sm) var(--billadm-space-lg);
+  background-color: var(--billadm-color-major-background);
+  border-radius: var(--billadm-radius-md);
+  border: 1px solid var(--billadm-color-divider);
+  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.line-sum-item:hover {
+  border-color: var(--billadm-color-primary);
+  box-shadow: var(--billadm-shadow-sm);
 }
 
 .line-sum-value {
-  font-size: var(--billadm-size-text-body);
-  font-weight: 500;
+  font-size: var(--billadm-size-text-title-sm);
+  font-weight: 600;
   color: var(--billadm-color-text-major);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Entrance animation for footer stats */
+@keyframes statSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.line-sum-item {
+  animation: statSlideIn 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.line-sum-item:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.line-sum-item:nth-child(2) {
+  animation-delay: 60ms;
+}
+
+.line-sum-item:nth-child(3) {
+  animation-delay: 120ms;
+}
+
+.line-sum-item:nth-child(4) {
+  animation-delay: 180ms;
 }
 </style>

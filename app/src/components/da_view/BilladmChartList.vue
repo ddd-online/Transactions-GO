@@ -143,16 +143,22 @@ const handleDelete = async (chart: ChartDto) => {
 .chart-list {
   display: flex;
   flex-direction: column;
-  padding: var(--billadm-space-sm) 0;
+  padding: var(--billadm-space-md);
 }
 
 .chart-list-add {
-  padding: 0 var(--billadm-space-md);
+  padding: 0 var(--billadm-space-xs);
   margin-bottom: var(--billadm-space-md);
 }
 
+.chart-list-add :deep(.ant-btn) {
+  height: 40px;
+  font-weight: 500;
+  border-radius: var(--billadm-radius-md);
+}
+
 .chart-list-section {
-  margin-top: var(--billadm-space-md);
+  margin-top: var(--billadm-space-lg);
 }
 
 .chart-list-section-title {
@@ -162,36 +168,38 @@ const handleDelete = async (chart: ChartDto) => {
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--billadm-color-text-secondary);
-  padding: var(--billadm-space-xs) var(--billadm-space-md);
-  margin-bottom: var(--billadm-space-xs);
+  padding: 0 var(--billadm-space-xs);
+  margin-bottom: var(--billadm-space-sm);
 }
 
 .chart-list-item {
   display: flex;
   align-items: center;
-  gap: var(--billadm-space-md);
-  padding: var(--billadm-space-md);
+  gap: var(--billadm-space-sm);
+  padding: var(--billadm-space-sm);
   cursor: pointer;
-  transition: background-color var(--billadm-transition-fast),
-              color var(--billadm-transition-fast);
+  transition: all 150ms ease;
   color: var(--billadm-color-text-secondary);
   border-radius: var(--billadm-radius-md);
 }
 
 .chart-list-item:hover {
   background-color: var(--billadm-color-hover-bg);
-  color: var(--billadm-color-primary);
+  color: var(--billadm-color-text-major);
 }
 
 .chart-list-item.active {
   background-color: var(--billadm-color-hover-bg);
   color: var(--billadm-color-primary);
+  font-weight: 500;
 }
 
 .chart-list-item-icon {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
 }
 
@@ -208,19 +216,12 @@ const handleDelete = async (chart: ChartDto) => {
   display: none;
 }
 
-.chart-list-item:hover .chart-list-item-actions {
-  display: block;
-}
-
+.chart-list-item:hover .chart-list-item-actions,
 .chart-list-item.active .chart-list-item-actions {
-  display: block;
+  display: flex;
 }
 
 .chart-list-item.active .chart-list-item-actions :deep(.ant-btn) {
   color: var(--billadm-color-expense);
-}
-
-.chart-list-item.active .chart-list-item-actions :deep(.ant-btn:hover) {
-  background-color: rgba(199, 62, 58, 0.08);
 }
 </style>

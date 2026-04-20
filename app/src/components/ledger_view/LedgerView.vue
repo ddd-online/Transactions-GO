@@ -182,7 +182,7 @@ const handleOk = async () => {
 .ledger-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: var(--billadm-space-lg);
+  gap: var(--billadm-space-md);
   flex: 1;
   overflow-y: auto;
   align-content: start;
@@ -190,87 +190,50 @@ const handleOk = async () => {
 
 /* ========== Ledger Card ========== */
 .ledger-card {
-  position: relative;
   border-radius: var(--billadm-radius-lg);
   background-color: var(--billadm-color-major-background);
-  transition:
-    transform var(--billadm-transition-smooth),
-    box-shadow var(--billadm-transition-normal);
-  /* Entrance animation: fade + slide up */
-  animation: cardEntrance 400ms cubic-bezier(0.25, 1, 0.5, 1) both;
+  border: 1px solid var(--billadm-color-window-border);
+  transition: box-shadow var(--billadm-transition-normal);
 }
 
-@keyframes cardEntrance {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Stagger delay via nth-child — applied inline via style binding */
 .ledger-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--billadm-shadow-lg);
-}
-
-.ledger-card:active {
-  transform: translateY(-1px);
-  transition-duration: 100ms;
+  box-shadow: var(--billadm-shadow-md);
 }
 
 .ledger-card-inner {
   display: flex;
   overflow: hidden;
   border-radius: var(--billadm-radius-lg);
-  border: 1px solid var(--billadm-color-window-border);
 }
 
 .ledger-card-body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: var(--billadm-space-lg);
+  padding: var(--billadm-space-md);
   min-width: 0;
 }
 
 .ledger-card-header {
   display: flex;
   align-items: flex-start;
-  gap: var(--billadm-space-md);
-  margin-bottom: var(--billadm-space-lg);
+  gap: var(--billadm-space-sm);
+  margin-bottom: var(--billadm-space-md);
 }
 
 .ledger-icon {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--billadm-radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  /* Icon entrance — subtle scale-in to complement card stagger */
-  animation: iconEntrance 350ms cubic-bezier(0.25, 1, 0.5, 1) both;
-  animation-delay: calc(var(--card-index, 0) * 60ms + 120ms);
-}
-
-@keyframes iconEntrance {
-  from {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
 }
 
 .ledger-icon svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .ledger-info {
@@ -282,7 +245,7 @@ const handleOk = async () => {
   font-size: var(--billadm-size-text-section);
   font-weight: var(--billadm-weight-semibold);
   color: var(--billadm-color-text-major);
-  margin: 0 0 var(--billadm-space-2xs) 0;
+  margin: 0 0 var(--billadm-space-xs) 0;
   line-height: var(--billadm-height-tight);
 }
 
@@ -307,20 +270,20 @@ const handleOk = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: var(--billadm-space-md);
+  padding-top: var(--billadm-space-sm);
   border-top: 1px solid var(--billadm-color-divider);
 }
 
 .ledger-meta {
   display: flex;
   align-items: center;
-  gap: var(--billadm-space-md);
+  gap: var(--billadm-space-sm);
 }
 
 .ledger-meta-item {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   font-size: var(--billadm-size-text-caption);
   color: var(--billadm-color-text-secondary);
 }
@@ -337,8 +300,8 @@ const handleOk = async () => {
 }
 
 .action-btn {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -347,30 +310,17 @@ const handleOk = async () => {
   border: none;
   border-radius: var(--billadm-radius-sm);
   cursor: pointer;
-  transition:
-    background-color var(--billadm-transition-fast),
-    color var(--billadm-transition-fast),
-    transform var(--billadm-transition-fast);
+  transition: all var(--billadm-transition-fast);
 }
 
 .action-btn svg {
-  width: 15px;
-  height: 15px;
-  transition: transform var(--billadm-transition-fast);
+  width: 14px;
+  height: 14px;
 }
 
 .action-btn:hover {
   color: var(--billadm-color-primary);
   background-color: var(--billadm-color-hover-bg);
-}
-
-.action-btn:hover svg {
-  transform: scale(1.15);
-}
-
-.action-btn:active {
-  transform: scale(0.92);
-  transition-duration: 80ms;
 }
 
 .action-btn--danger:hover {
@@ -390,18 +340,11 @@ const handleOk = async () => {
 }
 
 .empty-state-visual {
-  width: 120px;
-  height: 120px;
-  margin-bottom: var(--billadm-space-xl);
+  width: 80px;
+  height: 80px;
+  margin-bottom: var(--billadm-space-lg);
   color: var(--billadm-color-primary);
-  opacity: 0.25;
-  /* Gentle float animation for empty state illustration */
-  animation: emptyFloat 4s ease-in-out infinite;
-}
-
-@keyframes emptyFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  opacity: 0.3;
 }
 
 .empty-state-icon {
@@ -413,7 +356,7 @@ const handleOk = async () => {
   font-size: var(--billadm-size-text-title);
   font-weight: var(--billadm-weight-semibold);
   color: var(--billadm-color-text-major);
-  margin: 0 0 var(--billadm-space-sm) 0;
+  margin: 0 0 var(--billadm-space-xs) 0;
 }
 
 .empty-state-desc {
@@ -430,31 +373,7 @@ const handleOk = async () => {
 
 /* ========== Floating Button ========== */
 .float-primary {
-  right: 48px;
-  bottom: 80px;
-  /* Subtle attention pulse when idle */
-  animation: fabPulse 3s ease-in-out infinite;
-}
-
-@keyframes fabPulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
-}
-
-.float-primary:hover {
-  animation: none;
-}
-
-/* Respect reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  .ledger-card,
-  .ledger-icon,
-  .empty-state-visual,
-  .float-primary {
-    animation: none;
-  }
-  .ledger-card:hover {
-    transform: none;
-  }
+  right: 40px;
+  bottom: 72px;
 }
 </style>

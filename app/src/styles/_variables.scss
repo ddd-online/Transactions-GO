@@ -78,6 +78,7 @@ $shadow-colors: (
 // ============================================
 
 $font-sizes: (
+  'display-xl': 36px,
   'display': 28px,
   'display-sm': 24px,
   'title': 20px,
@@ -199,6 +200,7 @@ $transitions: (
   --billadm-shadow-xl: 0 12px 36px #{map.get($shadow-colors, 'xl')};
 
   // Typography
+  --billadm-size-text-display-xl: #{map.get($font-sizes, 'display-xl')};
   --billadm-size-text-display: #{map.get($font-sizes, 'display')};
   --billadm-size-text-display-sm: #{map.get($font-sizes, 'display-sm')};
   --billadm-size-text-title: #{map.get($font-sizes, 'title')};

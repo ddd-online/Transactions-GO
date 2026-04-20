@@ -35,6 +35,17 @@
 // ============================================
 
 .typography {
+  // Display XL - Hero numbers and key metrics
+  &-display-xl {
+    font-family: var(--billadm-font-display);
+    font-size: var(--billadm-size-text-display-xl);
+    font-weight: 600;
+    color: var(--billadm-color-text-major);
+    line-height: var(--billadm-height-tight);
+    margin: 0;
+    letter-spacing: -0.03em;
+  }
+
   // Display - Editorial serif for major headings
   &-display {
     font-family: var(--billadm-font-display);
