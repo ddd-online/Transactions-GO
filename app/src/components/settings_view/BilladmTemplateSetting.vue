@@ -37,7 +37,7 @@
                   stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </button>
-            <a-popconfirm title="确定要删除该模板吗？" @confirm="handleDelete(record.template_id)" ok-text="确定" cancel-text="取消">
+            <a-popconfirm :title="`确认删除模板「${record.name}」？`" @confirm="handleDelete(record.template_id)" ok-text="确认" cancel-text="取消">
               <button class="action-icon delete" title="删除">
                 <svg class="delete-icon" viewBox="0 0 16 16" fill="none">
                   <path d="M3 4h10M6 4V3a1 1 0 011-1h2a1 1 0 011 1v1M12 4v8a2 2 0 01-2 2H6a2 2 0 01-2-2V4"

@@ -49,7 +49,7 @@
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <a-popconfirm title="确认删除此账本吗？" ok-text="确认" :showCancel="false"
+                <a-popconfirm :title="`确认删除账本「${ledger.name}」？`" ok-text="确认" :showCancel="false"
                   @confirm="ledgerStore.deleteLedger(ledger.id)">
                   <button class="action-btn action-btn--danger" title="删除">
                     <svg viewBox="0 0 16 16" fill="none">
@@ -76,7 +76,7 @@
           <path d="M24 36h16M28 44h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
       </div>
-      <h3 class="empty-state-title">暂无账本</h3>
+      <h3 class="empty-state-title">还没有账本</h3>
       <p class="empty-state-desc">点击下方按钮创建你的第一个账本</p>
     </div>
 

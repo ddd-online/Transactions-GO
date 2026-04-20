@@ -56,7 +56,7 @@
             <EditOutlined /> 编辑
           </a-button>
           <a-popconfirm
-            title="确认删除此记录吗？"
+            title="确认删除此条记录？"
             ok-text="确认"
             @confirm="handleDelete(record as TransactionRecord)"
             :showCancel="false"
