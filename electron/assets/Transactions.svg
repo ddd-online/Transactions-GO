@@ -4,70 +4,8 @@
    height="1024"
    viewBox="0 0 1024 1024"
    version="1.1"
-   id="svg9"
-   sodipodi:docname="Transactions .svg"
-   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview
-     id="namedview9"
-     pagecolor="#ffffff"
-     bordercolor="#000000"
-     borderopacity="0.25"
-     inkscape:showpageshadow="2"
-     inkscape:pageopacity="0.0"
-     inkscape:pagecheckerboard="0"
-     inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.44506836"
-     inkscape:cx="-67.405376"
-     inkscape:cy="578.56281"
-     inkscape:window-width="3840"
-     inkscape:window-height="2054"
-     inkscape:window-x="-11"
-     inkscape:window-y="-11"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="svg9" />
-  <!-- 定义过滤器 (阴影) -->
-  <defs
-     id="defs2">
-    <filter
-       id="shadow"
-       x="-20%"
-       y="-20%"
-       width="140%"
-       height="140%"
-       filterUnits="userSpaceOnUse">
-      <feGaussianBlur
-         stdDeviation="16"
-         result="blur"
-         id="feGaussianBlur1" />
-      <feOffset
-         dx="0"
-         dy="16"
-         id="feOffset1" />
-      <feComponentTransfer
-         result="shadow"
-         id="feComponentTransfer1">
-        <feFuncA
-           type="linear"
-           slope="0.15"
-           id="feFuncA1" />
-      </feComponentTransfer>
-      <feMerge
-         id="feMerge2">
-        <feMergeNode
-           in="shadow"
-           id="feMergeNode1" />
-        <feMergeNode
-           in="SourceGraphic"
-           id="feMergeNode2" />
-      </feMerge>
-    </filter>
-  </defs>
-  <!-- 背景：符合苹果标准的圆角矩形 (30% 圆角率) -->
-  <!-- rx = 1024 * 0.3125 = 320 -->
+   xmlns="http://www.w3.org/2000/svg">
+  <!-- Background: Primary green #2D5A27 -->
   <rect
      x="0"
      y="0"
@@ -75,94 +13,16 @@
      height="1024"
      rx="200"
      ry="200"
-     fill="#f5f5f7"
-     id="rect2" />
-  <!-- 主体内容组 -->
-  <!-- 使用 translate 将内容居中，并留出安全边距 -->
-  <g
-     transform="translate(160, 160)"
-     filter="url(#shadow)"
-     id="g9">
-    <!-- 1. 收入条 (绿色) #52c41a -->
-    <!-- 宽度调整为 640，居中于 704x704 的区域内 -->
-    <!-- 2. 支出条 (红色) #f5222d -->
-    <!-- 3. 转账条 (蓝色) #1677ff -->
-    <!-- 4. 数据分析折线图 (深灰) -->
-    <!-- 线条加粗以适应大图标，颜色改为深灰以匹配iOS风格 -->
-    <!-- 5. 折线图数据点 -->
-    <g
-       id="g11"
-       transform="translate(0,-47.561707)">
-      <rect
-         x="32"
-         y="100"
-         width="640"
-         height="112"
-         rx="24"
-         ry="24"
-         fill="#52c41a"
-         id="rect3" />
-      <rect
-         x="32"
-         y="260"
-         width="640"
-         height="112"
-         rx="24"
-         ry="24"
-         fill="#f5222d"
-         id="rect4" />
-      <rect
-         x="32"
-         y="420"
-         width="640"
-         height="112"
-         rx="24"
-         ry="24"
-         fill="#1677ff"
-         id="rect5" />
-      <g
-         id="g10"
-         transform="translate(-5.8716431)">
-        <polyline
-           points="120,680 260,600 400,680 540,560 680,640"
-           fill="none"
-           stroke="#8e8e93"
-           stroke-width="20"
-           stroke-linecap="round"
-           stroke-linejoin="round"
-           id="polyline5"
-           transform="translate(-42.12836,1.1234229)" />
-        <circle
-           cx="77.871643"
-           cy="681.12341"
-           r="18"
-           fill="#8e8e93"
-           id="circle5" />
-        <circle
-           cx="217.87164"
-           cy="601.12341"
-           r="18"
-           fill="#8e8e93"
-           id="circle6" />
-        <circle
-           cx="357.87164"
-           cy="681.12341"
-           r="18"
-           fill="#8e8e93"
-           id="circle7" />
-        <circle
-           cx="497.87164"
-           cy="561.12341"
-           r="18"
-           fill="#8e8e93"
-           id="circle8" />
-        <circle
-           cx="637.87164"
-           cy="641.12341"
-           r="18"
-           fill="#8e8e93"
-           id="circle9" />
-      </g>
-    </g>
-  </g>
+     fill="#2D5A27" />
+  <!-- Letter T: Fills ~75% of icon, centered, Playfair Display font, color #FAFAF8 -->
+  <text
+     x="512"
+     y="540"
+     dominant-baseline="central"
+     text-anchor="middle"
+     font-family="Playfair Display, Georgia, 'Times New Roman', serif"
+     font-size="820"
+     font-weight="600"
+     fill="#FAFAF8"
+     letter-spacing="-8">T</text>
 </svg>

@@ -340,12 +340,19 @@ const handleOk = async () => {
   height: 14px;
 }
 
-.action-btn:hover {
+.action-btn:hover,
+.action-btn:focus-visible {
   color: var(--billadm-color-primary);
   background-color: var(--billadm-color-hover-bg);
 }
 
-.action-btn--danger:hover {
+.action-btn:focus-visible {
+  outline: 2px solid var(--billadm-color-primary);
+  outline-offset: 1px;
+}
+
+.action-btn--danger:hover,
+.action-btn--danger:focus-visible {
   color: var(--billadm-color-expense);
   background-color: rgba(199, 62, 58, 0.08);
 }
@@ -408,12 +415,6 @@ const handleOk = async () => {
   max-width: 280px;
 }
 
-/* ========== Form ========== */
-.ledger-form :deep(.ant-form-item-label > label) {
-  font-weight: 500;
-  color: var(--billadm-color-text-major);
-}
-
 /* ========== Floating Button ========== */
 .float-primary {
   right: 40px;
@@ -425,5 +426,26 @@ const handleOk = async () => {
 .float-primary:hover {
   box-shadow: var(--billadm-shadow-xl);
   transform: scale(1.08);
+}
+
+.float-primary:focus-visible {
+  box-shadow: var(--billadm-shadow-lg);
+  transform: scale(1.04);
+}
+
+/* ========== Modal Form Polish ========== */
+.ledger-form :deep(.ant-form-item) {
+  margin-bottom: var(--billadm-space-md);
+}
+
+.ledger-form :deep(.ant-form-item-label > label) {
+  font-weight: 500;
+  color: var(--billadm-color-text-major);
+  font-size: var(--billadm-size-text-body-sm);
+}
+
+.ledger-form :deep(.ant-input-data-count) {
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-disabled);
 }
 </style>

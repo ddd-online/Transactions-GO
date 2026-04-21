@@ -24,10 +24,11 @@ let chart: Chart | null = null
 // 获取当前主题颜色
 const getThemeColors = () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+  // 使用设计系统暗模式文字色，与 T.svg 图标保持一致
   return {
-    labelFill: isDark ? '#e8e8f0' : '#000000',
-    lineStroke: isDark ? '#e8e8f0' : '#000000',
-    titleFill: isDark ? '#e8e8f0' : '#000000',
+    labelFill: isDark ? '#FAFAF8' : '#1A1A18',
+    lineStroke: isDark ? '#FAFAF8' : '#E5E5E0',
+    titleFill: isDark ? '#FAFAF8' : '#1A1A18',
   }
 }
 

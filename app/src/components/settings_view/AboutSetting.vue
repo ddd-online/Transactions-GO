@@ -2,29 +2,13 @@
   <div class="about-setting">
     <div class="about-header">
       <div class="app-logo">
-        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-              <feGaussianBlur stdDeviation="16" result="blur"/>
-              <feOffset dx="0" dy="16"/>
-              <feComponentTransfer><feFuncA type="linear" slope="0.15"/></feComponentTransfer>
-              <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <rect x="0" y="0" width="1024" height="1024" rx="200" fill="#f5f5f7"/>
-          <g transform="translate(160, 160)" filter="url(#shadow)">
-            <rect x="32" y="100" width="640" height="112" rx="24" fill="#52c41a"/>
-            <rect x="32" y="260" width="640" height="112" rx="24" fill="#f5222d"/>
-            <rect x="32" y="420" width="640" height="112" rx="24" fill="#1677ff"/>
-            <g transform="translate(-5.8716431)">
-              <polyline points="120,680 260,600 400,680 540,560 680,640" fill="none" stroke="#8e8e93" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" transform="translate(-42.12836,1.1234229)"/>
-              <circle cx="77.871643" cy="681.12341" r="18" fill="#8e8e93"/>
-              <circle cx="217.87164" cy="601.12341" r="18" fill="#8e8e93"/>
-              <circle cx="357.87164" cy="681.12341" r="18" fill="#8e8e93"/>
-              <circle cx="497.87164" cy="561.12341" r="18" fill="#8e8e93"/>
-              <circle cx="637.87164" cy="641.12341" r="18" fill="#8e8e93"/>
-            </g>
-          </g>
+        <svg width="1024" height="1024" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background: Primary green #2D5A27 -->
+          <rect x="0" y="0" width="1024" height="1024" rx="200" ry="200" fill="#2D5A27" />
+          <!-- Letter T: Fills ~75% of icon, centered, Playfair Display font, color #FAFAF8 -->
+          <text x="512" y="540" dominant-baseline="central" text-anchor="middle"
+            font-family="Playfair Display, Georgia, 'Times New Roman', serif" font-size="820" font-weight="600"
+            fill="#FAFAF8" letter-spacing="-8">T</text>
         </svg>
       </div>
       <h2 class="app-name">Transactions</h2>
@@ -54,7 +38,7 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from 'vue';
+import { ref } from 'vue';
 
 const buildTime = ref('2024-04-20');
 </script>
