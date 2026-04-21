@@ -24,11 +24,9 @@ let chart: Chart | null = null
 // 获取当前主题颜色
 const getThemeColors = () => {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
-  // 使用设计系统暗模式文字色，与 T.svg 图标保持一致
   return {
-    labelFill: isDark ? '#FAFAF8' : '#1A1A18',
-    lineStroke: isDark ? '#FAFAF8' : '#E5E5E0',
-    titleFill: isDark ? '#FAFAF8' : '#1A1A18',
+    labelFill: isDark ? '#FFFFFF' : '#000000',
+    titleFill: isDark ? '#FFFFFF' : '#000000',
   }
 }
 
@@ -80,23 +78,20 @@ const initChart = () => {
 
   chart.axis('x', {
     title: xAxisTitle,
-    labelFill: themeColors.labelFill,
+    titleFill: themeColors.titleFill,
     labelFontSize: 15,
-    titleFontSize: 16,
-    line: { style: { stroke: themeColors.lineStroke, lineWidth: 1 } }
+    titleFontSize: 16
   })
   chart.axis('y', {
     title: '金额（元）',
-    labelFill: themeColors.labelFill,
+    titleFill: themeColors.titleFill,
     labelFontSize: 15,
-    titleFontSize: 16,
-    line: { style: { stroke: themeColors.lineStroke, lineWidth: 1 } }
+    titleFontSize: 16
   })
 
   // 图例配置
-  chart.legend('label', {
+  chart.legend('color', {
     itemLabelFill: themeColors.labelFill,
-    itemValueFill: themeColors.labelFill,
   })
 
   chart
