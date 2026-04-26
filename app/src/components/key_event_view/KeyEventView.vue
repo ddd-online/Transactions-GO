@@ -14,7 +14,7 @@
     </div>
 
     <!-- 全年日历 -->
-    <div class="calendar-container">
+    <div class="calendar-container" :class="{ 'is-loading': isLoading }">
       <div v-for="month in 12" :key="month" class="month-grid">
         <div class="month-header">{{ month }}月</div>
         <div class="weekday-header">
@@ -79,8 +79,10 @@
 import { ref, computed, onMounted } from 'vue';
 import { useKeyEventStore } from "@/stores/keyEventStore";
 import dayjs from "dayjs";
+import NotificationUtil from "@/backend/notification";
 
 const keyEventStore = useKeyEventStore();
+const isLoading = ref(false);
 
 // ========== 年份选择 ==========
 const currentYear = new Date().getFullYear();
@@ -154,6 +156,7 @@ const onDayClick = async (year: number, month: number, day: number) => {
 
 const handleSave = async () => {
   if (!eventContent.value.trim()) {
+    NotificationUtil.warning('内容不能为空', '请输入事件内容');
     return;
   }
   confirmLoading.value = true;
@@ -175,8 +178,13 @@ const handleDelete = async () => {
   }
 };
 
-const onYearChange = (year: number) => {
-  keyEventStore.fetchDatesByYear(year);
+const onYearChange = async (year: number) => {
+  isLoading.value = true;
+  try {
+    await keyEventStore.fetchDatesByYear(year);
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 // ========== 初始化 ==========
@@ -209,6 +217,11 @@ onMounted(() => {
   gap: var(--billadm-space-md);
   overflow-y: auto;
   align-content: start;
+}
+
+.calendar-container.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 /* ========== 月份网格 ========== */
