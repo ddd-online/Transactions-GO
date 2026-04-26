@@ -4,7 +4,18 @@
     <div class="key-event-toolbar">
       <div class="key-event-toolbar-left"></div>
       <div class="key-event-toolbar-center">
-        <!-- Placeholder: will be filled by Task 2 -->
+        <a-button type="text" @click="goToPrevYear">
+          <template #icon><LeftOutlined /></template>
+        </a-button>
+        <a-date-picker
+          v-model:value="selectedYearDayjs"
+          picker="year"
+          :style="{ width: '120px' }"
+          @change="(val) => onYearChange(val)"
+        />
+        <a-button type="text" @click="goToNextYear">
+          <template #icon><RightOutlined /></template>
+        </a-button>
       </div>
       <div class="key-event-toolbar-right"></div>
     </div>
@@ -74,8 +85,9 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useKeyEventStore } from "@/stores/keyEventStore";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import NotificationUtil from "@/backend/notification";
+import { LeftOutlined, RightOutlined } from "@ant-design/icons-vue";
 
 const keyEventStore = useKeyEventStore();
 const isLoading = ref(false);
@@ -92,15 +104,26 @@ const handleResize = () => {
 };
 
 // ========== 年份选择 ==========
-const currentYear = new Date().getFullYear();
-const selectedYear = ref(currentYear);
-const yearOptions = computed(() => {
-  const years = [];
-  for (let y = currentYear - 10; y <= currentYear + 5; y++) {
-    years.push(y);
+const selectedYearDayjs = ref<Dayjs>(dayjs());
+const selectedYear = computed(() => selectedYearDayjs.value.year());
+
+const goToPrevYear = () => {
+  selectedYearDayjs.value = dayjs().year(selectedYearDayjs.value.year() - 1);
+  keyEventStore.fetchDatesByYear(selectedYearDayjs.value.year());
+};
+
+const goToNextYear = () => {
+  selectedYearDayjs.value = dayjs().year(selectedYearDayjs.value.year() + 1);
+  keyEventStore.fetchDatesByYear(selectedYearDayjs.value.year());
+};
+
+const onYearChange = (val: Dayjs | string | null) => {
+  if (val) {
+    const d = typeof val === 'string' ? dayjs(val) : val;
+    selectedYearDayjs.value = d;
+    keyEventStore.fetchDatesByYear(d.year());
   }
-  return years;
-});
+};
 
 // ========== 工具函数 ==========
 const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
@@ -182,15 +205,6 @@ const handleDelete = async () => {
     modalVisible.value = false;
   } finally {
     confirmLoading.value = false;
-  }
-};
-
-const onYearChange = async (year: number) => {
-  isLoading.value = true;
-  try {
-    await keyEventStore.fetchDatesByYear(year);
-  } finally {
-    isLoading.value = false;
   }
 };
 
