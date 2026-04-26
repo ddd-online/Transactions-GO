@@ -36,7 +36,13 @@
             :key="day"
             class="day-cell"
             :class="{ 'day-cell--has-record': hasRecord(selectedYear, month, day), 'day-cell--today': isToday(selectedYear, month, day) }"
+            role="button"
+            tabindex="0"
+            :aria-label="`${month}月${day}日`"
+            :aria-pressed="keyEventStore.hasRecord(formatDate(selectedYear, month, day))"
             @click="onDayClick(selectedYear, month, day)"
+            @keydown.enter.prevent="onDayClick(selectedYear, month, day)"
+            @keydown.space.prevent="onDayClick(selectedYear, month, day)"
           >
             {{ day }}
           </div>
@@ -254,6 +260,14 @@ onUnmounted(() => {
   gap: 8px;
 }
 
+.key-event-toolbar-center :deep(.ant-btn-text) {
+  border-radius: var(--billadm-radius-sm);
+}
+
+.key-event-toolbar-center :deep(.ant-btn-text:hover) {
+  background-color: var(--billadm-color-hover-bg);
+}
+
 /* ========== 日历容器 ========== */
 .calendar-container {
   flex: 1;
@@ -262,6 +276,18 @@ onUnmounted(() => {
   gap: var(--billadm-space-md);
   overflow-y: auto;
   align-content: start;
+}
+
+@media (max-width: 1024px) {
+  .calendar-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .calendar-container {
+    grid-template-columns: 1fr;
+  }
 }
 
 .calendar-container.is-loading {
@@ -304,6 +330,7 @@ onUnmounted(() => {
 }
 
 .day-cell {
+  position: relative;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
@@ -340,12 +367,12 @@ onUnmounted(() => {
   right: 3px;
   width: 6px;
   height: 6px;
-  background-color: var(--billadm-color-error, #ff4d4f);
+  background-color: var(--billadm-color-negative);
   border-radius: 50%;
 }
 
-.day-cell {
-  position: relative;
+.day-cell:active {
+  background-color: var(--billadm-color-active-bg);
 }
 
 /* ========== 弹窗内容 ========== */
