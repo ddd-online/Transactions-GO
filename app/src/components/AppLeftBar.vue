@@ -28,6 +28,15 @@
       >
         <LineChartOutlined style="font-size: 20px"/>
       </button>
+      <button
+        class="nav-btn"
+        :class="{ active: route.path === '/key_event_view' }"
+        @click="navigate('key_event_view')"
+        aria-label="关键事件"
+        title="关键事件"
+      >
+        <StarOutlined style="font-size: 20px"/>
+      </button>
     </div>
     <div class="app-left-bar-bottom">
       <button
@@ -45,7 +54,7 @@
 
 <script setup lang="ts">
 import {useRoute, useRouter} from 'vue-router';
-import {BookOutlined, LineChartOutlined, SettingOutlined, TransactionOutlined} from "@ant-design/icons-vue";
+import {BookOutlined, LineChartOutlined, SettingOutlined, StarOutlined, TransactionOutlined} from "@ant-design/icons-vue";
 
 const router = useRouter()
 const route = useRoute()
