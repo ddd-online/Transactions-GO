@@ -23,6 +23,11 @@ const routes = [
         component: () => import('@/components/da_view/DataAnalysisView.vue')
       },
       {
+        name: '关键事件',
+        path: 'key_event_view',
+        component: () => import('@/components/key_event_view/KeyEventView.vue')
+      },
+      {
         name: '应用设置',
         path: 'settings_view',
         component: () => import('@/components/settings_view/SettingsView.vue')
