@@ -70,6 +70,15 @@ func ServeAPI(ginServer *gin.Engine) {
 			charts.PATCH("", updateChart)
 		}
 
+		// Key Events
+		keyEvents := v1.Group("/key-events")
+		{
+			keyEvents.GET("/dates/:year", listKeyEventDates)
+			keyEvents.GET("/:date", getKeyEvent)
+			keyEvents.POST("", upsertKeyEvent)
+			keyEvents.DELETE("/:date", deleteKeyEvent)
+		}
+
 		// MCP server control
 		mcpGroup := v1.Group("/mcp")
 		{
