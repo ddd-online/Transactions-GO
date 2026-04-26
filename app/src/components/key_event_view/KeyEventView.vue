@@ -108,12 +108,12 @@ const selectedYearDayjs = ref<Dayjs>(dayjs());
 const selectedYear = computed(() => selectedYearDayjs.value.year());
 
 const goToPrevYear = () => {
-  selectedYearDayjs.value = dayjs().year(selectedYearDayjs.value.year() - 1);
+  selectedYearDayjs.value = selectedYearDayjs.value.year(selectedYearDayjs.value.year() - 1);
   keyEventStore.fetchDatesByYear(selectedYearDayjs.value.year());
 };
 
 const goToNextYear = () => {
-  selectedYearDayjs.value = dayjs().year(selectedYearDayjs.value.year() + 1);
+  selectedYearDayjs.value = selectedYearDayjs.value.year(selectedYearDayjs.value.year() + 1);
   keyEventStore.fetchDatesByYear(selectedYearDayjs.value.year());
 };
 
