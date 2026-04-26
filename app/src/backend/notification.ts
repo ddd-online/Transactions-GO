@@ -26,6 +26,17 @@ class NotificationUtil {
             message.error(messageText);
         }
     }
+
+    static warning(messageText: string, description?: string) {
+        if (description) {
+            notification.warning({
+                message: messageText,
+                description,
+            })
+        } else {
+            message.warning(messageText);
+        }
+    }
 }
 
 export default NotificationUtil

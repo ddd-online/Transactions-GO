@@ -5,7 +5,7 @@
       <a-select
         v-model:value="selectedYear"
         :style="{ width: '120px' }"
-        @change="onYearChange"
+        @change="(val: any) => onYearChange(val as number)"
       >
         <a-select-option v-for="year in yearOptions" :key="year" :value="year">
           {{ year }}
@@ -45,7 +45,8 @@
       ok-text="保存"
       cancel-text="取消"
       centered
-      :width="480"
+      :width="modalWidth"
+      :height="modalHeight"
       @ok="handleSave"
       @cancel="modalVisible = false"
     >
@@ -76,13 +77,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useKeyEventStore } from "@/stores/keyEventStore";
 import dayjs from "dayjs";
 import NotificationUtil from "@/backend/notification";
 
 const keyEventStore = useKeyEventStore();
 const isLoading = ref(false);
+
+// ========== 弹窗尺寸 ==========
+const windowWidth = ref(window.innerWidth);
+const windowHeight = ref(window.innerHeight);
+const modalWidth = computed(() => Math.floor(windowWidth.value * (2 / 3)));
+const modalHeight = computed(() => Math.floor(modalWidth.value * (3 / 4)));
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
+  windowHeight.value = window.innerHeight;
+};
 
 // ========== 年份选择 ==========
 const currentYear = new Date().getFullYear();
@@ -190,6 +202,11 @@ const onYearChange = async (year: number) => {
 // ========== 初始化 ==========
 onMounted(() => {
   keyEventStore.fetchDatesByYear(selectedYear.value);
+  window.addEventListener('resize', handleResize);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
 });
 </script>
 
