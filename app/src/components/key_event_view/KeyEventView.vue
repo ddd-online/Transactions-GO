@@ -2,15 +2,11 @@
   <div class="key-event-view">
     <!-- 顶部工具栏 -->
     <div class="key-event-toolbar">
-      <a-select
-        v-model:value="selectedYear"
-        :style="{ width: '120px' }"
-        @change="(val: any) => onYearChange(val as number)"
-      >
-        <a-select-option v-for="year in yearOptions" :key="year" :value="year">
-          {{ year }}
-        </a-select-option>
-      </a-select>
+      <div class="key-event-toolbar-left"></div>
+      <div class="key-event-toolbar-center">
+        <!-- Placeholder: will be filled by Task 2 -->
+      </div>
+      <div class="key-event-toolbar-right"></div>
     </div>
 
     <!-- 全年日历 -->
@@ -221,8 +217,22 @@ onUnmounted(() => {
 /* ========== 工具栏 ========== */
 .key-event-toolbar {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: var(--billadm-space-md);
+  flex-shrink: 0;
+  padding-bottom: var(--billadm-space-md);
+  border-bottom: 1px solid var(--billadm-color-divider);
+}
+
+.key-event-toolbar-left,
+.key-event-toolbar-right {
+  flex: 1;
+}
+
+.key-event-toolbar-center {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ========== 日历容器 ========== */
