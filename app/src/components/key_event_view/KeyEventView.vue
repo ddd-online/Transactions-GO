@@ -2,8 +2,7 @@
   <div class="key-event-view">
     <!-- 顶部工具栏 -->
     <div class="key-event-toolbar">
-      <div class="key-event-toolbar-left"></div>
-      <div class="key-event-toolbar-center">
+      <div class="key-event-toolbar-left">
         <a-button type="text" @click="goToPrevYear">
           <template #icon><LeftOutlined /></template>
         </a-button>
@@ -17,6 +16,7 @@
           <template #icon><RightOutlined /></template>
         </a-button>
       </div>
+      <div class="key-event-toolbar-center"></div>
       <div class="key-event-toolbar-right"></div>
     </div>
 
@@ -249,7 +249,12 @@ onUnmounted(() => {
   border-bottom: 1px solid var(--billadm-color-divider);
 }
 
-.key-event-toolbar-left,
+.key-event-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .key-event-toolbar-right {
   flex: 1;
 }
