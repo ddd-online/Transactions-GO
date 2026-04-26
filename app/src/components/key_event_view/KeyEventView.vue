@@ -35,7 +35,7 @@
             v-for="day in getMonthDays(month)"
             :key="day"
             class="day-cell"
-            :class="{ 'day-cell--has-record': hasRecord(selectedYear, month, day) }"
+            :class="{ 'day-cell--has-record': hasRecord(selectedYear, month, day), 'day-cell--today': isToday(selectedYear, month, day) }"
             @click="onDayClick(selectedYear, month, day)"
           >
             {{ day }}
@@ -143,6 +143,11 @@ const formatDate = (year: number, month: number, day: number) => {
 const hasRecord = (year: number, month: number, day: number) => {
   const dateStr = formatDate(year, month, day);
   return keyEventStore.hasRecord(dateStr);
+};
+
+const isToday = (year: number, month: number, day: number) => {
+  const today = dayjs();
+  return year === today.year() && month === today.month() + 1 && day === today.date();
 };
 
 // ========== 弹窗状态 ==========
@@ -326,6 +331,11 @@ onUnmounted(() => {
 
 .day-cell--has-record:hover {
   background-color: var(--billadm-color-primary-light);
+}
+
+.day-cell--today {
+  border: 2px solid var(--billadm-color-primary);
+  font-weight: var(--billadm-weight-bold);
 }
 
 /* ========== 弹窗内容 ========== */
