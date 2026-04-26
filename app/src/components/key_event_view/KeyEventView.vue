@@ -333,9 +333,19 @@ onUnmounted(() => {
   background-color: var(--billadm-color-primary-light);
 }
 
-.day-cell--today {
-  border: 2px solid var(--billadm-color-primary);
-  font-weight: var(--billadm-weight-bold);
+.day-cell--today::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 6px;
+  height: 6px;
+  background-color: var(--billadm-color-error, #ff4d4f);
+  border-radius: 50%;
+}
+
+.day-cell {
+  position: relative;
 }
 
 /* ========== 弹窗内容 ========== */
