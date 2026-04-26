@@ -46,7 +46,7 @@
       cancel-text="取消"
       centered
       :width="modalWidth"
-      :height="modalHeight"
+      :body-style="{ height: modalBodyHeight }"
       @ok="handleSave"
       @cancel="modalVisible = false"
     >
@@ -89,7 +89,7 @@ const isLoading = ref(false);
 const windowWidth = ref(window.innerWidth);
 const windowHeight = ref(window.innerHeight);
 const modalWidth = computed(() => Math.floor(windowWidth.value * (2 / 3)));
-const modalHeight = computed(() => Math.floor(modalWidth.value * (3 / 4)));
+const modalBodyHeight = computed(() => Math.floor(modalWidth.value * (3 / 4)) + 'px');
 
 const handleResize = () => {
   windowWidth.value = window.innerWidth;
@@ -310,6 +310,12 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: var(--billadm-space-sm);
+  height: 100%;
+}
+
+.event-modal-content :deep(.ant-input) {
+  flex: 1;
+  resize: none;
 }
 
 .event-date-label {
