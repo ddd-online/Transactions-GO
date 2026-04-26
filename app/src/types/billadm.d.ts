@@ -139,3 +139,14 @@ export interface TransactionTemplate {
     description: string;
     sort_order?: number;
 }
+
+/**
+ * 关键事件
+ */
+export interface KeyEvent {
+    id: string;           // 事件UUID
+    date: string;        // 日期 YYYY-MM-DD
+    content: string;     // 事件内容
+    createdAt: number;   // 创建时间戳
+    updatedAt: number;   // 更新时间戳
+}
