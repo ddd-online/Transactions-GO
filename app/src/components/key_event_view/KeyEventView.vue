@@ -51,7 +51,6 @@
       @cancel="modalVisible = false"
     >
       <div class="event-modal-content">
-        <div class="event-date-label">{{ selectedDate }}</div>
         <a-textarea
           v-model:value="eventContent"
           placeholder="记录今天发生的事情..."
@@ -309,11 +308,16 @@ onUnmounted(() => {
 .event-modal-content {
   display: flex;
   flex-direction: column;
-  gap: var(--billadm-space-sm);
   height: 100%;
 }
 
-.event-modal-content :deep(.ant-input) {
+.event-modal-content :deep(.ant-input-textarea) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-modal-content :deep(.ant-input-textarea textarea) {
   flex: 1;
   resize: none;
 }
