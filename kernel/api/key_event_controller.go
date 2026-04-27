@@ -10,6 +10,35 @@ import (
 	"github.com/billadm/workspace"
 )
 
+// GET /api/v1/key-events/year/:year
+func listKeyEventsByYear(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	year := c.Param("year")
+	if year == "" {
+		ret.Code = -1
+		ret.Msg = "missing year parameter"
+		return
+	}
+
+	events, err := service.GetKeyEventService().QueryByYear(ws, year)
+	if err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ret.Data = events
+}
+
 // GET /api/v1/key-events/dates/:year
 func listKeyEventDates(c *gin.Context) {
 	ret := models.NewResult()
@@ -68,7 +97,7 @@ func getKeyEvent(c *gin.Context) {
 	ret.Data = event
 }
 
-// POST /api/v1/key-events  body: { date, content }
+// POST /api/v1/key-events  body: { date, title, content }
 func upsertKeyEvent(c *gin.Context) {
 	ret := models.NewResult()
 	defer c.JSON(http.StatusOK, ret)
@@ -92,9 +121,10 @@ func upsertKeyEvent(c *gin.Context) {
 		return
 	}
 
+	title, _ := arg["title"].(string)
 	content, _ := arg["content"].(string)
 
-	if err := service.GetKeyEventService().UpsertKeyEvent(ws, date, content); err != nil {
+	if err := service.GetKeyEventService().UpsertKeyEvent(ws, date, title, content); err != nil {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return

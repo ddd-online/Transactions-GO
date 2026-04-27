@@ -73,6 +73,7 @@ func ServeAPI(ginServer *gin.Engine) {
 		// Key Events
 		keyEvents := v1.Group("/key-events")
 		{
+			keyEvents.GET("/year/:year", listKeyEventsByYear)
 			keyEvents.GET("/dates/:year", listKeyEventDates)
 			keyEvents.GET("/:date", getKeyEvent)
 			keyEvents.POST("", upsertKeyEvent)

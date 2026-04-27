@@ -29,8 +29,9 @@ func GetKeyEventService() KeyEventService {
 }
 
 type KeyEventService interface {
-	UpsertKeyEvent(ws *workspace.Workspace, date string, content string) error
+	UpsertKeyEvent(ws *workspace.Workspace, date string, title string, content string) error
 	QueryByDate(ws *workspace.Workspace, date string) (*models.KeyEvent, error)
+	QueryByYear(ws *workspace.Workspace, year string) ([]models.KeyEvent, error)
 	QueryDatesByYear(ws *workspace.Workspace, year string) ([]string, error)
 	DeleteByDate(ws *workspace.Workspace, date string) error
 }
@@ -41,8 +42,8 @@ type keyEventServiceImpl struct {
 	keyEventDao dao.KeyEventDao
 }
 
-// UpsertKeyEvent 根据 date 判断是否存在：存在则更新 content，不存在则新建
-func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date string, content string) error {
+// UpsertKeyEvent 根据 date 判断是否存在：存在则更新 title 和 content，不存在则新建
+func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date string, title string, content string) error {
 	existing, err := s.keyEventDao.QueryByDate(ws, date)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return err
@@ -50,6 +51,7 @@ func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date strin
 
 	if existing != nil {
 		// Update
+		existing.Title = title
 		existing.Content = content
 		return s.keyEventDao.UpsertKeyEvent(ws, existing)
 	}
@@ -58,6 +60,7 @@ func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date strin
 	event := &models.KeyEvent{
 		ID:      util.GetUUID(),
 		Date:    date,
+		Title:   title,
 		Content: content,
 	}
 	return s.keyEventDao.UpsertKeyEvent(ws, event)
@@ -65,6 +68,10 @@ func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date strin
 
 func (s *keyEventServiceImpl) QueryByDate(ws *workspace.Workspace, date string) (*models.KeyEvent, error) {
 	return s.keyEventDao.QueryByDate(ws, date)
+}
+
+func (s *keyEventServiceImpl) QueryByYear(ws *workspace.Workspace, year string) ([]models.KeyEvent, error) {
+	return s.keyEventDao.QueryByYear(ws, year)
 }
 
 func (s *keyEventServiceImpl) QueryDatesByYear(ws *workspace.Workspace, year string) ([]string, error) {
