@@ -31,21 +31,25 @@
           <!-- 空白占位格 -->
           <div v-for="n in getMonthFirstWeekday(month)" :key="'blank-' + n" class="day-cell day-cell--blank" />
           <!-- 日期格 -->
-          <div
+          <a-tooltip
             v-for="day in getMonthDays(month)"
             :key="day"
-            class="day-cell"
-            :class="{ 'day-cell--has-record': hasRecord(selectedYear, month, day), 'day-cell--today': isToday(selectedYear, month, day) }"
-            role="button"
-            tabindex="0"
-            :aria-label="`${month}月${day}日`"
-            :aria-pressed="keyEventStore.hasRecord(formatDate(selectedYear, month, day))"
-            @click="onDayClick(selectedYear, month, day)"
-            @keydown.enter.prevent="onDayClick(selectedYear, month, day)"
-            @keydown.space.prevent="onDayClick(selectedYear, month, day)"
+            :title="hasRecord(selectedYear, month, day) ? (getTooltipTitle(formatDate(selectedYear, month, day)) || '无标题') : ''"
           >
-            {{ day }}
-          </div>
+            <div
+              class="day-cell"
+              :class="{ 'day-cell--has-record': hasRecord(selectedYear, month, day), 'day-cell--today': isToday(selectedYear, month, day) }"
+              role="button"
+              tabindex="0"
+              :aria-label="`${month}月${day}日`"
+              :aria-pressed="keyEventStore.hasRecord(formatDate(selectedYear, month, day))"
+              @click="onDayClick(selectedYear, month, day)"
+              @keydown.enter.prevent="onDayClick(selectedYear, month, day)"
+              @keydown.space.prevent="onDayClick(selectedYear, month, day)"
+            >
+              {{ day }}
+            </div>
+          </a-tooltip>
         </div>
       </div>
     </div>
@@ -64,6 +68,12 @@
       @cancel="modalVisible = false"
     >
       <div class="event-modal-content">
+        <a-input
+          v-model:value="eventTitle"
+          placeholder="标题（可选）"
+          :maxlength="200"
+          class="event-title-input"
+        />
         <a-textarea
           v-model:value="eventContent"
           placeholder="记录今天发生的事情..."
@@ -156,11 +166,23 @@ const isToday = (year: number, month: number, day: number) => {
   return year === today.year() && month === today.month() + 1 && day === today.date();
 };
 
+const getTooltipTitle = (dateStr: string): string => {
+  if (!keyEventStore.hasRecord(dateStr)) return '';
+  const title = keyEventStore.getTitle(dateStr);
+  return title || '无标题';
+};
+
+const extractTitle = (content: string): string => {
+  const firstLine = content.split('\n')[0]?.trim() ?? '';
+  return firstLine.length > 200 ? firstLine.slice(0, 200) : firstLine;
+};
+
 // ========== 弹窗状态 ==========
 const modalVisible = ref(false);
 const confirmLoading = ref(false);
 const selectedDate = ref('');
 const eventContent = ref('');
+const eventTitle = ref('');
 const isEditMode = ref(false);
 
 const modalTitle = computed(() => {
@@ -177,9 +199,11 @@ const onDayClick = async (year: number, month: number, day: number) => {
     try {
       const event = await keyEventStore.fetchEventByDate(dateStr);
       if (event) {
+        eventTitle.value = event.title;
         eventContent.value = event.content;
         isEditMode.value = true;
       } else {
+        eventTitle.value = '';
         eventContent.value = '';
         isEditMode.value = false;
       }
@@ -188,6 +212,7 @@ const onDayClick = async (year: number, month: number, day: number) => {
     }
   } else {
     // 无记录，直接新建
+    eventTitle.value = '';
     eventContent.value = '';
     isEditMode.value = false;
   }
@@ -200,9 +225,10 @@ const handleSave = async () => {
     NotificationUtil.warning('内容不能为空', '请输入事件内容');
     return;
   }
+  const title = eventTitle.value.trim() || extractTitle(eventContent.value);
   confirmLoading.value = true;
   try {
-    await keyEventStore.saveEvent(selectedDate.value, eventContent.value.trim());
+    await keyEventStore.saveEvent(selectedDate.value, title, eventContent.value.trim());
     modalVisible.value = false;
   } finally {
     confirmLoading.value = false;
@@ -385,6 +411,10 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   height: 100%;
+}
+
+.event-title-input {
+  margin-bottom: var(--billadm-space-sm);
 }
 
 .event-modal-content :deep(.ant-input-textarea) {
