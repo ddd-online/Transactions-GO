@@ -146,6 +146,7 @@ export interface TransactionTemplate {
 export interface KeyEvent {
     id: string;           // 事件UUID
     date: string;        // 日期 YYYY-MM-DD
+    title: string;       // 事件标题（可为空）
     content: string;     // 事件内容
     createdAt: number;   // 创建时间戳
     updatedAt: number;   // 更新时间戳
