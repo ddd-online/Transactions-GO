@@ -15,6 +15,8 @@ export const useKeyEventStore = defineStore('keyEvent', () => {
     const currentYear = ref(new Date().getFullYear());
     // 日期 -> 标题 的缓存
     const titles = ref(new Map<string, string>());
+    // 日期 -> 颜色 的缓存
+    const colors = ref(new Map<string, string>());
 
     // 获取某年有记录的日期列表
     const fetchDatesByYear = async (year: number) => {
@@ -22,6 +24,7 @@ export const useKeyEventStore = defineStore('keyEvent', () => {
             const events = await queryKeyEventsByYear(year);
             datesWithRecords.value = new Set(events.map(e => e.date));
             titles.value = new Map(events.map(e => [e.date, e.title]));
+            colors.value = new Map(events.map(e => [e.date, e.color]));
             currentYear.value = year;
         } catch (error) {
             NotificationUtil.error('查询关键事件失败', `${error}`);
@@ -43,11 +46,12 @@ export const useKeyEventStore = defineStore('keyEvent', () => {
     };
 
     // 保存事件（新建或更新）
-    const saveEvent = async (date: string, title: string, content: string): Promise<void> => {
+    const saveEvent = async (date: string, title: string, content: string, color: string): Promise<void> => {
         try {
-            await saveKeyEvent(date, title, content);
+            await saveKeyEvent(date, title, content, color);
             datesWithRecords.value.add(date);
             titles.value.set(date, title);
+            colors.value.set(date, color);
             NotificationUtil.success('保存成功');
         } catch (error) {
             NotificationUtil.error('保存失败', `${error}`);
@@ -61,6 +65,7 @@ export const useKeyEventStore = defineStore('keyEvent', () => {
             await deleteKeyEvent(date);
             datesWithRecords.value.delete(date);
             titles.value.delete(date);
+            colors.value.delete(date);
             NotificationUtil.success('删除成功');
         } catch (error) {
             NotificationUtil.error('删除失败', `${error}`);
@@ -78,6 +83,11 @@ export const useKeyEventStore = defineStore('keyEvent', () => {
         return titles.value.get(date) || '';
     };
 
+    // 获取某天的颜色
+    const getColor = (date: string): string => {
+        return colors.value.get(date) || '';
+    };
+
     return {
         datesWithRecords,
         currentYear,
@@ -87,5 +97,6 @@ export const useKeyEventStore = defineStore('keyEvent', () => {
         deleteEvent,
         hasRecord,
         getTitle,
+        getColor,
     };
 });

@@ -39,6 +39,7 @@
             <div
               class="day-cell"
               :class="{ 'day-cell--has-record': hasRecord(selectedYear, month, day), 'day-cell--today': isToday(selectedYear, month, day) }"
+              :style="getDayCellStyle(selectedYear, month, day)"
               role="button"
               tabindex="0"
               :aria-label="`${month}月${day}日`"
@@ -74,6 +75,18 @@
           :maxlength="200"
           class="event-title-input"
         />
+        <div class="color-picker">
+          <div
+            v-for="c in EVENT_COLORS"
+            :key="c"
+            class="color-swatch"
+            :class="{ 'is-selected': eventColor === c }"
+            :style="{ backgroundColor: c }"
+            @click="eventColor = c"
+          >
+            <CheckOutlined v-if="eventColor === c" class="check-icon" />
+          </div>
+        </div>
         <a-textarea
           v-model:value="eventContent"
           placeholder="记录今天发生的事情..."
@@ -103,10 +116,21 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useKeyEventStore } from "@/stores/keyEventStore";
 import dayjs, { type Dayjs } from "dayjs";
 import NotificationUtil from "@/backend/notification";
-import { LeftOutlined, RightOutlined } from "@ant-design/icons-vue";
+import { LeftOutlined, RightOutlined, CheckOutlined } from "@ant-design/icons-vue";
 
 const keyEventStore = useKeyEventStore();
 const isLoading = ref(false);
+
+// ========== 颜色配置 ==========
+const EVENT_COLORS = [
+  '#C73E3A', '#E57373', '#2D7D46', '#4CAF50',
+  '#5A7FAA', '#64B5F6', '#C9A227', '#8B7355',
+  '#7A5C58', '#5C7A6A'
+]
+
+const DEFAULT_COLOR = '#2D5A27'  // --billadm-color-primary
+
+const eventColor = ref(DEFAULT_COLOR)
 
 // ========== 弹窗尺寸 ==========
 const windowWidth = ref(window.innerWidth);
@@ -172,6 +196,13 @@ const getTooltipTitle = (dateStr: string): string => {
   return title || '无标题';
 };
 
+const getDayCellStyle = (year: number, month: number, day: number) => {
+  const dateStr = formatDate(year, month, day);
+  if (!keyEventStore.hasRecord(dateStr)) return {};
+  const color = keyEventStore.getColor(dateStr) || DEFAULT_COLOR;
+  return { '--event-color': color } as Record<string, string>;
+};
+
 const extractTitle = (content: string): string => {
   const firstLine = content.split('\n')[0]?.trim() ?? '';
   return firstLine.length > 200 ? firstLine.slice(0, 200) : firstLine;
@@ -201,10 +232,12 @@ const onDayClick = async (year: number, month: number, day: number) => {
       if (event) {
         eventTitle.value = event.title;
         eventContent.value = event.content;
+        eventColor.value = event.color || DEFAULT_COLOR;
         isEditMode.value = true;
       } else {
         eventTitle.value = '';
         eventContent.value = '';
+        eventColor.value = DEFAULT_COLOR;
         isEditMode.value = false;
       }
     } finally {
@@ -214,6 +247,7 @@ const onDayClick = async (year: number, month: number, day: number) => {
     // 无记录，直接新建
     eventTitle.value = '';
     eventContent.value = '';
+    eventColor.value = DEFAULT_COLOR;
     isEditMode.value = false;
   }
 
@@ -228,7 +262,7 @@ const handleSave = async () => {
   const title = eventTitle.value.trim() || extractTitle(eventContent.value);
   confirmLoading.value = true;
   try {
-    await keyEventStore.saveEvent(selectedDate.value, title, eventContent.value.trim());
+    await keyEventStore.saveEvent(selectedDate.value, title, eventContent.value.trim(), eventColor.value);
     modalVisible.value = false;
   } finally {
     confirmLoading.value = false;
@@ -382,7 +416,7 @@ onUnmounted(() => {
 }
 
 .day-cell--has-record {
-  background-color: var(--billadm-color-primary);
+  background-color: var(--event-color, var(--billadm-color-primary));
   color: var(--billadm-color-text-inverse);
   font-weight: var(--billadm-weight-semibold);
 }
@@ -426,6 +460,39 @@ onUnmounted(() => {
 .event-modal-content :deep(.ant-input-textarea textarea) {
   flex: 1;
   resize: none;
+}
+
+/* ========== 颜色选择器 ========== */
+.color-picker {
+  display: flex;
+  gap: 6px;
+  margin-bottom: var(--billadm-space-sm);
+  flex-wrap: wrap;
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: border-color var(--billadm-transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-swatch:hover {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.color-swatch.is-selected {
+  border-color: #000;
+}
+
+.check-icon {
+  color: #fff;
+  font-size: 12px;
 }
 
 .event-date-label {

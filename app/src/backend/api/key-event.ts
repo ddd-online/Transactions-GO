@@ -13,8 +13,8 @@ export async function queryKeyEventByDate(date: string): Promise<KeyEvent> {
     return api.get<KeyEvent>(`/v1/key-events/${date}`, '查询关键事件详情');
 }
 
-export async function saveKeyEvent(date: string, title: string, content: string): Promise<string> {
-    return api.post<string>('/v1/key-events', { date, title, content }, '保存关键事件');
+export async function saveKeyEvent(date: string, title: string, content: string, color: string): Promise<string> {
+    return api.post<string>('/v1/key-events', { date, title, content, color }, '保存关键事件');
 }
 
 export async function deleteKeyEvent(date: string): Promise<void> {
