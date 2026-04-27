@@ -422,7 +422,7 @@ onUnmounted(() => {
 }
 
 .day-cell--has-record:hover {
-  background-color: var(--billadm-color-primary-light);
+  background-color: var(--billadm-color-primary-light) !important;
 }
 
 .day-cell--today::after {
