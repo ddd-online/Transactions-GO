@@ -44,6 +44,10 @@ type keyEventServiceImpl struct {
 
 // UpsertKeyEvent 根据 date 判断是否存在：存在则更新 title 和 content，不存在则新建
 func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date string, title string, content string) error {
+	if len(title) > 200 {
+		title = title[:200]
+	}
+
 	existing, err := s.keyEventDao.QueryByDate(ws, date)
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return err
