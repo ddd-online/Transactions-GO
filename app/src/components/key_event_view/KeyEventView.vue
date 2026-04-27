@@ -125,7 +125,10 @@ const isLoading = ref(false);
 const EVENT_COLORS = [
   '#C73E3A', '#E57373', '#2D7D46', '#4CAF50',
   '#5A7FAA', '#64B5F6', '#C9A227', '#8B7355',
-  '#7A5C58', '#5C7A6A'
+  '#7A5C58', '#5C7A6A',
+  '#9C27B0', '#BA68C8', '#FF9800', '#FFB74D',
+  '#00BCD4', '#4DD0E1', '#795548', '#A1887F',
+  '#607D8B', '#90A4AE'
 ]
 
 const DEFAULT_COLOR = '#2D5A27'  // --billadm-color-primary
