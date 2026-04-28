@@ -157,7 +157,7 @@ const handleSwitchWorkspace = async (newWorkspaceDir: string) => {
 
 .hero-path {
   font-size: var(--billadm-size-text-body);
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: var(--billadm-font-mono);
   color: var(--billadm-color-text-major);
   margin: 0;
   max-width: 400px;

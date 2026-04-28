@@ -465,8 +465,11 @@ watch(
   align-items: center;
   justify-content: space-between;
   padding: var(--billadm-space-md) var(--billadm-space-lg);
+  border-radius: var(--billadm-radius-md);
+  border: 1px solid transparent;
   cursor: pointer;
-  transition: background-color var(--billadm-transition-fast);
+  transition: background-color var(--billadm-transition-fast),
+              border-color var(--billadm-transition-fast);
   position: relative;
 }
 
@@ -476,16 +479,7 @@ watch(
 
 .category-item.is-active {
   background-color: var(--billadm-color-active-bg);
-}
-
-.category-item.is-active::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background-color: var(--billadm-color-primary);
+  border: 1px solid var(--billadm-color-primary);
 }
 
 .category-info {

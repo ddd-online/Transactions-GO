@@ -75,9 +75,9 @@
       @cancel="closeTrModal" cancel-text="取消" centered>
       <a-form :model="trForm" :rules="rules">
         <a-form-item label="模板">
-          <div style="display: flex; gap: 8px; align-items: center;">
+          <div class="template-select-row">
             <a-select v-model:value="selectedTemplateId" :options="templateOptions" placeholder="选择模板自动填充"
-              style="flex: 1;" allowClear />
+              class="template-select" allowClear />
             <a-button @click="saveAsTemplate" :disabled="!trForm.type || !trForm.category">
               保存为模板
             </a-button>
@@ -510,5 +510,15 @@ watch(() => ledgerStore.currentLedgerId, () => {
   display: flex;
   justify-content: flex-end;
   gap: var(--billadm-space-sm);
+}
+
+.template-select-row {
+  display: flex;
+  gap: var(--billadm-space-sm);
+  align-items: center;
+}
+
+.template-select {
+  flex: 1;
 }
 </style>

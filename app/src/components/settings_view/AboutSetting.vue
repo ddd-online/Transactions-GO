@@ -73,7 +73,8 @@ const buildTime = ref('2024-04-20');
 }
 
 .app-name {
-  font-size: 24px;
+  font-family: var(--billadm-font-display);
+  font-size: var(--billadm-size-text-display-sm);
   font-weight: 600;
   color: var(--billadm-color-text-major);
   margin: 0;
@@ -89,7 +90,7 @@ const buildTime = ref('2024-04-20');
   text-align: center;
   color: var(--billadm-color-text-secondary);
   font-size: var(--billadm-size-text-body);
-  line-height: 1.8;
+  line-height: var(--billadm-height-relaxed);
 }
 
 .about-links {

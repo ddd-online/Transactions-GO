@@ -21,12 +21,12 @@ const props = defineProps<Props>()
 const containerRef = ref<HTMLDivElement | null>(null)
 let chart: Chart | null = null
 
-// 获取当前主题颜色
+// Get theme colors from design system CSS custom properties
 const getThemeColors = () => {
-  const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+  const styles = getComputedStyle(document.documentElement)
   return {
-    labelFill: isDark ? '#FFFFFF' : '#000000',
-    titleFill: isDark ? '#FFFFFF' : '#000000',
+    labelFill: styles.getPropertyValue('--billadm-color-text-major').trim() || '#1A1A18',
+    titleFill: styles.getPropertyValue('--billadm-color-text-major').trim() || '#1A1A18',
   }
 }
 
@@ -107,7 +107,7 @@ const initChart = () => {
     .encode('y', props.yField)
     .encode('color', 'label')
     .style('size', 4)
-    .style('stroke', '#fff')
+    .style('stroke', getComputedStyle(document.documentElement).getPropertyValue('--billadm-color-major-background').trim() || '#FFFFFF')
     .style('lineWidth', 1)
     .tooltip(false)
 

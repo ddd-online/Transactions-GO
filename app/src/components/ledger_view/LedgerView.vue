@@ -4,6 +4,7 @@
     <div class="ledger-grid" v-if="ledgerStore.ledgers.length > 0">
       <article v-for="(ledger, index) in ledgerStore.ledgers" :key="ledger.id"
         class="ledger-card"
+        :class="{ 'is-featured': index === 0 && ledgerStore.ledgers.length >= 3 }"
         :style="{
           '--ledger-accent': `var(${ledgerColorVars[index % ledgerColorVars.length]})`,
           animationDelay: `${index * 60}ms`
@@ -26,7 +27,7 @@
                 </svg>
               </div>
               <div class="ledger-info">
-                <h3 class="ledger-name">{{ ledger.name }}</h3>
+                <h2 class="ledger-name">{{ ledger.name }}</h2>
                 <p class="ledger-desc" :class="{ 'is-empty': !ledger.description }">
                   {{ ledger.description || '暂无描述' }}
                 </p>
@@ -79,7 +80,7 @@
           <path d="M24 36h16M28 44h8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
         </svg>
       </div>
-      <h3 class="empty-state-title">还没有账本</h3>
+      <h2 class="empty-state-title">还没有账本</h2>
       <p class="empty-state-desc">点击下方按钮创建你的第一个账本</p>
     </div>
 
@@ -191,35 +192,36 @@ const handleOk = async () => {
   align-content: start;
 }
 
+/* Featured first card — spans 2 columns when 3+ cards exist */
+.ledger-card.is-featured {
+  grid-column: span 2;
+}
+
+.ledger-card.is-featured .ledger-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.ledger-card.is-featured .ledger-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
 /* ========== Ledger Card ========== */
 .ledger-card {
   border-radius: var(--billadm-radius-lg);
   background-color: var(--billadm-color-major-background);
   border: 1px solid var(--billadm-color-window-border);
+  border-top: 3px solid var(--ledger-accent, var(--billadm-ledger-forest));
   transition: box-shadow var(--billadm-transition-normal), transform var(--billadm-transition-fast);
   position: relative;
   overflow: hidden;
 }
 
-.ledger-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background-color: var(--ledger-accent, var(--billadm-ledger-forest));
-  opacity: 0.6;
-  transition: opacity var(--billadm-transition-fast);
-}
-
 .ledger-card:hover {
   box-shadow: var(--billadm-shadow-lg);
   transform: translateY(-2px);
-}
-
-.ledger-card:hover::before {
-  opacity: 1;
+  border-top-color: var(--billadm-color-primary);
 }
 
 .ledger-card-inner {
@@ -366,18 +368,6 @@ const handleOk = async () => {
   justify-content: center;
   padding: var(--billadm-space-3xl);
   text-align: center;
-  position: relative;
-}
-
-.empty-state::before {
-  content: '';
-  position: absolute;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--billadm-color-primary) 0%, transparent 60%);
-  opacity: 0.08;
-  pointer-events: none;
 }
 
 .empty-state-visual {

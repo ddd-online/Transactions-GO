@@ -35,13 +35,13 @@ const appDataStore = useAppDataStore();
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 20px;
+  gap: var(--billadm-space-2xl);
 }
 
 .statistics-footer-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--billadm-space-md);
 }
 
 .statistics-footer-item-label {

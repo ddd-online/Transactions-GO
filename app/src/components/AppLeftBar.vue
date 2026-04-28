@@ -8,7 +8,7 @@
         aria-label="账本"
         title="账本"
       >
-        <BookOutlined style="font-size: 20px"/>
+        <BookOutlined />
       </button>
       <button
         class="nav-btn"
@@ -17,7 +17,7 @@
         aria-label="交易记录"
         title="交易记录"
       >
-        <TransactionOutlined style="font-size: 20px"/>
+        <TransactionOutlined />
       </button>
       <button
         class="nav-btn"
@@ -26,7 +26,7 @@
         aria-label="数据分析"
         title="数据分析"
       >
-        <LineChartOutlined style="font-size: 20px"/>
+        <LineChartOutlined />
       </button>
       <button
         class="nav-btn"
@@ -35,7 +35,7 @@
         aria-label="关键事件"
         title="关键事件"
       >
-        <StarOutlined style="font-size: 20px"/>
+        <StarOutlined />
       </button>
     </div>
     <div class="app-left-bar-bottom">
@@ -46,7 +46,7 @@
         aria-label="设置"
         title="设置"
       >
-        <SettingOutlined style="font-size: 20px"/>
+        <SettingOutlined />
       </button>
     </div>
   </div>
@@ -102,6 +102,7 @@ const navigate = (path: string) => {
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 20px;
 }
 
 .nav-btn:hover {

@@ -32,7 +32,7 @@
       <div class="config-desc">在终端运行以下命令添加 MCP 服务器：</div>
       <pre class="config-code"><code>{{ configCommand }}</code></pre>
 
-      <div class="config-title" style="margin-top: 16px;">可用工具</div>
+      <div class="config-title config-title--tools">可用工具</div>
       <div class="tools-list">
         <div class="tool-item">
           <div class="tool-name">query_ledgers</div>
@@ -169,6 +169,10 @@ const handleToggle = async (checked: boolean | string | number) => {
   color: var(--billadm-color-text-major);
 }
 
+.config-title--tools {
+  margin-top: var(--billadm-space-lg);
+}
+
 .config-desc {
   font-size: var(--billadm-size-text-caption);
   color: var(--billadm-color-text-secondary);
@@ -182,12 +186,13 @@ const handleToggle = async (checked: boolean | string | number) => {
 }
 
 .config-code {
-  background-color: #1e1e1e;
-  color: #d4d4d4;
+  background-color: var(--billadm-color-elevated);
+  color: var(--billadm-color-text-major);
   padding: var(--billadm-space-md);
   border-radius: var(--billadm-radius-md);
+  border: 1px solid var(--billadm-color-divider);
   font-size: var(--billadm-size-text-caption);
-  font-family: 'Consolas', 'Monaco', monospace;
+  font-family: var(--billadm-font-mono);
   overflow-x: auto;
   margin: 0;
 }
@@ -253,12 +258,13 @@ const handleToggle = async (checked: boolean | string | number) => {
 }
 
 .example-output {
-  background-color: #1e1e1e;
-  color: #d4d4d4;
+  background-color: var(--billadm-color-elevated);
+  color: var(--billadm-color-text-major);
   padding: var(--billadm-space-sm);
   border-radius: var(--billadm-radius-md);
+  border: 1px solid var(--billadm-color-divider);
   font-size: var(--billadm-size-text-small);
-  font-family: monospace;
+  font-family: var(--billadm-font-mono);
   overflow-x: auto;
   margin: 0;
   line-height: 1.5;

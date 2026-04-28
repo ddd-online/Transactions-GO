@@ -2,7 +2,7 @@
   <div class="chart-view">
     <!-- 图表头部 -->
     <div class="chart-view-header">
-      <h3 class="chart-view-title">{{ title }}</h3>
+      <h2 class="chart-view-title">{{ title }}</h2>
       <a-button type="text" size="small" @click="drawerVisible = true">
         <template #icon>
           <SettingOutlined />
@@ -21,7 +21,7 @@
             </template>
             添加曲线
           </a-button>
-          <a-button type="primary" size="small" style="margin-left: 8px;" @click="handleSave">
+          <a-button type="primary" size="small" class="drawer-save-btn" @click="handleSave">
             保存修改
           </a-button>
         </div>
@@ -68,7 +68,7 @@
         <a-table-column title="筛选条件">
           <template #default="{ record }">
             <template v-if="record.conditions && record.conditions.length > 0">
-              <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+              <div class="conditions-tags">
                 <a-tag v-for="cond in record.conditions" :key="cond.description" color="purple">
                   {{ cond.category }}
                   <template v-if="cond.tags && cond.tags.length > 0">
@@ -80,7 +80,7 @@
                 </a-tag>
               </div>
             </template>
-            <span v-else style="color: #999;">无</span>
+            <span v-else class="text-disabled">无</span>
           </template>
         </a-table-column>
         <a-table-column v-if="!isPreset" title="操作" width="60">
@@ -351,24 +351,10 @@ const formatAmount = (amount: number) => {
 
 .chart-view-title {
   margin: 0;
+  font-family: var(--billadm-font-display);
   font-size: var(--billadm-size-text-title);
   font-weight: 600;
   color: var(--billadm-color-text-major);
-  position: relative;
-  padding-left: var(--billadm-space-lg);
-}
-
-/* Accent bar - indicates active/selected state */
-.chart-view-title::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 4px;
-  height: 24px;
-  background-color: var(--billadm-color-primary);
-  border-radius: 2px;
 }
 
 .chart-view-actions {
@@ -381,6 +367,20 @@ const formatAmount = (amount: number) => {
   display: flex;
   align-items: center;
   gap: var(--billadm-space-sm);
+}
+
+.drawer-save-btn {
+  margin-left: var(--billadm-space-sm);
+}
+
+.conditions-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--billadm-space-xs);
+}
+
+.text-disabled {
+  color: var(--billadm-color-text-disabled);
 }
 
 .chart-view-content {
@@ -425,7 +425,7 @@ const formatAmount = (amount: number) => {
   background-color: var(--billadm-color-major-background);
   border-radius: var(--billadm-radius-md);
   border: 1px solid var(--billadm-color-divider);
-  transition: all 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all var(--billadm-transition-smooth);
 }
 
 .line-sum-item:hover {
@@ -454,7 +454,7 @@ const formatAmount = (amount: number) => {
 }
 
 .line-sum-item {
-  animation: statSlideIn 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: statSlideIn var(--billadm-transition-slow) both;
 }
 
 .line-sum-item:nth-child(1) {

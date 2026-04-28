@@ -45,9 +45,9 @@ defineEmits<{
   gap: 6px;
   border: 1px solid transparent;
   border-radius: var(--billadm-radius-sm);
-  font-size: 14px;
+  font-size: var(--billadm-size-text-body);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all var(--billadm-transition-normal);
   outline: none;
   white-space: nowrap;
 }
@@ -61,7 +61,7 @@ defineEmits<{
 .billadm-btn-small {
   height: 24px;
   padding: 0 8px;
-  font-size: 12px;
+  font-size: var(--billadm-size-text-caption);
 }
 
 .billadm-btn-default {
@@ -87,13 +87,13 @@ defineEmits<{
 }
 
 .billadm-btn-primary:hover:not(:disabled) {
-  background-color: var(--billadm-color-primary-hover, #4096ff);
-  border-color: var(--billadm-color-primary-hover, #4096ff);
+  background-color: var(--billadm-color-primary-light);
+  border-color: var(--billadm-color-primary-light);
 }
 
 .billadm-btn-primary:active:not(:disabled) {
-  background-color: var(--billadm-color-primary-active, #0958d9);
-  border-color: var(--billadm-color-primary-active, #0958d9);
+  background-color: var(--billadm-color-primary);
+  border-color: var(--billadm-color-primary);
 }
 
 /* Secondary (Default) */
@@ -104,7 +104,7 @@ defineEmits<{
 }
 
 .billadm-btn-secondary:hover:not(:disabled) {
-  background-color: var(--billadm-color-icon-hover-bg);
+  background-color: var(--billadm-color-hover-bg);
   border-color: var(--billadm-color-primary);
   color: var(--billadm-color-primary);
 }
@@ -117,7 +117,7 @@ defineEmits<{
 }
 
 .billadm-btn-text:hover:not(:disabled) {
-  background-color: var(--billadm-color-icon-hover-bg);
+  background-color: var(--billadm-color-hover-bg);
   color: var(--billadm-color-primary);
 }
 
@@ -141,8 +141,9 @@ defineEmits<{
 }
 
 .billadm-btn-danger.billadm-btn-primary:hover:not(:disabled) {
-  background-color: #ff4d4f;
-  border-color: #ff4d4f;
+  background-color: var(--billadm-color-negative);
+  border-color: var(--billadm-color-negative);
+  opacity: 0.85;
 }
 
 .billadm-btn-danger.billadm-btn-secondary,
@@ -152,7 +153,7 @@ defineEmits<{
 
 .billadm-btn-danger.billadm-btn-secondary:hover:not(:disabled),
 .billadm-btn-danger.billadm-btn-text:hover:not(:disabled) {
-  background-color: rgba(245, 34, 45, 0.1);
+  background-color: rgba(199, 62, 58, 0.1);
   border-color: var(--billadm-color-negative);
   color: var(--billadm-color-negative);
 }

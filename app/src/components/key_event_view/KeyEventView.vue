@@ -123,8 +123,8 @@ const isLoading = ref(false);
 
 // ========== 颜色配置 ==========
 const EVENT_COLORS = [
-  '#C73E3A', '#E57373', '#2D7D46', '#4CAF50',
-  '#5A7FAA', '#64B5F6', '#C9A227', '#8B7355',
+  '#D4756E', '#E57373', '#3E8E50', '#4CAF50',
+  '#6B8FB8', '#64B5F6', '#C9A227', '#9E8770',
   '#7A5C58', '#5C7A6A',
   '#9C27B0', '#BA68C8', '#FF9800', '#FFB74D',
   '#00BCD4', '#4DD0E1', '#795548', '#A1887F',
@@ -375,11 +375,13 @@ onUnmounted(() => {
 }
 
 .month-header {
+  font-family: var(--billadm-font-display);
   font-size: var(--billadm-size-text-body);
   font-weight: var(--billadm-weight-semibold);
   color: var(--billadm-color-text-major);
   text-align: center;
   padding-bottom: var(--billadm-space-xs);
+  letter-spacing: -0.01em;
 }
 
 .weekday-header {
@@ -407,7 +409,9 @@ onUnmounted(() => {
   color: var(--billadm-color-text-major);
   border-radius: var(--billadm-radius-sm);
   cursor: pointer;
-  transition: background-color var(--billadm-transition-fast);
+  transition: background-color var(--billadm-transition-fast),
+              filter var(--billadm-transition-fast),
+              box-shadow var(--billadm-transition-fast);
 }
 
 .day-cell:hover {
@@ -422,10 +426,12 @@ onUnmounted(() => {
   background-color: var(--event-color, var(--billadm-color-primary));
   color: var(--billadm-color-text-inverse);
   font-weight: var(--billadm-weight-semibold);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
 
 .day-cell--has-record:hover {
-  background-color: var(--billadm-color-primary-light) !important;
+  filter: brightness(1.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .day-cell--today::after {
@@ -496,6 +502,7 @@ onUnmounted(() => {
 .check-icon {
   color: #fff;
   font-size: 12px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5));
 }
 
 .event-date-label {

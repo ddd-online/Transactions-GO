@@ -76,13 +76,13 @@ const handleDblClick = () => {
   width: 80%;
   height: auto;
   max-width: 1200px;
-  background: var(--billadm-color-major-background-color);
-  border: 1px solid var(--billadm-color-window-border-color);
-  border-radius: 16px;
+  background: var(--billadm-color-elevated);
+  border: 1px solid var(--billadm-color-window-border);
+  border-radius: var(--billadm-radius-xl);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--billadm-shadow-xl);
 }
 
 .fullscreen-mask {

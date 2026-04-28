@@ -104,7 +104,7 @@
           :message="`共 ${importPreview.length} 条记录待导入`"
           type="info"
           show-icon
-          style="margin-bottom: 16px"
+          class="import-alert"
         />
 
         <a-table
@@ -536,6 +536,10 @@ const confirmImport = async () => {
   display: flex;
   flex-direction: column;
   gap: var(--billadm-space-md);
+}
+
+.import-alert {
+  margin-bottom: var(--billadm-space-lg);
 }
 
 .preview-footer {

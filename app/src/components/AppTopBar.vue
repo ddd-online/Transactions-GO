@@ -4,7 +4,7 @@
       <span class="app-title">Transactions</span>
     </div>
     <div class="menu-bar-center">
-      <h1 class="page-title">{{ currentPageTitle }}</h1>
+      <span class="page-title">{{ currentPageTitle }}</span>
     </div>
     <div class="menu-bar-right">
       <a-switch v-model:checked="isDark" size="small" class="theme-switch" @change="toggleTheme" />
@@ -93,7 +93,7 @@ const onClose = () => {
 
 .app-title {
   font-family: var(--billadm-font-display);
-  font-size: 15px;
+  font-size: var(--billadm-size-text-section);
   font-weight: 600;
   color: var(--billadm-color-primary);
   margin: 0;
@@ -109,7 +109,7 @@ const onClose = () => {
 
 .page-title {
   font-family: var(--billadm-font-display);
-  font-size: 14px;
+  font-size: var(--billadm-size-text-body);
   font-weight: 500;
   color: var(--billadm-color-text-secondary);
   margin: 0;

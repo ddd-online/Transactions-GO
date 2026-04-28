@@ -21,7 +21,7 @@
         @click="selectChart(chart, true)"
       >
         <div class="chart-list-item-icon">
-          <RiseOutlined style="font-size: 14px" />
+          <RiseOutlined />
         </div>
         <span class="chart-list-item-title">{{ chart.title }}</span>
       </div>
@@ -38,7 +38,7 @@
         @click="selectChart(chart, false)"
       >
         <div class="chart-list-item-icon">
-          <LineChartOutlined style="font-size: 14px" />
+          <LineChartOutlined />
         </div>
         <span class="chart-list-item-title">{{ chart.title }}</span>
         <div class="chart-list-item-actions" @click.stop>
@@ -178,7 +178,7 @@ const handleDelete = async (chart: ChartDto) => {
   gap: var(--billadm-space-sm);
   padding: var(--billadm-space-sm);
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all var(--billadm-transition-fast);
   color: var(--billadm-color-text-secondary);
   border-radius: var(--billadm-radius-md);
 }
@@ -201,6 +201,7 @@ const handleDelete = async (chart: ChartDto) => {
   width: 28px;
   height: 28px;
   flex-shrink: 0;
+  font-size: var(--billadm-size-text-body);
 }
 
 .chart-list-item-title {
