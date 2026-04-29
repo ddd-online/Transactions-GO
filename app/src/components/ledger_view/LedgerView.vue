@@ -197,22 +197,25 @@ const handleOk = async () => {
   grid-column: span 2;
 }
 
-.ledger-card.is-featured .ledger-icon {
-  width: 48px;
-  height: 48px;
-}
-
-.ledger-card.is-featured .ledger-icon svg {
-  width: 24px;
-  height: 24px;
+/* Featured card double-line ornament (book spine detail) */
+.ledger-card.is-featured::before {
+  content: '';
+  position: absolute;
+  top: var(--billadm-space-md);
+  left: var(--billadm-space-md);
+  right: var(--billadm-space-md);
+  height: 4px;
+  border-top: 1px solid var(--billadm-color-divider);
+  border-bottom: 1px solid var(--billadm-color-divider);
+  pointer-events: none;
 }
 
 /* ========== Ledger Card ========== */
 .ledger-card {
   border-radius: var(--billadm-radius-lg);
-  background-color: var(--billadm-color-major-background);
+  background-color: var(--billadm-color-major-warm);
   border: 1px solid var(--billadm-color-window-border);
-  border-top: 3px solid var(--ledger-accent, var(--billadm-ledger-forest));
+  border-left: 4px solid var(--ledger-accent, var(--billadm-ledger-forest));
   transition: box-shadow var(--billadm-transition-normal), transform var(--billadm-transition-fast);
   position: relative;
   overflow: hidden;
@@ -221,7 +224,7 @@ const handleOk = async () => {
 .ledger-card:hover {
   box-shadow: var(--billadm-shadow-lg);
   transform: translateY(-2px);
-  border-top-color: var(--billadm-color-primary);
+  border-left-color: var(--billadm-color-primary);
 }
 
 .ledger-card-inner {
