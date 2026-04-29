@@ -266,15 +266,19 @@ const handleOk = async () => {
 }
 
 .ledger-name {
-  font-size: var(--billadm-size-text-section);
-  font-weight: var(--billadm-weight-semibold);
+  font-family: var(--billadm-font-display);
+  font-size: var(--billadm-size-text-title);
+  font-weight: 600;
   color: var(--billadm-color-text-major);
   margin: 0 0 var(--billadm-space-xs) 0;
   line-height: var(--billadm-height-tight);
+  letter-spacing: -0.02em;
 }
 
 .ledger-desc {
-  font-size: var(--billadm-size-text-body-sm);
+  font-family: var(--billadm-font-body);
+  font-size: var(--billadm-size-text-body);
+  font-style: italic;
   color: var(--billadm-color-text-secondary);
   margin: 0;
   line-height: var(--billadm-height-snug);
@@ -287,7 +291,6 @@ const handleOk = async () => {
 
 .ledger-desc.is-empty {
   color: var(--billadm-color-text-disabled);
-  font-style: italic;
 }
 
 .ledger-card-footer {
@@ -308,8 +311,10 @@ const handleOk = async () => {
   display: flex;
   align-items: center;
   gap: 4px;
-  font-size: var(--billadm-size-text-caption);
+  font-size: var(--billadm-size-text-small);
   color: var(--billadm-color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .meta-icon {
@@ -391,6 +396,7 @@ const handleOk = async () => {
 }
 
 .empty-state-title {
+  font-family: var(--billadm-font-display);
   font-size: var(--billadm-size-text-display-sm);
   font-weight: var(--billadm-weight-bold);
   color: var(--billadm-color-text-major);
