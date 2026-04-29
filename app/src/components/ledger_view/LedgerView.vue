@@ -15,15 +15,15 @@
             <div class="ledger-card-header">
               <div class="ledger-icon"
                 :style="{
-                  backgroundColor: `color-mix(in srgb, var(${ledgerColorVars[index % ledgerColorVars.length]}) 15%, transparent)`,
+                  backgroundColor: `color-mix(in srgb, var(${ledgerColorVars[index % ledgerColorVars.length]}) 10%, transparent)`,
                   color: `var(${ledgerColorVars[index % ledgerColorVars.length]})`,
                   '--card-index': index
                 }">
                 <svg viewBox="0 0 24 24" fill="none">
-                  <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.5"
+                  <path d="M4 19.5A2.5 2.5 0 016.5 17H20" stroke="currentColor" stroke-width="1.8"
                     stroke-linecap="round" stroke-linejoin="round" />
                   <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" stroke="currentColor"
-                    stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
                 </svg>
               </div>
               <div class="ledger-info">
@@ -38,8 +38,8 @@
               <div class="ledger-meta">
                 <span class="ledger-meta-item">
                   <svg class="meta-icon" viewBox="0 0 16 16" fill="none">
-                    <rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.2" />
-                    <path d="M5 1.5v3M11 1.5v3M2 7h12" stroke="currentColor" stroke-width="1.2"
+                    <rect x="2" y="3" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5" />
+                    <path d="M5 1.5v3M11 1.5v3M2 7h12" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" />
                   </svg>
                   {{ formatTimestamp(ledger.createdAt, 'YYYY/MM/dd') }}
@@ -49,7 +49,7 @@
               <div class="ledger-actions">
                 <button class="action-btn" @click="openEditModal(ledger)" title="编辑">
                   <svg viewBox="0 0 16 16" fill="none">
-                    <path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z" stroke="currentColor" stroke-width="1.2"
+                    <path d="M11.5 2.5l2 2-8 8H3.5v-2l8-8z" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
@@ -59,7 +59,7 @@
                     <svg viewBox="0 0 16 16" fill="none">
                       <path
                         d="M3 5h10M6 5V4a1 1 0 011-1h2a1 1 0 011 1v1M11 5v7a1.5 1.5 0 01-1.5 1.5H6.5A1.5 1.5 0 015 12V5"
-                        stroke="currentColor" stroke-width="1.2" stroke-linecap="round" />
+                        stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
                     </svg>
                   </button>
                 </a-popconfirm>
@@ -383,14 +383,14 @@ const handleOk = async () => {
   height: 96px;
   margin-bottom: var(--billadm-space-xl);
   color: var(--billadm-color-primary);
-  opacity: 0.25;
+  opacity: 0.15;
   transform: scale(1);
   transition: transform var(--billadm-transition-slow);
 }
 
 .empty-state:hover .empty-state-visual {
   transform: scale(1.05);
-  opacity: 0.35;
+  opacity: 0.25;
 }
 
 .empty-state-icon {
