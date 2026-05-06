@@ -293,7 +293,7 @@ const linkedCount = computed(() => linkedTransactions.value.length);
 
 const linkedScrollY = computed(() => {
   const bodyHeight = Math.floor(modalWidth.value * (3 / 4));
-  return Math.max(200, bodyHeight - 120);
+  return Math.max(200, bodyHeight - 200);
 });
 
 const linkedSummary = computed(() => {
