@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/billadm/util"
 	"github.com/billadm/workspace"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 var (
@@ -39,6 +41,9 @@ type TransactionRecordService interface {
 	QueryTrsOnCondition(ws *workspace.Workspace, condition *dto.TrQueryCondition) (*dto.TrQueryResult, error)
 	QueryTrsForChart(ws *workspace.Workspace, req *dto.ChartQueryRequest) (*dto.ChartQueryResponse, error)
 	DeleteTrById(ws *workspace.Workspace, trId string) error
+	LinkToKeyEvent(ws *workspace.Workspace, trId string, date string) error
+	UnlinkFromKeyEvent(ws *workspace.Workspace, trId string) error
+	QueryLinkedByDate(ws *workspace.Workspace, date string) ([]*dto.TransactionRecordDto, error)
 }
 
 var _ TransactionRecordService = &transactionRecordServiceImpl{}
@@ -303,4 +308,77 @@ func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trI
 
 	logrus.Infof("delete transaction record success, tr id: %s", trId)
 	return nil
+}
+
+func (t *transactionRecordServiceImpl) LinkToKeyEvent(ws *workspace.Workspace, trId string, date string) error {
+	logrus.Infof("link transaction %s to key event date %s", trId, date)
+
+	if err := t.trDao.UpdateKeyEventDate(ws, trId, date); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("transaction not found: %s", trId)
+		}
+		return fmt.Errorf("update key event date: %w", err)
+	}
+
+	keyEventSvc := GetKeyEventService()
+	_, err := keyEventSvc.QueryByDate(ws, date)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return fmt.Errorf("check key event: %w", err)
+	}
+	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+		if err := keyEventSvc.UpsertKeyEvent(ws, date, "", "", ""); err != nil {
+			return fmt.Errorf("auto-create key event: %w", err)
+		}
+		logrus.Infof("auto-created empty key event for date %s", date)
+	}
+
+	logrus.Infof("linked transaction %s to key event date %s", trId, date)
+	return nil
+}
+
+func (t *transactionRecordServiceImpl) UnlinkFromKeyEvent(ws *workspace.Workspace, trId string) error {
+	logrus.Infof("unlink transaction %s from key event", trId)
+
+	if err := t.trDao.UpdateKeyEventDate(ws, trId, ""); err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("transaction not found: %s", trId)
+		}
+		return fmt.Errorf("unlink key event date: %w", err)
+	}
+
+	logrus.Infof("unlinked transaction %s from key event", trId)
+	return nil
+}
+
+func (t *transactionRecordServiceImpl) QueryLinkedByDate(ws *workspace.Workspace, date string) ([]*dto.TransactionRecordDto, error) {
+	logrus.Infof("query linked transactions for date %s", date)
+
+	trs, err := t.trDao.QueryByKeyEventDate(ws, date)
+	if err != nil {
+		return nil, fmt.Errorf("query by key event date: %w", err)
+	}
+
+	trIds := make([]string, len(trs))
+	for i, tr := range trs {
+		trIds[i] = tr.TransactionID
+	}
+	tagMap, err := t.trTagDao.QueryTrTagsByTrIds(ws, trIds)
+	if err != nil {
+		return nil, err
+	}
+
+	dtos := make([]*dto.TransactionRecordDto, 0, len(trs))
+	for _, tr := range trs {
+		trDto := &dto.TransactionRecordDto{}
+		trDto.FromTransactionRecord(tr)
+		if tags, ok := tagMap[tr.TransactionID]; ok {
+			for _, tag := range tags {
+				trDto.Tags = append(trDto.Tags, tag.Tag)
+			}
+		}
+		dtos = append(dtos, trDto)
+	}
+
+	logrus.Infof("query linked transactions for date %s, count: %d", date, len(dtos))
+	return dtos, nil
 }
