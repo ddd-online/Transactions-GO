@@ -113,21 +113,20 @@
                 <span class="summary-value">{{ centsToYuan(linkedSummary.transfer) }}</span>
               </div>
             </div>
-            <div class="linked-table-wrapper">
-              <div v-if="linkedLoading" style="text-align:center;padding:24px">
-                <a-spin />
-              </div>
-              <div v-else-if="linkedTransactions.length === 0" style="text-align:center;padding:24px;color:var(--billadm-color-text-secondary)">
-                暂无关联交易记录
-              </div>
-              <a-table
-                v-else
-                :columns="linkedColumns"
-                :data-source="linkedTransactions"
-                :pagination="false"
-                size="small"
-                :sticky="true"
-              >
+            <div v-if="linkedLoading" style="text-align:center;padding:24px">
+              <a-spin />
+            </div>
+            <div v-else-if="linkedTransactions.length === 0" style="text-align:center;padding:24px;color:var(--billadm-color-text-secondary)">
+              暂无关联交易记录
+            </div>
+            <a-table
+              v-else
+              :columns="linkedColumns"
+              :data-source="linkedTransactions"
+              :pagination="false"
+              size="small"
+              :scroll="{ y: linkedScrollY }"
+            >
               <template #bodyCell="{ column, record }">
                 <template v-if="column.dataIndex === 'ledgerName'">
                   <span style="font-size:12px;color:var(--billadm-color-text-secondary)">{{ getLedgerName(record.ledgerId) }}</span>
@@ -149,7 +148,6 @@
                 </template>
               </template>
             </a-table>
-            </div>
           </a-tab-pane>
         </a-tabs>
       </div>
@@ -292,6 +290,11 @@ const getLedgerName = (ledgerId: string): string => {
 };
 
 const linkedCount = computed(() => linkedTransactions.value.length);
+
+const linkedScrollY = computed(() => {
+  const bodyHeight = Math.floor(modalWidth.value * (3 / 4));
+  return Math.max(200, bodyHeight - 120);
+});
 
 const linkedSummary = computed(() => {
   let income = 0, expense = 0, transfer = 0;
@@ -643,13 +646,6 @@ onUnmounted(() => {
   font-size: var(--billadm-size-text-body);
   font-weight: var(--billadm-weight-semibold);
   color: var(--billadm-color-text-major);
-}
-
-/* ========== 关联交易表格容器 ========== */
-.linked-table-wrapper {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
 }
 
 /* ========== 关联交易统计栏 ========== */
