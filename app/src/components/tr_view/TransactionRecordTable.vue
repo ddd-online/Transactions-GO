@@ -55,6 +55,14 @@
           <a-button type="text" class="action-btn" @click="handleEdit(record as TransactionRecord)">
             <EditOutlined /> 编辑
           </a-button>
+          <a-tooltip v-if="(record as TransactionRecord).keyEventDate" :title="'已关联至 ' + (record as TransactionRecord).keyEventDate">
+            <a-button type="text" class="action-btn" @click="handleLink(record as TransactionRecord)">
+              <LinkOutlined /> 已关联
+            </a-button>
+          </a-tooltip>
+          <a-button v-else type="text" class="action-btn" @click="handleLink(record as TransactionRecord)">
+            <LinkOutlined /> 关联
+          </a-button>
           <a-popconfirm
             title="确认删除此条记录？"
             ok-text="确认"
@@ -76,7 +84,7 @@ import type {TransactionRecord} from '@/types/billadm';
 import {centsToYuan, formatTimestamp} from "@/backend/functions";
 import {TransactionTypeToLabel} from "@/backend/constant";
 import type {ColumnsType} from "ant-design-vue/es/table";
-import {EditOutlined, DeleteOutlined} from "@ant-design/icons-vue";
+import {EditOutlined, DeleteOutlined, LinkOutlined} from "@ant-design/icons-vue";
 
 const columns: ColumnsType = [
   {
@@ -122,7 +130,7 @@ const columns: ColumnsType = [
   {
     title: '操作',
     dataIndex: 'action',
-    width: 160,
+    width: 200,
     align: 'center'
   }
 ];
@@ -136,6 +144,7 @@ defineProps<Props>()
 const emit = defineEmits<{
   (e: 'edit', record: TransactionRecord): void;
   (e: 'delete', record: TransactionRecord): void;
+  (e: 'link', record: TransactionRecord): void;
 }>();
 
 const handleEdit = (record: TransactionRecord) => {
@@ -144,6 +153,10 @@ const handleEdit = (record: TransactionRecord) => {
 
 const handleDelete = (record: TransactionRecord) => {
   emit('delete', record);
+};
+
+const handleLink = (record: TransactionRecord) => {
+  emit('link', record);
 };
 </script>
 
