@@ -123,8 +123,9 @@ func upsertKeyEvent(c *gin.Context) {
 
 	title, _ := arg["title"].(string)
 	content, _ := arg["content"].(string)
+	color, _ := arg["color"].(string)
 
-	if err := service.GetKeyEventService().UpsertKeyEvent(ws, date, title, content); err != nil {
+	if err := service.GetKeyEventService().UpsertKeyEvent(ws, date, title, content, color); err != nil {
 		ret.Code = -1
 		ret.Msg = err.Error()
 		return

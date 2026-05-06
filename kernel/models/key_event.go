@@ -5,6 +5,7 @@ type KeyEvent struct {
 	Date      string `gorm:"uniqueIndex;not null;comment:日期 YYYY-MM-DD" json:"date"`
 	Title     string `gorm:"type:varchar(200);comment:标题" json:"title"`
 	Content   string `gorm:"type:text;comment:事件内容" json:"content"`
+	Color     string `gorm:"type:varchar(20);comment:颜色标记" json:"color"`
 	CreatedAt int64  `gorm:"autoCreateTime:unix;not null;comment:创建时间" json:"createdAt"`
 	UpdatedAt int64  `gorm:"autoUpdateTime:unix;not null;comment:更新时间" json:"updatedAt"`
 }

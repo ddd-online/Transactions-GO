@@ -37,6 +37,7 @@ export const useKeyEventStore = defineStore('keyEvent', () => {
             const event = await queryKeyEventByDate(date);
             if (event) {
                 titles.value.set(date, event.title);
+                colors.value.set(date, event.color);
             }
             return event;
         } catch (error) {

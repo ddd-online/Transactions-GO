@@ -29,7 +29,7 @@ func GetKeyEventService() KeyEventService {
 }
 
 type KeyEventService interface {
-	UpsertKeyEvent(ws *workspace.Workspace, date string, title string, content string) error
+	UpsertKeyEvent(ws *workspace.Workspace, date string, title string, content string, color string) error
 	QueryByDate(ws *workspace.Workspace, date string) (*models.KeyEvent, error)
 	QueryByYear(ws *workspace.Workspace, year string) ([]models.KeyEvent, error)
 	QueryDatesByYear(ws *workspace.Workspace, year string) ([]string, error)
@@ -42,8 +42,8 @@ type keyEventServiceImpl struct {
 	keyEventDao dao.KeyEventDao
 }
 
-// UpsertKeyEvent 根据 date 判断是否存在：存在则更新 title 和 content，不存在则新建
-func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date string, title string, content string) error {
+// UpsertKeyEvent 根据 date 判断是否存在：存在则更新 title、content、color，不存在则新建
+func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date string, title string, content string, color string) error {
 	if len(title) > 200 {
 		title = title[:200]
 	}
@@ -57,6 +57,7 @@ func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date strin
 		// Update
 		existing.Title = title
 		existing.Content = content
+		existing.Color = color
 		return s.keyEventDao.UpsertKeyEvent(ws, existing)
 	}
 
@@ -66,6 +67,7 @@ func (s *keyEventServiceImpl) UpsertKeyEvent(ws *workspace.Workspace, date strin
 		Date:    date,
 		Title:   title,
 		Content: content,
+		Color:   color,
 	}
 	return s.keyEventDao.UpsertKeyEvent(ws, event)
 }

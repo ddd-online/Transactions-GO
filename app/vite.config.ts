@@ -6,6 +6,9 @@ import {AntDesignVueResolver} from 'unplugin-vue-components/resolvers'
 
 
 export default defineConfig({
+    define: {
+        __BUILD_TIME__: JSON.stringify(new Date().toISOString().replace('T', ' ').slice(0, 19)),
+    },
     base: '/static',
     server: {
         port: 31945,

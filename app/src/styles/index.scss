@@ -245,6 +245,41 @@ body::before {
   box-shadow: 0 0 0 2px rgba(45, 90, 39, 0.1) !important;
 }
 
+// DatePicker panel "today" button
+.ant-picker-today-btn {
+  color: var(--billadm-color-primary) !important;
+
+  &:hover {
+    color: var(--billadm-color-primary-light) !important;
+  }
+}
+
+// DatePicker panel — selected date background
+.ant-picker-cell-in-view.ant-picker-cell-selected .ant-picker-cell-inner {
+  background-color: var(--billadm-color-primary) !important;
+}
+
+// DatePicker panel — today marker border
+.ant-picker-cell-in-view.ant-picker-cell-today .ant-picker-cell-inner::before {
+  border-color: var(--billadm-color-primary) !important;
+}
+
+// DatePicker panel — range selection in-range cells
+.ant-picker-cell-in-view.ant-picker-cell-in-range .ant-picker-cell-inner {
+  background-color: var(--billadm-color-hover-bg) !important;
+}
+
+// DatePicker panel — range selection start/end
+.ant-picker-cell-in-view.ant-picker-cell-range-start .ant-picker-cell-inner,
+.ant-picker-cell-in-view.ant-picker-cell-range-end .ant-picker-cell-inner {
+  background-color: var(--billadm-color-primary) !important;
+}
+
+// DatePicker panel — month/year header hover
+.ant-picker-header-view button:hover {
+  color: var(--billadm-color-primary) !important;
+}
+
 // Placeholder - Dark mode
 [data-theme='dark'] {
   .ant-input,

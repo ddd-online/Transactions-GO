@@ -12,7 +12,7 @@
         </svg>
       </div>
       <h2 class="app-name">Transactions</h2>
-      <p class="app-version">版本 1.0.0</p>
+      <p class="app-version">版本 {{ appVersion || '...' }}</p>
     </div>
 
     <div class="about-description">
@@ -32,15 +32,24 @@
     </div>
 
     <div class="about-copyright">
-      <p>© 2024 Transactions. All rights reserved.</p>
+      <p>© {{ new Date().getFullYear() }} Transactions. All rights reserved.</p>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
-const buildTime = ref('2024-04-20');
+const appVersion = ref('');
+const buildTime = ref(__BUILD_TIME__);
+
+onMounted(async () => {
+  try {
+    appVersion.value = await window.electronAPI.getAppInfo('version');
+  } catch {
+    appVersion.value = 'unknown';
+  }
+});
 </script>
 
 <style scoped>
