@@ -36,3 +36,15 @@ export async function batchCreateTrForLedger(data: TransactionRecord[]): Promise
 export async function deleteTrById(id: string): Promise<void> {
     return api.delete<void>(`/v1/transactions/${id}`, '删除消费记录');
 }
+
+export async function linkTrToKeyEvent(transactionId: string, date: string): Promise<string> {
+    return api.post<string>('/v1/transactions/link', { transaction_id: transactionId, date }, '关联关键事件');
+}
+
+export async function unlinkTrFromKeyEvent(transactionId: string): Promise<string> {
+    return api.post<string>('/v1/transactions/unlink', { transaction_id: transactionId }, '解除关联');
+}
+
+export async function fetchLinkedTransactions(date: string): Promise<TransactionRecord[]> {
+    return api.get<TransactionRecord[]>(`/v1/transactions/linked/${date}`, '查询关联交易记录');
+}
