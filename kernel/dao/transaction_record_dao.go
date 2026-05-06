@@ -33,6 +33,8 @@ type TransactionRecordDao interface {
 	DeleteTrById(ws *workspace.Workspace, trId string) error
 	CountTrByLedgerId(ws *workspace.Workspace, ledgerId string) (int64, error)
 	DeleteAllTrByLedgerId(ws *workspace.Workspace, ledgerId string) error
+	UpdateKeyEventDate(ws *workspace.Workspace, trId string, date string) error
+	QueryByKeyEventDate(ws *workspace.Workspace, date string) ([]*models.TransactionRecord, error)
 }
 
 var _ TransactionRecordDao = &transactionRecordDaoImpl{}
@@ -103,4 +105,20 @@ func (t *transactionRecordDaoImpl) DeleteAllTrByLedgerId(ws *workspace.Workspace
 		return err
 	}
 	return nil
+}
+
+func (t *transactionRecordDaoImpl) UpdateKeyEventDate(ws *workspace.Workspace, trId string, date string) error {
+	return ws.GetDb().
+		Model(&models.TransactionRecord{}).
+		Where("transaction_id = ?", trId).
+		Update("key_event_date", date).Error
+}
+
+func (t *transactionRecordDaoImpl) QueryByKeyEventDate(ws *workspace.Workspace, date string) ([]*models.TransactionRecord, error) {
+	trs := make([]*models.TransactionRecord, 0)
+	err := ws.GetDb().
+		Where("key_event_date = ?", date).
+		Order("transaction_at desc").
+		Find(&trs).Error
+	return trs, err
 }
