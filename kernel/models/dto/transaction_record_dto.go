@@ -41,7 +41,7 @@ type TransactionRecordDto struct {
 	Tags            []string `json:"tags"`
 	TransactionAt   int64    `json:"transactionAt"`
 	Outlier         bool     `json:"outlier"`
-	KeyEventDate    string   `json:"key_event_date"`
+	KeyEventDate    string   `json:"keyEventDate"`
 }
 
 func (dto *TransactionRecordDto) Validate(result *models.Result) bool {
