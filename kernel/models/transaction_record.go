@@ -20,7 +20,7 @@ type TransactionRecord struct {
 	Flags string `gorm:"comment:标记集" json:"flags"`
 
 	// 关联关键事件日期
-	KeyEventDate string `gorm:"type:varchar(10);comment:关联关键事件日期" json:"key_event_date"`
+	KeyEventDate string `gorm:"type:varchar(10);default:'';comment:关联关键事件日期" json:"key_event_date"`
 
 	// 时间信息
 	TransactionAt int64 `gorm:"not null;comment:交易时间" json:"transaction_at"`
