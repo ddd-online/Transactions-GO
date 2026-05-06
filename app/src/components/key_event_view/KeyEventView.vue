@@ -99,6 +99,20 @@
           </a-tab-pane>
 
           <a-tab-pane key="linked" :tab="`关联交易 (${linkedCount})`">
+            <div class="linked-summary" v-if="linkedTransactions.length > 0">
+              <div class="summary-item income">
+                <span class="summary-label">收入</span>
+                <span class="summary-value">+{{ centsToYuan(linkedSummary.income) }}</span>
+              </div>
+              <div class="summary-item expense">
+                <span class="summary-label">支出</span>
+                <span class="summary-value">-{{ centsToYuan(linkedSummary.expense) }}</span>
+              </div>
+              <div class="summary-item transfer">
+                <span class="summary-label">转账</span>
+                <span class="summary-value">{{ centsToYuan(linkedSummary.transfer) }}</span>
+              </div>
+            </div>
             <div v-if="linkedLoading" style="text-align:center;padding:24px">
               <a-spin />
             </div>
@@ -276,6 +290,16 @@ const getLedgerName = (ledgerId: string): string => {
 };
 
 const linkedCount = computed(() => linkedTransactions.value.length);
+
+const linkedSummary = computed(() => {
+  let income = 0, expense = 0, transfer = 0;
+  for (const t of linkedTransactions.value) {
+    if (t.transactionType === 'income') income += t.price;
+    else if (t.transactionType === 'expense') expense += t.price;
+    else if (t.transactionType === 'transfer') transfer += t.price;
+  }
+  return { income, expense, transfer };
+});
 
 const linkedColumns = [
   { title: '账本', dataIndex: 'ledgerName', width: 100 },
@@ -596,5 +620,46 @@ onUnmounted(() => {
   font-size: var(--billadm-size-text-body);
   font-weight: var(--billadm-weight-semibold);
   color: var(--billadm-color-text-major);
+}
+
+/* ========== 关联交易统计栏 ========== */
+.linked-summary {
+  display: flex;
+  gap: var(--billadm-space-md);
+  padding: var(--billadm-space-sm) var(--billadm-space-md);
+  margin-bottom: var(--billadm-space-sm);
+  background: var(--billadm-color-minor-background);
+  border-radius: var(--billadm-radius-md);
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.summary-label {
+  font-size: var(--billadm-size-text-caption);
+  color: var(--billadm-color-text-secondary);
+}
+
+.summary-value {
+  font-family: var(--billadm-font-mono);
+  font-size: var(--billadm-size-text-body);
+  font-weight: var(--billadm-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.summary-item.income .summary-value {
+  color: var(--billadm-color-income);
+}
+
+.summary-item.expense .summary-value {
+  color: var(--billadm-color-expense);
+}
+
+.summary-item.transfer .summary-value {
+  color: var(--billadm-color-transfer);
 }
 </style>
