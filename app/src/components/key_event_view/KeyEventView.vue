@@ -295,7 +295,7 @@ const loadLinkedTransactions = async (date: string) => {
   }
 };
 
-const handleUnlinkTr = async (record: TransactionRecord) => {
+const handleUnlinkTr = async (record: Record<string, any>) => {
   const ok = await unlinkTransactionFromKeyEvent(record.transactionId);
   if (ok) {
     linkedTransactions.value = linkedTransactions.value.filter(

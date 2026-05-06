@@ -12,7 +12,7 @@ export interface TrForm {
     tags: string[];
     flags: string[];
     time: Dayjs;
-    keyEventDate: string;  // 关联的关键事件日期，可为空
+    keyEventDate?: string;  // 关联的关键事件日期，可为空
 }
 
 /**
@@ -54,7 +54,7 @@ export interface TransactionRecord {
     tags: string[];
     transactionAt: number;
     outlier: boolean;
-    keyEventDate: string;  // 关联的关键事件日期，可为空
+    keyEventDate?: string;  // 关联的关键事件日期，可为空
 }
 
 /**

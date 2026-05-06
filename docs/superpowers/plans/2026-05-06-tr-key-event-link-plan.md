@@ -548,7 +548,7 @@ export interface TransactionRecord {
     tags: string[];
     transactionAt: number;
     outlier: boolean;
-    key_event_date: string;  // 关联的关键事件日期，可为空
+    keyEventDate: string;  // 关联的关键事件日期，可为空
 }
 ```
 
@@ -564,7 +564,7 @@ export interface TrForm {
     tags: string[];
     flags: string[];
     time: Dayjs;
-    key_event_date: string;  // 关联的关键事件日期，可为空
+    keyEventDate: string;  // 关联的关键事件日期，可为空
 }
 ```
 
@@ -596,7 +596,7 @@ export function trFormToTrDto(data: TrForm, ledgerId: string = ''): TransactionR
         tags: data.tags,
         transactionAt: data.time.unix(),
         outlier: false,
-        key_event_date: data.key_event_date || '',
+        keyEventDate: data.keyEventDate || '',
     };
 
     if (data.flags.includes('outlier')) {
@@ -620,7 +620,7 @@ export function trDtoToTrForm(dto: TransactionRecord): TrForm {
         tags: dto.tags,
         flags: [],
         time: dayjs(dto.transactionAt * 1000),
-        key_event_date: dto.key_event_date || '',
+        keyEventDate: dto.keyEventDate || '',
     };
 
     if (dto.outlier) {
@@ -761,7 +761,7 @@ git commit -m "feat: add link/unlink/fetchLinked helper functions with error han
     <a-button type="text" class="action-btn" @click="handleEdit(record as TransactionRecord)">
       <EditOutlined /> 编辑
     </a-button>
-    <a-tooltip v-if="(record as TransactionRecord).key_event_date" :title="'已关联至 ' + (record as TransactionRecord).key_event_date">
+    <a-tooltip v-if="(record as TransactionRecord).keyEventDate" :title="'已关联至 ' + (record as TransactionRecord).keyEventDate">
       <a-button type="text" class="action-btn" @click="handleLink(record as TransactionRecord)">
         <LinkOutlined /> 已关联
       </a-button>
@@ -877,7 +877,7 @@ const linkDate = ref<Dayjs>(dayjs());
       />
     </a-form-item>
   </a-form>
-  <template v-if="linkingRecord?.key_event_date" #footer>
+  <template v-if="linkingRecord?.keyEventDate" #footer>
     <a-button danger @click="handleUnlink">解除关联</a-button>
     <a-button @click="openLinkModal = false">取消</a-button>
     <a-button type="primary" @click="confirmLink">确认关联</a-button>
@@ -892,7 +892,7 @@ const linkDate = ref<Dayjs>(dayjs());
 ```ts
 const handleLink = (record: TransactionRecord) => {
   linkingRecord.value = record;
-  linkDate.value = record.key_event_date ? dayjs(record.key_event_date) : dayjs();
+  linkDate.value = record.keyEventDate ? dayjs(record.keyEventDate) : dayjs();
   openLinkModal.value = true;
 };
 
