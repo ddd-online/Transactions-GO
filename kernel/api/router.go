@@ -32,6 +32,9 @@ func ServeAPI(ginServer *gin.Engine) {
 			transactions.POST("/batch", batchCreateTransactions)
 			transactions.POST("", createTransaction)
 			transactions.DELETE("/:id", deleteTransaction)
+			transactions.POST("/link", linkTransactionToKeyEvent)
+			transactions.POST("/unlink", unlinkTransactionFromKeyEvent)
+			transactions.GET("/linked/:date", listLinkedTransactions)
 		}
 
 		// Templates

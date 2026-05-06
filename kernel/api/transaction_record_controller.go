@@ -166,3 +166,100 @@ func queryChartData(c *gin.Context) {
 
 	ret.Data = result
 }
+
+// POST /transactions/link
+func linkTransactionToKeyEvent(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	arg, ok := JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	trId, _ := arg["transaction_id"].(string)
+	date, _ := arg["date"].(string)
+
+	if trId == "" || date == "" {
+		ret.Code = -1
+		ret.Msg = "transaction_id and date are required"
+		return
+	}
+
+	if err := service.GetTrService().LinkToKeyEvent(ws, trId, date); err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ret.Data = date
+}
+
+// POST /transactions/unlink
+func unlinkTransactionFromKeyEvent(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	arg, ok := JsonArg(c, ret)
+	if !ok {
+		return
+	}
+
+	trId, _ := arg["transaction_id"].(string)
+	if trId == "" {
+		ret.Code = -1
+		ret.Msg = "transaction_id is required"
+		return
+	}
+
+	if err := service.GetTrService().UnlinkFromKeyEvent(ws, trId); err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ret.Data = trId
+}
+
+// GET /transactions/linked/:date
+func listLinkedTransactions(c *gin.Context) {
+	ret := models.NewResult()
+	defer c.JSON(http.StatusOK, ret)
+
+	ws := workspace.Manager.OpenedWorkspace()
+	if ws == nil {
+		ret.Code = -1
+		ret.Msg = workspace.ErrOpenedWorkspaceNotFound
+		return
+	}
+
+	date := c.Param("date")
+	if date == "" {
+		ret.Code = -1
+		ret.Msg = "date is required"
+		return
+	}
+
+	dtos, err := service.GetTrService().QueryLinkedByDate(ws, date)
+	if err != nil {
+		ret.Code = -1
+		ret.Msg = err.Error()
+		return
+	}
+
+	ret.Data = dtos
+}
