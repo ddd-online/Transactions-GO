@@ -13,7 +13,7 @@
 
     <!-- 主内容区 -->
     <div class="tr-content">
-      <transaction-record-table :items="tableData" @edit="updateTr" @delete="deleteTr" />
+      <transaction-record-table :items="tableData" @edit="updateTr" @delete="deleteTr" @link="handleLink" />
     </div>
 
     <!-- 底部分页 -->
@@ -127,6 +127,32 @@
         </a-form-item>
       </a-form>
     </a-modal>
+
+    <!-- 关联关键事件弹窗 -->
+    <a-modal
+      v-model:open="openLinkModal"
+      title="关联关键事件"
+      ok-text="确认关联"
+      cancel-text="取消"
+      centered
+      @ok="confirmLink"
+      @cancel="openLinkModal = false"
+    >
+      <a-form>
+        <a-form-item label="选择日期">
+          <a-date-picker
+            v-model:value="linkDate"
+            style="width: 100%"
+            placeholder="选择要关联的日期"
+          />
+        </a-form-item>
+      </a-form>
+      <template v-if="linkingRecord?.keyEventDate" #footer>
+        <a-button danger @click="handleUnlink">解除关联</a-button>
+        <a-button @click="openLinkModal = false">取消</a-button>
+        <a-button type="primary" @click="confirmLink">确认关联</a-button>
+      </template>
+    </a-modal>
   </div>
 </template>
 
@@ -141,6 +167,8 @@ import {
   getCategoryByType,
   getTagsByCategory,
   getTrOnCondition,
+  linkTransactionToKeyEvent,
+  unlinkTransactionFromKeyEvent,
   updateTransactionRecord,
   getTemplatesByLedgerId,
   saveTemplate
@@ -148,7 +176,7 @@ import {
 import { useLedgerStore } from "@/stores/ledgerStore.ts";
 import { useTrQueryConditionStore } from "@/stores/trQueryConditionStore.ts";
 import { useAppDataStore } from "@/stores/appDataStore.ts";
-import dayjs from "dayjs";
+import dayjs, { type Dayjs } from "dayjs";
 import { trDtoToTrForm, trFormToTrDto } from "@/backend/dto-utils.ts";
 import type { DefaultOptionType } from "ant-design-vue/es/vc-cascader";
 import type { Rule } from "ant-design-vue/es/form";
@@ -204,6 +232,11 @@ const templateOptions = ref<DefaultOptionType[]>([]);
 const selectedTemplateId = ref<string | undefined>();
 const openSaveTemplateModal = ref(false);
 const templateName = ref('');
+
+// 关联关键事件弹窗
+const openLinkModal = ref(false);
+const linkingRecord = ref<TransactionRecord | null>(null);
+const linkDate = ref<Dayjs>(dayjs());
 
 // 排序相关状态
 interface SortItem {
@@ -407,6 +440,34 @@ const confirmSaveTemplate = async () => {
     message.success('保存模板成功');
     openSaveTemplateModal.value = false;
     await loadTemplates();
+  }
+};
+
+// 关联关键事件
+const handleLink = (record: TransactionRecord) => {
+  linkingRecord.value = record;
+  linkDate.value = record.keyEventDate ? dayjs(record.keyEventDate) : dayjs();
+  openLinkModal.value = true;
+};
+
+const confirmLink = async () => {
+  if (!linkingRecord.value || !linkDate.value) return;
+  const date = linkDate.value.format('YYYY-MM-DD');
+  const ok = await linkTransactionToKeyEvent(linkingRecord.value.transactionId, date);
+  if (ok) {
+    openLinkModal.value = false;
+    linkingRecord.value = null;
+    await refreshTable();
+  }
+};
+
+const handleUnlink = async () => {
+  if (!linkingRecord.value) return;
+  const ok = await unlinkTransactionFromKeyEvent(linkingRecord.value.transactionId);
+  if (ok) {
+    openLinkModal.value = false;
+    linkingRecord.value = null;
+    await refreshTable();
   }
 };
 
