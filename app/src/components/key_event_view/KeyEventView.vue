@@ -567,6 +567,27 @@ onUnmounted(() => {
   height: 100%;
 }
 
+/* 让 Tabs 和 Tab 内容区支持 flex 伸缩 */
+.event-modal-content :deep(.ant-tabs) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.event-modal-content :deep(.ant-tabs-content-holder) {
+  flex: 1;
+}
+
+.event-modal-content :deep(.ant-tabs-content) {
+  height: 100%;
+}
+
+.event-modal-content :deep(.ant-tabs-tabpane) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 .event-title-input {
   margin-bottom: var(--billadm-space-sm);
 }
