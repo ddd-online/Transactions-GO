@@ -313,23 +313,32 @@ func (t *transactionRecordServiceImpl) DeleteTrById(ws *workspace.Workspace, trI
 func (t *transactionRecordServiceImpl) LinkToKeyEvent(ws *workspace.Workspace, trId string, date string) error {
 	logrus.Infof("link transaction %s to key event date %s", trId, date)
 
-	if err := t.trDao.UpdateKeyEventDate(ws, trId, date); err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return fmt.Errorf("transaction not found: %s", trId)
+	err := ws.Transaction(func(tx *workspace.Workspace) error {
+		if err := t.trDao.UpdateKeyEventDate(tx, trId, date); err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return fmt.Errorf("transaction not found: %s", trId)
+			}
+			return fmt.Errorf("update key event date: %w", err)
 		}
-		return fmt.Errorf("update key event date: %w", err)
-	}
 
-	keyEventSvc := GetKeyEventService()
-	_, err := keyEventSvc.QueryByDate(ws, date)
-	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
-		return fmt.Errorf("check key event: %w", err)
-	}
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-		if err := keyEventSvc.UpsertKeyEvent(ws, date, "", "", ""); err != nil {
-			return fmt.Errorf("auto-create key event: %w", err)
+		keyEventSvc := GetKeyEventService()
+		_, keyErr := keyEventSvc.QueryByDate(tx, date)
+		if keyErr != nil && !errors.Is(keyErr, gorm.ErrRecordNotFound) {
+			return fmt.Errorf("check key event: %w", keyErr)
 		}
-		logrus.Infof("auto-created empty key event for date %s", date)
+		if keyErr != nil && errors.Is(keyErr, gorm.ErrRecordNotFound) {
+			upsertErr := keyEventSvc.UpsertKeyEvent(tx, date, "", "", "")
+			if upsertErr != nil {
+				return fmt.Errorf("auto-create key event: %w", upsertErr)
+			}
+			logrus.Infof("auto-created empty key event for date %s", date)
+		}
+		return nil
+	})
+
+	if err != nil {
+		logrus.Errorf("link transaction %s to key event date %s failed: %v", trId, date, err)
+		return err
 	}
 
 	logrus.Infof("linked transaction %s to key event date %s", trId, date)
@@ -364,7 +373,7 @@ func (t *transactionRecordServiceImpl) QueryLinkedByDate(ws *workspace.Workspace
 	}
 	tagMap, err := t.trTagDao.QueryTrTagsByTrIds(ws, trIds)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query tr tags: %w", err)
 	}
 
 	dtos := make([]*dto.TransactionRecordDto, 0, len(trs))

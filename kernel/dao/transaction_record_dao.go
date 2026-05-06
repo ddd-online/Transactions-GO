@@ -7,6 +7,7 @@ import (
 	"github.com/billadm/models"
 	"github.com/billadm/models/dto"
 	"github.com/billadm/workspace"
+	"gorm.io/gorm"
 )
 
 var (
@@ -108,10 +109,17 @@ func (t *transactionRecordDaoImpl) DeleteAllTrByLedgerId(ws *workspace.Workspace
 }
 
 func (t *transactionRecordDaoImpl) UpdateKeyEventDate(ws *workspace.Workspace, trId string, date string) error {
-	return ws.GetDb().
+	result := ws.GetDb().
 		Model(&models.TransactionRecord{}).
 		Where("transaction_id = ?", trId).
-		Update("key_event_date", date).Error
+		Update("key_event_date", date)
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
 }
 
 func (t *transactionRecordDaoImpl) QueryByKeyEventDate(ws *workspace.Workspace, date string) ([]*models.TransactionRecord, error) {
