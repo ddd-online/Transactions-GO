@@ -69,31 +69,73 @@
       @cancel="modalVisible = false"
     >
       <div class="event-modal-content">
-        <a-input
-          v-model:value="eventTitle"
-          placeholder="标题（可选）"
-          :maxlength="200"
-          class="event-title-input"
-        />
-        <div class="color-picker">
-          <div
-            v-for="c in EVENT_COLORS"
-            :key="c"
-            class="color-swatch"
-            :class="{ 'is-selected': eventColor === c }"
-            :style="{ backgroundColor: c }"
-            @click="eventColor = c"
-          >
-            <CheckOutlined v-if="eventColor === c" class="check-icon" />
-          </div>
-        </div>
-        <a-textarea
-          v-model:value="eventContent"
-          placeholder="记录今天发生的事情..."
-          :rows="5"
-          :maxlength="5000"
-          show-count
-        />
+        <a-tabs v-model:activeKey="activeTab">
+          <a-tab-pane key="detail" tab="详情">
+            <a-input
+              v-model:value="eventTitle"
+              placeholder="标题（可选）"
+              :maxlength="200"
+              class="event-title-input"
+            />
+            <div class="color-picker">
+              <div
+                v-for="c in EVENT_COLORS"
+                :key="c"
+                class="color-swatch"
+                :class="{ 'is-selected': eventColor === c }"
+                :style="{ backgroundColor: c }"
+                @click="eventColor = c"
+              >
+                <CheckOutlined v-if="eventColor === c" class="check-icon" />
+              </div>
+            </div>
+            <a-textarea
+              v-model:value="eventContent"
+              placeholder="记录今天发生的事情..."
+              :rows="5"
+              :maxlength="5000"
+              show-count
+            />
+          </a-tab-pane>
+
+          <a-tab-pane key="linked" :tab="`关联交易 (${linkedCount})`">
+            <div v-if="linkedLoading" style="text-align:center;padding:24px">
+              <a-spin />
+            </div>
+            <div v-else-if="linkedTransactions.length === 0" style="text-align:center;padding:24px;color:var(--billadm-color-text-secondary)">
+              暂无关联交易记录
+            </div>
+            <a-table
+              v-else
+              :columns="linkedColumns"
+              :data-source="linkedTransactions"
+              :pagination="false"
+              size="small"
+              :scroll="{ y: 300 }"
+            >
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.dataIndex === 'ledgerName'">
+                  <span style="font-size:12px;color:var(--billadm-color-text-secondary)">{{ getLedgerName(record.ledgerId) }}</span>
+                </template>
+                <template v-else-if="column.dataIndex === 'tags'">
+                  <div style="display:flex;flex-wrap:wrap;gap:4px">
+                    <a-tag v-for="tag in record.tags" :key="tag" style="font-size:11px">{{ tag }}</a-tag>
+                  </div>
+                </template>
+                <template v-else-if="column.dataIndex === 'price'">
+                  <span :style="{ color: record.transactionType === 'expense' ? 'var(--billadm-color-expense)' : record.transactionType === 'income' ? 'var(--billadm-color-income)' : 'var(--billadm-color-transfer)', fontFamily: 'var(--billadm-font-mono)' }">
+                    <template v-if="record.transactionType === 'expense'">-</template>
+                    <template v-else-if="record.transactionType === 'income'">+</template>
+                    {{ centsToYuan(record.price) }}
+                  </span>
+                </template>
+                <template v-else-if="column.dataIndex === 'action'">
+                  <a-button type="text" danger size="small" @click="handleUnlinkTr(record)">删除</a-button>
+                </template>
+              </template>
+            </a-table>
+          </a-tab-pane>
+        </a-tabs>
       </div>
       <template #footer v-if="isEditMode">
         <a-popconfirm
@@ -117,6 +159,9 @@ import { useKeyEventStore } from "@/stores/keyEventStore";
 import dayjs, { type Dayjs } from "dayjs";
 import NotificationUtil from "@/backend/notification";
 import { LeftOutlined, RightOutlined, CheckOutlined } from "@ant-design/icons-vue";
+import { getLinkedTransactions, unlinkTransactionFromKeyEvent, centsToYuan } from "@/backend/functions.ts";
+import { useLedgerStore } from "@/stores/ledgerStore";
+import type { TransactionRecord } from "@/types/billadm";
 
 const keyEventStore = useKeyEventStore();
 const isLoading = ref(false);
@@ -219,6 +264,46 @@ const eventContent = ref('');
 const eventTitle = ref('');
 const isEditMode = ref(false);
 
+// 关联交易 Tab
+const activeTab = ref('detail');
+const linkedTransactions = ref<TransactionRecord[]>([]);
+const linkedLoading = ref(false);
+const ledgerStore = useLedgerStore();
+
+const getLedgerName = (ledgerId: string): string => {
+  const ledger = ledgerStore.ledgers.find(l => l.id === ledgerId);
+  return ledger?.name || ledgerId;
+};
+
+const linkedCount = computed(() => linkedTransactions.value.length);
+
+const linkedColumns = [
+  { title: '账本', dataIndex: 'ledgerName', width: 100 },
+  { title: '分类', dataIndex: 'category', width: 100 },
+  { title: '标签', dataIndex: 'tags', width: 160 },
+  { title: '描述', dataIndex: 'description', ellipsis: true },
+  { title: '金额', dataIndex: 'price', width: 110, align: 'right' as const },
+  { title: '操作', dataIndex: 'action', width: 70, align: 'center' as const },
+];
+
+const loadLinkedTransactions = async (date: string) => {
+  linkedLoading.value = true;
+  try {
+    linkedTransactions.value = await getLinkedTransactions(date);
+  } finally {
+    linkedLoading.value = false;
+  }
+};
+
+const handleUnlinkTr = async (record: TransactionRecord) => {
+  const ok = await unlinkTransactionFromKeyEvent(record.transactionId);
+  if (ok) {
+    linkedTransactions.value = linkedTransactions.value.filter(
+      t => t.transactionId !== record.transactionId
+    );
+  }
+};
+
 const modalTitle = computed(() => {
   return isEditMode.value ? selectedDate.value : `添加事件 — ${selectedDate.value}`;
 });
@@ -254,6 +339,8 @@ const onDayClick = async (year: number, month: number, day: number) => {
     isEditMode.value = false;
   }
 
+  activeTab.value = 'detail';
+  loadLinkedTransactions(dateStr);
   modalVisible.value = true;
 };
 
