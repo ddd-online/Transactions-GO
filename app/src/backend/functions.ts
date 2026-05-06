@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import type {Category, Tag, TransactionRecord, TrQueryCondition, TrQueryResult} from "@/types/billadm";
-import {createTrForLedger, deleteTrById, queryTrOnCondition} from "@/backend/api/tr.ts";
+import {createTrForLedger, deleteTrById, queryTrOnCondition, linkTrToKeyEvent, unlinkTrFromKeyEvent, fetchLinkedTransactions} from "@/backend/api/tr.ts";
 import NotificationUtil from "@/backend/notification.ts";
 import {queryCategory, createCategory, deleteCategory, updateCategorySort} from "@/backend/api/category.ts";
 import {queryTags, createTag, deleteTag, updateTagSort} from "@/backend/api/tag.ts";
@@ -226,5 +226,36 @@ export async function reorderTag(name: string, categoryTransactionType: string, 
     } catch (error) {
         NotificationUtil.error('更新标签排序失败', `${error}`);
         throw error;
+    }
+}
+
+export async function linkTransactionToKeyEvent(transactionId: string, date: string): Promise<boolean> {
+    try {
+        await linkTrToKeyEvent(transactionId, date);
+        NotificationUtil.success('关联成功');
+        return true;
+    } catch (error) {
+        NotificationUtil.error('关联失败', `${error}`);
+        return false;
+    }
+}
+
+export async function unlinkTransactionFromKeyEvent(transactionId: string): Promise<boolean> {
+    try {
+        await unlinkTrFromKeyEvent(transactionId);
+        NotificationUtil.success('已解除关联');
+        return true;
+    } catch (error) {
+        NotificationUtil.error('解除关联失败', `${error}`);
+        return false;
+    }
+}
+
+export async function getLinkedTransactions(date: string): Promise<TransactionRecord[]> {
+    try {
+        return await fetchLinkedTransactions(date);
+    } catch (error) {
+        NotificationUtil.error('查询关联交易失败', `${error}`);
+        return [];
     }
 }
