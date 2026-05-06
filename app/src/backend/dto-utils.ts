@@ -16,6 +16,7 @@ export function trFormToTrDto(data: TrForm, ledgerId: string = ''): TransactionR
         tags: data.tags,
         transactionAt: data.time.unix(),
         outlier: false,
+        keyEventDate: data.keyEventDate || '',
     };
 
     if (data.flags.includes('outlier')) {
@@ -38,6 +39,7 @@ export function trDtoToTrForm(dto: TransactionRecord): TrForm {
         tags: dto.tags,
         flags: [],
         time: dayjs(dto.transactionAt * 1000),
+        keyEventDate: dto.keyEventDate || '',
     };
 
     if (dto.outlier) {
