@@ -20,6 +20,7 @@ description: 执行 Transactions 项目的发布流程：版本升级、构建�
 ## 执行约定
 
 - 在仓库根目录用 `powershell -ExecutionPolicy Bypass -File .\build\<script>.ps1` 调用；执行策略允许时也可直接 `.\build\<script>.ps1`。
+- 脚本为 UTF-8（无 BOM）：Windows PowerShell 5.1 会按 ANSI 解析，中文会乱码并报“字符串缺少结束符”等解析错误。请用 PowerShell 7+ 执行：`pwsh -NoProfile -ExecutionPolicy Bypass -File .\build\<script>.ps1`（本机可直接用 `C:\Users\ljw\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\powershell\pwsh.exe`）。
 - 脚本失败会以非零退出码结束并在输出中指明失败步骤；先修原因，再重跑对应脚本。
 - `build.ps1` 与 `release.ps1` 都会自动检测系统代理并设置 `HTTPS_PROXY`/`HTTP_PROXY`（仅在环境变量未设置时）。需要手动覆盖时，在调用前设置这两个变量即可；SSH 通道不读代理。
 
@@ -116,6 +117,7 @@ gh release view vX.Y.Z           # 复核：非草稿、非预发布、资产在
 
 | 失败点 | 原因 | 处理 |
 |--------|------|------|
+| clean/build 脚本解析报错（中文乱码、字符串缺少结束符、Try 缺少 Catch） | Windows PowerShell 5.1 按 ANSI 解析 UTF-8 脚本 | 改用 pwsh 7 执行：`pwsh -NoProfile -ExecutionPolicy Bypass -File .\build\<script>.ps1` |
 | clean/build 脚本退出码非零 | 脚本内某一步失败 | 看脚本输出定位步骤（Vue/Go/Electron），修复后重跑对应脚本 |
 | build 阶段 TS 错误 | `vue-tsc` 类型检查失败 | 根据错误信息修复源码，重跑 build.ps1 |
 | electron-builder 下载超时 | Electron/NSIS 资源下载慢 | 脚本已自动检测代理；仍失败则在调用前手动设置 `HTTPS_PROXY`/`HTTP_PROXY` 后重跑 |
