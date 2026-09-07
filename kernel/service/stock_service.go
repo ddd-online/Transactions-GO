@@ -36,13 +36,14 @@ type StockService interface {
 	ListFundRecords(ws *workspace.Workspace, ledgerID string, page int, pageSize int) (*dto.StockFundRecordPage, error)
 	ListPositions(ws *workspace.Workspace, ledgerID string) ([]dto.StockPositionDto, error)
 	ListTrades(ws *workspace.Workspace, ledgerID string, stockCode string) ([]dto.StockTradeDto, error)
-	CreateTrade(ws *workspace.Workspace, ledgerID string, stockCode string, stockName string, tradeType string, priceCents int64, lots int64, tradeTime int64, remark string) (*dto.StockTradeDto, error)
+	CreateTrade(ws *workspace.Workspace, ledgerID string, stockCode string, stockName string, tradeType string, priceCents int64, lots int64, tradeTime int64, remark string, tag string) (*dto.StockTradeDto, error)
 	ListTradeHistories(ws *workspace.Workspace, ledgerID string) ([]dto.StockTradeHistoryDto, error)
 	GetTradeHistoryDetail(ws *workspace.Workspace, ledgerID string, stockCode string) (*dto.StockTradeHistoryDetailDto, error)
 	UpdateRoundReview(ws *workspace.Workspace, ledgerID string, roundID string, review string) (*dto.StockTradeHistoryDetailDto, error)
+	UpdateRoundTag(ws *workspace.Workspace, ledgerID string, roundID string, tag string) (*dto.StockTradeHistoryDetailDto, error)
 	GetTradeHistorySummary(ws *workspace.Workspace, ledgerID string) (*dto.StockTradeHistorySummaryDto, error)
 	GetStatistics(ws *workspace.Workspace, ledgerID string) (*dto.StockStatisticsDto, error)
-	GetStatisticsRange(ws *workspace.Workspace, ledgerID string, startMonth string, endMonth string, recent int64) (*dto.StockStatisticsDto, error)
+	GetStatisticsRange(ws *workspace.Workspace, ledgerID string, startMonth string, endMonth string, recent int64, tag string) (*dto.StockStatisticsDto, error)
 	LookupStockName(ws *workspace.Workspace, stockCode string) (*dto.StockNameDto, error)
 	ResetData(ws *workspace.Workspace, ledgerID string) error
 }
@@ -494,12 +495,15 @@ func currentRoundTrades(trades []models.StockTrade) []models.StockTrade {
 // CreateTrade 记录一笔买卖交易：原子更新持仓、现金资金记录与交易流水。
 // 买入（建仓/加仓）：现金减少 成交金额+费用；卖出（减仓/清仓）：现金增加 成交金额-费用，
 // 并按平均成本结转已实现盈亏到资金记录（netPnl），使账户总盈亏自动汇总。
-func (s *stockServiceImpl) CreateTrade(ws *workspace.Workspace, ledgerID string, stockCode string, stockName string, tradeType string, priceCents int64, lots int64, tradeTime int64, remark string) (*dto.StockTradeDto, error) {
+func (s *stockServiceImpl) CreateTrade(ws *workspace.Workspace, ledgerID string, stockCode string, stockName string, tradeType string, priceCents int64, lots int64, tradeTime int64, remark string, tag string) (*dto.StockTradeDto, error) {
 	if priceCents <= 0 {
 		return nil, models.NewBadRequest("成交价必须大于 0")
 	}
 	if lots <= 0 {
 		return nil, models.NewBadRequest("手数必须大于 0")
+	}
+	if tag != "" && !models.IsValidStockTradeTag(tag) {
+		return nil, models.NewBadRequest("无效的交易标签")
 	}
 	if tradeTime <= 0 {
 		tradeTime = time.Now().Unix()
@@ -610,7 +614,7 @@ func (s *stockServiceImpl) CreateTrade(ws *workspace.Workspace, ledgerID string,
 
 		// 清仓：把本轮「建仓 → 清仓」的全部交易归档到交易历史
 		if isSell && position.Quantity == 0 {
-			roundID, err := s.closeRound(tx, ledgerID, stockCode, stockName, tradeTime)
+			roundID, err := s.closeRound(tx, ledgerID, stockCode, stockName, tradeTime, tag)
 			if err != nil {
 				return err
 			}
@@ -648,7 +652,7 @@ func (s *stockServiceImpl) CreateTrade(ws *workspace.Workspace, ledgerID string,
 
 // closeRound 清仓收尾：确保历史集合存在（首次清仓创建，之后复用），
 // 创建本轮次并把该股从建仓到清仓的全部未归档交易挂接进来。
-func (s *stockServiceImpl) closeRound(ws *workspace.Workspace, ledgerID string, stockCode string, stockName string, closedAt int64) (string, error) {
+func (s *stockServiceImpl) closeRound(ws *workspace.Workspace, ledgerID string, stockCode string, stockName string, closedAt int64, tag string) (string, error) {
 	// 兼容存量数据：先归档历史上已完成但未挂接的轮次，避免与当前轮次混淆
 	if err := s.ensureStockHistoryBackfill(ws, ledgerID, stockCode); err != nil {
 		return "", err
@@ -684,6 +688,9 @@ func (s *stockServiceImpl) closeRound(ws *workspace.Workspace, ledgerID string, 
 	if openedAt == 0 {
 		openedAt = closedAt
 	}
+	if tag == "" {
+		tag = models.StockTradeTagAnalysis
+	}
 	round := &models.StockTradeRound{
 		ID:        util.GetUUID(),
 		LedgerID:  ledgerID,
@@ -692,6 +699,7 @@ func (s *stockServiceImpl) closeRound(ws *workspace.Workspace, ledgerID string, 
 		RoundNo:   count + 1,
 		OpenedAt:  openedAt,
 		ClosedAt:  closedAt,
+		Tag:       tag,
 	}
 	if err := s.stockDao.CreateTradeRound(ws, round); err != nil {
 		return "", err
@@ -775,6 +783,7 @@ func (s *stockServiceImpl) GetTradeHistoryDetail(ws *workspace.Workspace, ledger
 			RoundNo:    round.RoundNo,
 			OpenedAt:   round.OpenedAt,
 			ClosedAt:   round.ClosedAt,
+			Tag:        round.Tag,
 			Review:     round.Review,
 			Pnl:        pnl,
 			PnlRate:    pnlRate,
@@ -817,6 +826,39 @@ func (s *stockServiceImpl) UpdateRoundReview(ws *workspace.Workspace, ledgerID s
 		return nil, err
 	}
 	logrus.Infof("保存轮次复盘, ledger: %s, round: %s", ledgerID, roundID)
+	return s.GetTradeHistoryDetail(ws, ledgerID, round.StockCode)
+}
+
+// UpdateRoundTag 更新某一已完成轮次的交易标签（分析/打板/尾盘/追涨），
+// 校验轮次属于当前账本后保存，并返回该股最新的历史详情。
+func (s *stockServiceImpl) UpdateRoundTag(ws *workspace.Workspace, ledgerID string, roundID string, tag string) (*dto.StockTradeHistoryDetailDto, error) {
+	if roundID == "" {
+		return nil, models.NewBadRequest("round_id is required")
+	}
+	tag = strings.TrimSpace(tag)
+	if tag == "" {
+		tag = models.StockTradeTagAnalysis
+	}
+	if !models.IsValidStockTradeTag(tag) {
+		return nil, models.NewBadRequest("无效的交易标签")
+	}
+
+	round, err := s.stockDao.GetTradeRound(ws, roundID)
+	if err != nil {
+		if dao.IsNotFound(err) {
+			return nil, models.NewNotFound("轮次不存在")
+		}
+		return nil, err
+	}
+	if round.LedgerID != ledgerID {
+		return nil, models.NewNotFound("轮次不存在")
+	}
+
+	if err := s.stockDao.UpdateTradeRoundTag(ws, roundID, tag); err != nil {
+		logrus.Errorf("保存轮次标签失败, ledger: %s, round: %s, err: %v", ledgerID, roundID, err)
+		return nil, err
+	}
+	logrus.Infof("保存轮次标签, ledger: %s, round: %s, tag: %s", ledgerID, roundID, tag)
 	return s.GetTradeHistoryDetail(ws, ledgerID, round.StockCode)
 }
 
@@ -962,6 +1004,7 @@ func (s *stockServiceImpl) ensureStockHistoryBackfill(ws *workspace.Workspace, l
 			RoundNo:   count + int64(i) + 1,
 			OpenedAt:  cycle.openedAt,
 			ClosedAt:  cycle.closedAt,
+			Tag:       models.StockTradeTagAnalysis,
 		}
 		if err := s.stockDao.CreateTradeRound(ws, round); err != nil {
 			return err

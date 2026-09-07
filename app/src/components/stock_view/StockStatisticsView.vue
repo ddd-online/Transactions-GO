@@ -43,6 +43,7 @@
             @range-change="onMonthRangeChange"
             @recent-change="onRecentChange"
           />
+          <StockStatisticsTagFilter :value="tagFilter" @change="onTagFilterChange" />
           <div class="stats-head-actions">
             <a-tooltip :overlay-style="{ maxWidth: '380px' }">
               <template #title>
@@ -64,7 +65,7 @@
         </header>
         <div class="stats-filter-empty-body">
           <div class="stats-empty-head">
-            <span class="stats-empty-title">所选区间内暂无结算记录</span>
+            <span class="stats-empty-title">当前筛选下暂无结算记录</span>
             <a-tooltip :overlay-style="{ maxWidth: '360px' }">
               <template #title><div class="stats-tip">{{ emptyTipText }}</div></template>
               <QuestionCircleOutlined class="stats-tip-icon" aria-label="所选区间说明" />
@@ -96,6 +97,7 @@
               @range-change="onMonthRangeChange"
               @recent-change="onRecentChange"
             />
+            <StockStatisticsTagFilter :value="tagFilter" @change="onTagFilterChange" />
             <div class="stats-head-actions">
               <a-button type="primary" class="stats-refresh-btn" :loading="loading" @click="applyFilter">刷新</a-button>
             </div>
@@ -109,7 +111,7 @@
                 {{ signedYuan(latestPoint.totalPnl) }}
               </span>
               <span class="stats-metric-sub">
-                截至 {{ formatDate(latestPoint.closedAt) }} · 第 {{ latestPoint.sequence }} 笔结算{{ isFiltered ? '（区间内）' : '' }}
+                截至 {{ formatDate(latestPoint.closedAt) }} · 第 {{ latestPoint.sequence }} 笔结算{{ isFiltered ? '（筛选内）' : '' }}
               </span>
             </div>
 
@@ -223,6 +225,7 @@
                 <tr>
                   <th class="align-center">结算点</th>
                   <th class="align-center">结算日期</th>
+                  <th class="align-center">标签</th>
                   <th class="align-center">本笔盈亏</th>
                   <th class="align-center">累计盈亏</th>
                   <th class="align-center">胜负</th>
@@ -241,6 +244,9 @@
                     <span class="cell-note amount">{{ p.stockName }} 第 {{ p.stockRoundNo }} 轮</span>
                   </td>
                   <td class="cell-date align-center">{{ formatDate(p.closedAt) }}</td>
+                  <td class="align-center">
+                    <span class="cell-tag-chip">{{ p.tag }}</span>
+                  </td>
                   <td class="align-center">
                     <span class="cell-pair">
                       <span class="cell-money amount" :class="pnlClass(p.pnl)">{{ signedYuan(p.pnl) }}</span>
@@ -296,8 +302,10 @@ import { useAppearanceStore } from '@/stores/appearanceStore'
 import { useStockStatisticsStore } from '@/stores/stockStatisticsStore'
 import { useLedgerStore } from '@/stores/ledgerStore'
 import { centsToYuan } from '@/backend/functions'
-import type { StockStatisticsPoint } from '@/types/transactions'
+import type { StockStatisticsQuery } from '@/backend/api/stock'
+import type { StockStatisticsPoint, StockTradeTag } from '@/types/transactions'
 import StockStatisticsRangeFilter from './StockStatisticsRangeFilter.vue'
+import StockStatisticsTagFilter from './StockStatisticsTagFilter.vue'
 
 const statsStore = useStockStatisticsStore()
 const { stats, loading } = storeToRefs(statsStore)
@@ -309,39 +317,36 @@ type FilterMode = 'all' | 'range' | 'recent'
 const filterMode = ref<FilterMode>('all')
 const monthRange = ref<[Dayjs, Dayjs] | undefined>(undefined)
 const recentN = ref<number>(0)
+const tagFilter = ref<StockTradeTag | ''>('')
 
 const isFiltered = computed(
   () =>
     (filterMode.value === 'range' && !!monthRange.value) ||
-    (filterMode.value === 'recent' && recentN.value > 0)
+    (filterMode.value === 'recent' && recentN.value > 0) ||
+    tagFilter.value !== ''
 )
 const statsTipText = computed(() => {
   if (isFiltered.value) {
-    return `当前区间共 ${stats.value?.roundCount ?? 0} 笔 · 区间内从第 1 笔起按累计口径统计。`
+    return `当前筛选共 ${stats.value?.roundCount ?? 0} 笔 · 筛选内从第 1 笔起按累计口径统计。`
   }
   return `已结算 ${stats.value?.roundCount ?? 0} 笔 · 每完成一笔结算，自第 1 笔起按累计口径统计一次。`
 })
 const emptyTipText = computed(() =>
   isFiltered.value
-    ? '该区间内没有已完成结算的轮次，可调整时间范围或切换回「全部」查看全量统计。'
+    ? '当前筛选条件下没有已完成结算的轮次，可调整筛选条件或切换回「全部」查看全量统计。'
     : '股票清仓后，这一轮从建仓到清仓的完整交易会自动成为一笔结算；完成第 1 笔结算后即可看到逐笔累计的统计与曲线。'
 )
 
 const applyFilter = async () => {
-  if (!isFiltered.value) {
-    await statsStore.loadStats()
-    return
-  }
+  const query: StockStatisticsQuery = {}
   if (filterMode.value === 'range' && monthRange.value) {
-    await statsStore.loadStats({
-      startMonth: monthRange.value[0].format('YYYY-MM'),
-      endMonth: monthRange.value[1].format('YYYY-MM'),
-    })
-    return
+    query.startMonth = monthRange.value[0].format('YYYY-MM')
+    query.endMonth = monthRange.value[1].format('YYYY-MM')
+  } else if (filterMode.value === 'recent' && recentN.value > 0) {
+    query.recent = recentN.value
   }
-  if (filterMode.value === 'recent' && recentN.value > 0) {
-    await statsStore.loadStats({ recent: recentN.value })
-  }
+  if (tagFilter.value) query.tag = tagFilter.value
+  await statsStore.loadStats(query)
 }
 
 const onFilterModeChange = (value: string | number) => {
@@ -367,6 +372,11 @@ const onMonthRangeChange = (dates: [Dayjs, Dayjs] | [string, string] | null) => 
 
 const onRecentChange = (value: unknown) => {
   recentN.value = Number(value)
+  applyFilter()
+}
+
+const onTagFilterChange = (value: unknown) => {
+  tagFilter.value = value as StockTradeTag | ''
   applyFilter()
 }
 
@@ -532,7 +542,8 @@ const chartOption = computed<EChartsOption | null>(() => {
              <span style="color:${colors.textTertiary}">${label}</span><span>${value}</span>
            </div>`
         return `
-          <div style="margin-bottom:6px;font-weight:600">第 ${p.sequence} 笔${isFiltered.value ? '（区间内）' : ''}结算 · ${formatDate(p.closedAt)}</div>
+          <div style="margin-bottom:6px;font-weight:600">第 ${p.sequence} 笔${isFiltered.value ? '（筛选内）' : ''}结算 · ${formatDate(p.closedAt)}</div>
+          ${row('标签', p.tag)}
           ${row('该笔盈亏', `<span style="${mono}${signedStyle(p.pnl)}">${money(p.pnl)}</span>`)}
           ${row('累计盈亏', `<span style="${mono}${signedStyle(p.totalPnl)}">${money(p.totalPnl)}</span>`)}
           ${row('胜负', `<span>${p.winCount} 胜 · ${p.lossCount} 负</span>`)}
@@ -602,6 +613,7 @@ watch(
     filterMode.value = 'all'
     monthRange.value = undefined
     recentN.value = 0
+    tagFilter.value = ''
   }
 )
 
@@ -903,7 +915,7 @@ onMounted(() => {
 
 .stats-table {
   width: 100%;
-  min-width: 1140px;
+  min-width: 1220px;
   border-collapse: collapse;
 }
 
@@ -979,6 +991,19 @@ onMounted(() => {
   font-size: var(--transactions-size-text-body);
   color: var(--transactions-color-text-secondary);
   font-variant-numeric: tabular-nums;
+}
+
+.cell-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px var(--transactions-space-sm);
+  font-size: var(--transactions-size-text-caption);
+  font-weight: 500;
+  line-height: var(--transactions-height-snug);
+  color: var(--transactions-color-text-secondary);
+  background-color: var(--transactions-color-hover-bg);
+  border-radius: var(--transactions-radius-sm);
+  white-space: nowrap;
 }
 
 /* 金额 + 百分比同格展示：两个数值各自右对齐，形成稳定的金额列与百分比列 */

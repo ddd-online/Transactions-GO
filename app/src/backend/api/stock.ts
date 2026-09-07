@@ -1,5 +1,5 @@
 import api from "@/backend/api/api-client";
-import type { StockFeeSetting, StockFundRecordPage, StockNameResult, StockOverview, StockPosition, StockStatistics, StockTrade, StockTradeHistory, StockTradeHistoryDetail, StockTradeHistorySummary } from "@/types/transactions";
+import type { StockFeeSetting, StockFundRecordPage, StockNameResult, StockOverview, StockPosition, StockStatistics, StockTrade, StockTradeHistory, StockTradeHistoryDetail, StockTradeHistorySummary, StockTradeTag } from "@/types/transactions";
 
 export async function fetchStockOverview(ledgerId: string): Promise<StockOverview> {
     return api.get<StockOverview>(`/v1/stock/account/overview?ledger_id=${encodeURIComponent(ledgerId)}`, '查询股票账户总览');
@@ -84,6 +84,14 @@ export async function updateStockRoundReview(ledgerId: string, roundId: string, 
     );
 }
 
+export async function updateStockRoundTag(ledgerId: string, roundId: string, tag: string): Promise<StockTradeHistoryDetail> {
+    return api.put<StockTradeHistoryDetail>(
+        `/v1/stock/history/rounds/${encodeURIComponent(roundId)}/tag`,
+        { ledger_id: ledgerId, tag },
+        '保存交易标签'
+    );
+}
+
 export interface StockStatisticsQuery {
     /** 起始月份 YYYY-MM（含首月） */
     startMonth?: string
@@ -91,6 +99,8 @@ export interface StockStatisticsQuery {
     endMonth?: string
     /** 最近 N 笔（与时间区间互斥） */
     recent?: number
+    /** 交易标签（分析/打板/尾盘/追涨），缺省为全部 */
+    tag?: StockTradeTag
 }
 
 export async function fetchStockStatistics(
@@ -106,6 +116,9 @@ export async function fetchStockStatistics(
     }
     if (query.recent && query.recent > 0) {
         params.push(`recent=${query.recent}`)
+    }
+    if (query.tag) {
+        params.push(`tag=${encodeURIComponent(query.tag)}`)
     }
     return api.get<StockStatistics>(
         `/v1/stock/statistics?${params.join('&')}`,
@@ -129,7 +142,8 @@ export async function createStockTrade(
     price: number,
     lots: number,
     tradeTime: number,
-    remark: string
+    remark: string,
+    tag = '分析'
 ): Promise<StockTrade> {
     return api.post<StockTrade>('/v1/stock/trades', {
         ledger_id: ledgerId,
@@ -140,6 +154,7 @@ export async function createStockTrade(
         lots,
         trade_time: tradeTime,
         remark,
+        tag,
     }, '记录交易');
 }
 

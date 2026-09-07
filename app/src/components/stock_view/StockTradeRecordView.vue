@@ -140,6 +140,7 @@
                     <CaretRightOutlined />
                   </span>
                   <span class="round-title">第 {{ round.roundNo }} 轮</span>
+                  <span v-if="round.tag && round.tag !== '分析'" class="round-tag-chip">{{ round.tag }}</span>
                   <span class="round-period">{{ formatTime(round.openedAt) }} → {{ formatTime(round.closedAt) }}</span>
                 </div>
                 <div class="round-head-right">
@@ -177,6 +178,19 @@
                       </tr>
                     </tbody>
                   </table>
+                </div>
+
+                <!-- 本轮交易标签：四个固定策略取值，可直接修改 -->
+                <div class="round-tag">
+                  <span class="round-tag-label">本轮标签</span>
+                  <a-select
+                    :value="round.tag"
+                    class="round-tag-select"
+                    size="small"
+                    :options="STOCK_TRADE_TAG_OPTIONS"
+                    :disabled="tagSaving"
+                    @change="handleTagChange(round.id, $event)"
+                  />
                 </div>
 
                 <!-- 本轮复盘：一段话，500 字以内 -->
@@ -244,11 +258,12 @@ import { storeToRefs } from 'pinia'
 import { CaretRightOutlined, EditOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue'
 import { useStockHistoryStore } from '@/stores/stockHistoryStore'
 import { centsToYuan } from '@/backend/functions'
+import { STOCK_TRADE_TAG_OPTIONS } from '@/backend/constant'
 import type { StockTradeRound } from '@/types/transactions'
 import dayjs from 'dayjs'
 
 const historyStore = useStockHistoryStore()
-const { histories, historiesLoading, summary, detail, detailLoading, reviewSaving } = storeToRefs(historyStore)
+const { histories, historiesLoading, summary, detail, detailLoading, reviewSaving, tagSaving } = storeToRefs(historyStore)
 
 // ---------- 展示 ----------
 const tradeTypeLabels: Record<string, string> = {
@@ -342,6 +357,11 @@ const saveReviewRound = async () => {
     editingRoundId.value = null
     reviewDraft.value = ''
   }
+}
+
+// ---------- 本轮交易标签 ----------
+const handleTagChange = async (roundId: string, tag: unknown) => {
+  await historyStore.saveRoundTag(roundId, String(tag))
 }
 
 // 切换股票/重新加载详情后退出编辑态，避免残留旧草稿
@@ -766,6 +786,20 @@ onMounted(() => {
   text-overflow: ellipsis;
 }
 
+.round-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 1px var(--transactions-space-sm);
+  font-size: var(--transactions-size-text-caption);
+  font-weight: 500;
+  line-height: var(--transactions-height-snug);
+  color: var(--transactions-color-text-secondary);
+  background-color: var(--transactions-color-hover-bg);
+  border-radius: var(--transactions-radius-sm);
+  white-space: nowrap;
+}
+
 .round-head-right {
   margin-left: auto;
   display: flex;
@@ -842,6 +876,26 @@ onMounted(() => {
 
 .round-table tbody tr:hover td {
   background-color: var(--transactions-color-hover-bg);
+}
+
+/* ========== 本轮交易标签 ========== */
+.round-tag {
+  display: flex;
+  align-items: center;
+  gap: var(--transactions-space-md);
+  padding: var(--transactions-space-sm) var(--transactions-space-lg);
+  border-top: 1px solid var(--transactions-color-divider);
+  background-color: var(--transactions-color-major-background);
+}
+
+.round-tag-label {
+  flex-shrink: 0;
+  font-size: var(--transactions-size-text-body-sm);
+  color: var(--transactions-color-text-secondary);
+}
+
+.round-tag-select {
+  width: 140px;
 }
 
 /* ========== 本轮复盘 ========== */

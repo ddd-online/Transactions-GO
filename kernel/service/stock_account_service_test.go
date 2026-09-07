@@ -14,10 +14,10 @@ func TestWithdrawFollowsTotalAssetsFormula(t *testing.T) {
 	if _, err := svc.SetPrincipal(ws, testLedgerID, 10000000); err != nil {
 		t.Fatalf("设置本金失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700003000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700003000, "", ""); err != nil {
 		t.Fatalf("建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1700003100, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1700003100, "", ""); err != nil {
 		t.Fatalf("清仓失败: %v", err)
 	}
 
@@ -158,7 +158,7 @@ func TestAvailableCashSubtractsPositionCost(t *testing.T) {
 		t.Fatalf("设置本金失败: %v", err)
 	}
 	// 建仓 10 手 @ 10.00，买入成本 1000510 分，持仓成本计入可用现金扣除
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700004000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700004000, "", ""); err != nil {
 		t.Fatalf("建仓失败: %v", err)
 	}
 
@@ -174,7 +174,7 @@ func TestAvailableCashSubtractsPositionCost(t *testing.T) {
 	}
 
 	// 清仓后持仓成本归零，可用现金 = 总资产
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1100, 10, 1700004100, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1100, 10, 1700004100, "", ""); err != nil {
 		t.Fatalf("清仓失败: %v", err)
 	}
 	after, err := svc.GetOverview(ws, testLedgerID)

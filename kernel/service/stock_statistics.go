@@ -20,7 +20,8 @@ type settleEvent struct {
 }
 
 // GetStatistics 返回全量逐笔结算统计（自第 1 笔起累计口径）。
-// GetStatisticsRange 支持按月份区间或最近 N 笔筛选，区间内按独立口径从第 1 笔重新累计。
+// GetStatisticsRange 支持按月份区间、最近 N 笔与交易标签筛选（标签可与区间/最近 N 叠加），
+// 筛选集合内按独立口径从第 1 笔重新累计。
 //
 // 派生口径：
 //   - 胜率 = 盈利笔数 ÷ 总笔数（平局计入总笔数，不计胜负）；
@@ -30,27 +31,32 @@ type settleEvent struct {
 //   - 最大回撤按每笔结算时点的总资产曲线（当时的本金 + 累计已结算盈亏 − 当时累计支取）
 //     从高点跌落的幅度计算；本金追加/支取按记录日期参与时序，占本金比例使用当时的本金。
 func (s *stockServiceImpl) GetStatistics(ws *workspace.Workspace, ledgerID string) (*dto.StockStatisticsDto, error) {
-	return s.statistics(ws, ledgerID, "", "", 0)
+	return s.statistics(ws, ledgerID, "", "", 0, "")
 }
 
-// GetStatisticsRange 返回区间统计：时间范围（含首尾整月）或最近 N 笔二选一。
-// 区间内按独立口径逐笔累计；本金追加/支取仍按记录日期全程重放，用于回撤百分比分母。
-func (s *stockServiceImpl) GetStatisticsRange(ws *workspace.Workspace, ledgerID string, startMonth string, endMonth string, recent int64) (*dto.StockStatisticsDto, error) {
+// GetStatisticsRange 返回筛选统计：时间范围（含首尾整月）与最近 N 笔二选一，
+// 两者均可与交易标签叠加；筛选集合内按独立口径逐笔累计。
+// 本金追加/支取仍按记录日期全程重放，用于回撤百分比分母。
+func (s *stockServiceImpl) GetStatisticsRange(ws *workspace.Workspace, ledgerID string, startMonth string, endMonth string, recent int64, tag string) (*dto.StockStatisticsDto, error) {
 	if recent < 0 {
 		return nil, models.NewBadRequest("recent 必须为正整数")
 	}
 	if recent > 0 && (startMonth != "" || endMonth != "") {
 		return nil, models.NewBadRequest("时间范围与笔数筛选不能同时使用")
 	}
+	if tag != "" && !models.IsValidStockTradeTag(tag) {
+		return nil, models.NewBadRequest("无效的交易标签")
+	}
 	fromDay, toDay, err := normalizeStatisticsMonthRange(startMonth, endMonth)
 	if err != nil {
 		return nil, err
 	}
-	return s.statistics(ws, ledgerID, fromDay, toDay, recent)
+	return s.statistics(ws, ledgerID, fromDay, toDay, recent, tag)
 }
 
-// statistics 实现结算统计：fromDay/toDay 非空时按清仓日期区间筛选，recent > 0 时取最近 N 笔。
-func (s *stockServiceImpl) statistics(ws *workspace.Workspace, ledgerID string, fromDay string, toDay string, recent int64) (*dto.StockStatisticsDto, error) {
+// statistics 实现结算统计：fromDay/toDay 非空时按清仓日期区间筛选，recent > 0 时取最近 N 笔，
+// tag 非空时先按标签过滤轮次（使「最近 N 笔」取该标签内的最近 N 笔），再与区间/笔数筛选叠加。
+func (s *stockServiceImpl) statistics(ws *workspace.Workspace, ledgerID string, fromDay string, toDay string, recent int64, tag string) (*dto.StockStatisticsDto, error) {
 	if err := s.ensureTradeHistoryBackfill(ws, ledgerID); err != nil {
 		return nil, err
 	}
@@ -79,6 +85,15 @@ func (s *stockServiceImpl) statistics(ws *workspace.Workspace, ledgerID string, 
 				tradeCount: int64(len(trades)),
 			})
 		}
+	}
+	if tag != "" {
+		kept := make([]settleEvent, 0, len(events))
+		for i := range events {
+			if events[i].round.Tag == tag {
+				kept = append(kept, events[i])
+			}
+		}
+		events = kept
 	}
 	sort.SliceStable(events, func(i, j int) bool {
 		if events[i].round.ClosedAt != events[j].round.ClosedAt {
@@ -120,7 +135,7 @@ func (s *stockServiceImpl) statistics(ws *workspace.Workspace, ledgerID string, 
 	if includedTotal == 0 {
 		return result, nil
 	}
-	useWindow := fromDay != "" || recent > 0
+	useWindow := fromDay != "" || recent > 0 || tag != ""
 
 	// 资金事件与结算事件按日期合成同一条时序，保证本金追加/支取在正确时点影响总资产峰值与回撤
 	actions := make([]statAction, 0, len(flows)+len(events))
@@ -240,6 +255,7 @@ func (s *stockServiceImpl) statistics(ws *workspace.Workspace, ledgerID string, 
 			StockCode:    ev.round.StockCode,
 			StockName:    ev.stockName,
 			StockRoundNo: ev.round.RoundNo,
+			Tag:          ev.round.Tag,
 			Pnl:          ev.pnl,
 			PnlRate:      ev.pnlRate,
 			TradeCount:   ev.tradeCount,

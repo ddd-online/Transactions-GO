@@ -33,17 +33,17 @@ func TestCloseArchivesRoundWithAllTrades(t *testing.T) {
 	svc, ws := newStockService(t)
 
 	// 建仓 100 手 → 加仓 100 手 → 减仓 100 手 → 清仓 100 手
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 100, 1700000000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 100, 1700000000, "", ""); err != nil {
 		t.Fatalf("建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeAdd, 1100, 100, 1700000100, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeAdd, 1100, 100, 1700000100, "", ""); err != nil {
 		t.Fatalf("加仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeReduce, 1200, 100, 1700000200, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeReduce, 1200, 100, 1700000200, "", ""); err != nil {
 		t.Fatalf("减仓失败: %v", err)
 	}
 	closeTime := int64(1700000300)
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1250, 100, closeTime, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1250, 100, closeTime, "", ""); err != nil {
 		t.Fatalf("清仓失败: %v", err)
 	}
 
@@ -110,17 +110,17 @@ func TestMultipleRoundsReuseOneHistory(t *testing.T) {
 	svc, ws := newStockService(t)
 
 	// 第一轮：盈利
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700001000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700001000, "", ""); err != nil {
 		t.Fatalf("第一轮建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1100, 10, 1700001100, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1100, 10, 1700001100, "", ""); err != nil {
 		t.Fatalf("第一轮清仓失败: %v", err)
 	}
 	// 第二轮：亏损
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 2000, 10, 1700001200, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 2000, 10, 1700001200, "", ""); err != nil {
 		t.Fatalf("第二轮建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1900, 10, 1700001300, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1900, 10, 1700001300, "", ""); err != nil {
 		t.Fatalf("第二轮清仓失败: %v", err)
 	}
 
@@ -234,10 +234,10 @@ func TestIncompleteRoundNotArchived(t *testing.T) {
 	svc, ws := newStockService(t)
 
 	// 只有建仓 + 加仓，未清仓：不应出现在交易历史
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1690000000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1690000000, "", ""); err != nil {
 		t.Fatalf("建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeAdd, 1100, 10, 1690000100, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeAdd, 1100, 10, 1690000100, "", ""); err != nil {
 		t.Fatalf("加仓失败: %v", err)
 	}
 
@@ -250,7 +250,7 @@ func TestIncompleteRoundNotArchived(t *testing.T) {
 	}
 
 	// 随后清仓：本轮从第一次建仓开始完整归档
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 20, 1690000200, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 20, 1690000200, "", ""); err != nil {
 		t.Fatalf("清仓失败: %v", err)
 	}
 	detail, err := svc.GetTradeHistoryDetail(ws, testLedgerID, testCode)
@@ -269,17 +269,17 @@ func TestListTradesForHeldStockOnlyCurrentRound(t *testing.T) {
 	svc, ws := newStockService(t)
 
 	// 第一轮：建仓 → 清仓（历史轮次）
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1690001000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1690001000, "", ""); err != nil {
 		t.Fatalf("第一轮建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1690001100, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1690001100, "", ""); err != nil {
 		t.Fatalf("第一轮清仓失败: %v", err)
 	}
 	// 第二轮：再次建仓 + 加仓（当前持仓）
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1100, 10, 1690001200, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1100, 10, 1690001200, "", ""); err != nil {
 		t.Fatalf("第二轮建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeAdd, 1150, 10, 1690001300, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeAdd, 1150, 10, 1690001300, "", ""); err != nil {
 		t.Fatalf("第二轮加仓失败: %v", err)
 	}
 
@@ -301,7 +301,7 @@ func TestListTradesForHeldStockOnlyCurrentRound(t *testing.T) {
 	}
 
 	// 清仓后再查：保留查看该股完整交易记录的行为
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1300, 20, 1690001400, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1300, 20, 1690001400, "", ""); err != nil {
 		t.Fatalf("第二轮清仓失败: %v", err)
 	}
 	all, err := svc.ListTrades(ws, testLedgerID, testCode)
@@ -317,23 +317,23 @@ func TestTradeHistorySummaryAcrossStocks(t *testing.T) {
 	svc, ws := newStockService(t)
 
 	// 股票 A：第一轮盈利，第二轮亏损
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1690002000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1690002000, "", ""); err != nil {
 		t.Fatalf("A 第一轮建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1690002100, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1690002100, "", ""); err != nil {
 		t.Fatalf("A 第一轮清仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 2000, 10, 1690002200, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 2000, 10, 1690002200, "", ""); err != nil {
 		t.Fatalf("A 第二轮建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1800, 10, 1690002300, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1800, 10, 1690002300, "", ""); err != nil {
 		t.Fatalf("A 第二轮清仓失败: %v", err)
 	}
 	// 股票 B：一轮盈利
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCodeB, testNameB, models.StockTradeOpen, 500, 5, 1690002400, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCodeB, testNameB, models.StockTradeOpen, 500, 5, 1690002400, "", ""); err != nil {
 		t.Fatalf("B 建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCodeB, testNameB, models.StockTradeClose, 550, 5, 1690002500, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCodeB, testNameB, models.StockTradeClose, 550, 5, 1690002500, "", ""); err != nil {
 		t.Fatalf("B 清仓失败: %v", err)
 	}
 
@@ -374,10 +374,10 @@ func TestUpdateRoundReview(t *testing.T) {
 	svc, ws := newStockService(t)
 
 	// 先完成一轮交易，得到轮次
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700000000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700000000, "", ""); err != nil {
 		t.Fatalf("建仓失败: %v", err)
 	}
-	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1700000100, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1700000100, "", ""); err != nil {
 		t.Fatalf("清仓失败: %v", err)
 	}
 	detail, err := svc.GetTradeHistoryDetail(ws, testLedgerID, testCode)
@@ -424,5 +424,87 @@ func TestUpdateRoundReview(t *testing.T) {
 	}
 	if len(detail.Rounds) != 1 || detail.Rounds[0].Review != "" {
 		t.Fatalf("复盘应被清空: %+v", detail.Rounds)
+	}
+}
+
+func TestCloseRoundTagDefaultAndUpdate(t *testing.T) {
+	svc, ws := newStockService(t)
+
+	// 未传标签清仓 → 默认「分析」
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700000000, "", ""); err != nil {
+		t.Fatalf("建仓失败: %v", err)
+	}
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1700000100, "", ""); err != nil {
+		t.Fatalf("清仓失败: %v", err)
+	}
+	detail, err := svc.GetTradeHistoryDetail(ws, testLedgerID, testCode)
+	if err != nil {
+		t.Fatalf("查询历史详情失败: %v", err)
+	}
+	if len(detail.Rounds) != 1 {
+		t.Fatalf("轮次数应为 1, 实际 %d", len(detail.Rounds))
+	}
+	roundID := detail.Rounds[0].ID
+	if detail.Rounds[0].Tag != models.StockTradeTagAnalysis {
+		t.Fatalf("未指定标签时应默认「分析」, 实际 %q", detail.Rounds[0].Tag)
+	}
+
+	// 保存标签：随详情返回
+	detail, err = svc.UpdateRoundTag(ws, testLedgerID, roundID, models.StockTradeTagDaban)
+	if err != nil {
+		t.Fatalf("保存标签失败: %v", err)
+	}
+	if len(detail.Rounds) != 1 || detail.Rounds[0].Tag != models.StockTradeTagDaban {
+		t.Fatalf("标签保存结果错误: %+v", detail.Rounds)
+	}
+
+	// 非法标签拒绝
+	if _, err := svc.UpdateRoundTag(ws, testLedgerID, roundID, "短线"); err == nil {
+		t.Fatal("非法标签应被拒绝")
+	} else if !strings.Contains(err.Error(), "无效的交易标签") {
+		t.Fatalf("非法标签错误文案错误: %v", err)
+	}
+
+	// 其他账本不可操作该轮次
+	if _, err := svc.UpdateRoundTag(ws, "other-ledger", roundID, models.StockTradeTagWeipan); err == nil {
+		t.Fatal("其他账本写入标签应被拒绝")
+	}
+
+	// 空串/纯空白 = 恢复默认「分析」
+	detail, err = svc.UpdateRoundTag(ws, testLedgerID, roundID, "   ")
+	if err != nil {
+		t.Fatalf("清空标签失败: %v", err)
+	}
+	if len(detail.Rounds) != 1 || detail.Rounds[0].Tag != models.StockTradeTagAnalysis {
+		t.Fatalf("空标签应恢复「分析」: %+v", detail.Rounds)
+	}
+}
+
+func TestCloseRoundSavesProvidedTag(t *testing.T) {
+	svc, ws := newStockService(t)
+
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700002000, "", ""); err != nil {
+		t.Fatalf("建仓失败: %v", err)
+	}
+	// 清仓时指定标签
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1200, 10, 1700002100, "", models.StockTradeTagZhuizhang); err != nil {
+		t.Fatalf("清仓失败: %v", err)
+	}
+	detail, err := svc.GetTradeHistoryDetail(ws, testLedgerID, testCode)
+	if err != nil {
+		t.Fatalf("查询历史详情失败: %v", err)
+	}
+	if len(detail.Rounds) != 1 || detail.Rounds[0].Tag != models.StockTradeTagZhuizhang {
+		t.Fatalf("清仓时应保存指定标签: %+v", detail.Rounds)
+	}
+
+	// 非清仓交易传标签不影响交易本身
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeOpen, 1000, 10, 1700002200, "", models.StockTradeTagDaban); err != nil {
+		t.Fatalf("建仓失败: %v", err)
+	}
+
+	// 非法标签在清仓时拒绝且不产生轮次
+	if _, err := svc.CreateTrade(ws, testLedgerID, testCode, testName, models.StockTradeClose, 1100, 10, 1700002300, "", "打新"); err == nil {
+		t.Fatal("非法交易标签应被拒绝")
 	}
 }

@@ -2,11 +2,13 @@ package service_test
 
 import (
 	"math"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/transactions/dao"
 	"github.com/transactions/models"
+	"github.com/transactions/service"
 	"github.com/transactions/util"
 	"github.com/transactions/workspace"
 )
@@ -348,7 +350,7 @@ func TestStatisticsMonthRangeRecomputesWindow(t *testing.T) {
 	seedCleanRoundAt(t, ws, stockDao, testCodeB, testNameB, 1000, 920, 10, time.Date(2023, 7, 25, 12, 0, 0, 0, time.UTC))
 	seedCleanRoundAt(t, ws, stockDao, testCode, testName, 1000, 1050, 10, time.Date(2023, 8, 1, 12, 0, 0, 0, time.UTC))
 
-	stats, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-07", "2023-07", 0)
+	stats, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-07", "2023-07", 0, "")
 	if err != nil {
 		t.Fatalf("查询 2023-07 区间统计失败: %v", err)
 	}
@@ -376,7 +378,7 @@ func TestStatisticsMonthRangeRecomputesWindow(t *testing.T) {
 		t.Fatalf("区间最大回撤错误: %+v", p2)
 	}
 
-	august, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-08", "2023-08", 0)
+	august, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-08", "2023-08", 0, "")
 	if err != nil {
 		t.Fatalf("查询 2023-08 区间统计失败: %v", err)
 	}
@@ -388,7 +390,7 @@ func TestStatisticsMonthRangeRecomputesWindow(t *testing.T) {
 	}
 
 	// 跨年区间不应遗漏边界外数据
-	crossYear, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-07", "2023-12", 0)
+	crossYear, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-07", "2023-12", 0, "")
 	if err != nil {
 		t.Fatalf("查询跨月区间失败: %v", err)
 	}
@@ -407,7 +409,7 @@ func TestStatisticsRecentNRecomputesWindow(t *testing.T) {
 	seedCleanRoundAt(t, ws, stockDao, testCodeB, testNameB, 1000, 920, 10, time.Date(2023, 7, 25, 12, 0, 0, 0, time.UTC)) // -80000
 	seedCleanRoundAt(t, ws, stockDao, testCode, testName, 1000, 1050, 10, time.Date(2023, 8, 1, 12, 0, 0, 0, time.UTC))   // +50000
 
-	stats, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 2)
+	stats, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 2, "")
 	if err != nil {
 		t.Fatalf("查询最近 2 笔失败: %v", err)
 	}
@@ -422,7 +424,7 @@ func TestStatisticsRecentNRecomputesWindow(t *testing.T) {
 	}
 
 	// 请求笔数超过总笔数时返回全部
-	all, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 100)
+	all, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 100, "")
 	if err != nil {
 		t.Fatalf("查询超过总数的最近笔数失败: %v", err)
 	}
@@ -456,7 +458,7 @@ func TestStatisticsRangeDrawdownPercentUsesPrincipalAtPoint(t *testing.T) {
 	}
 	seedCleanRoundAt(t, ws, stockDao, testCodeB, testNameB, 2000, 1700, 10, time.Date(2023, 1, 20, 12, 0, 0, 0, time.UTC))
 
-	stats, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-01", "2023-01", 0)
+	stats, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-01", "2023-01", 0, "")
 	if err != nil {
 		t.Fatalf("查询 2023-01 区间统计失败: %v", err)
 	}
@@ -481,31 +483,180 @@ func TestStatisticsRangeDrawdownPercentUsesPrincipalAtPoint(t *testing.T) {
 func TestStatisticsRangeValidation(t *testing.T) {
 	svc, ws := newStockService(t)
 
-	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-01", "", 0); err == nil {
+	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-01", "", 0, ""); err == nil {
 		t.Fatalf("缺少 end_month 应报错")
 	}
-	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "", "2023-01", 0); err == nil {
+	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "", "2023-01", 0, ""); err == nil {
 		t.Fatalf("缺少 start_month 应报错")
 	}
-	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "2023/01", "2023-02", 0); err == nil {
+	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "2023/01", "2023-02", 0, ""); err == nil {
 		t.Fatalf("非法月份格式应报错")
 	}
-	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-03", "2023-01", 0); err == nil {
+	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-03", "2023-01", 0, ""); err == nil {
 		t.Fatalf("end_month 早于 start_month 应报错")
 	}
-	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-01", "2023-02", 5); err == nil {
+	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-01", "2023-02", 5, ""); err == nil {
 		t.Fatalf("时间与笔数并存应报错")
 	}
-	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", -1); err == nil {
+	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", -1, ""); err == nil {
 		t.Fatalf("负数 recent 应报错")
 	}
 
 	// 区间内无结算：返回空统计且不报错
-	empty, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-06", "2023-06", 0)
+	empty, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-06", "2023-06", 0, "")
 	if err != nil {
 		t.Fatalf("无结算区间不应报错: %v", err)
 	}
 	if empty.RoundCount != 0 || len(empty.Points) != 0 {
 		t.Fatalf("无结算区间应返回空, 实际 %+v", empty)
+	}
+}
+
+// seedTaggedStatRounds 造 6 轮带标签的干净结算：
+// A1(07-01,打板,+100000) B1(07-02,分析,+50000) A2(07-03,尾盘,-80000)
+// B2(08-01,打板,+50000) A3(08-02,打板,+50000) B3(08-05,追涨,-80000)
+func seedTaggedStatRounds(t *testing.T, svc service.StockService, ws *workspace.Workspace) {
+	t.Helper()
+	stockDao := dao.NewStockDao()
+	if _, err := svc.SetPrincipal(ws, testLedgerID, 10000000); err != nil {
+		t.Fatalf("设置本金失败: %v", err)
+	}
+	seedCleanRoundAt(t, ws, stockDao, testCode, testName, 1000, 1100, 10, time.Date(2023, 7, 1, 12, 0, 0, 0, time.UTC))
+	seedCleanRoundAt(t, ws, stockDao, testCodeB, testNameB, 800, 850, 10, time.Date(2023, 7, 2, 12, 0, 0, 0, time.UTC))
+	seedCleanRoundAt(t, ws, stockDao, testCode, testName, 2000, 1920, 10, time.Date(2023, 7, 3, 12, 0, 0, 0, time.UTC))
+	seedCleanRoundAt(t, ws, stockDao, testCodeB, testNameB, 800, 850, 10, time.Date(2023, 8, 1, 12, 0, 0, 0, time.UTC))
+	seedCleanRoundAt(t, ws, stockDao, testCode, testName, 1000, 1050, 10, time.Date(2023, 8, 2, 12, 0, 0, 0, time.UTC))
+	seedCleanRoundAt(t, ws, stockDao, testCodeB, testNameB, 2000, 1920, 10, time.Date(2023, 8, 5, 12, 0, 0, 0, time.UTC))
+
+	// 首次统计触发存量历史回填生成轮次，再按轮设置标签
+	if _, err := svc.GetStatistics(ws, testLedgerID); err != nil {
+		t.Fatalf("首次统计失败: %v", err)
+	}
+	assignTags := func(code string, tags []string) {
+		t.Helper()
+		detail, err := svc.GetTradeHistoryDetail(ws, testLedgerID, code)
+		if err != nil {
+			t.Fatalf("查询 %s 历史详情失败: %v", code, err)
+		}
+		if len(detail.Rounds) != len(tags) {
+			t.Fatalf("%s 轮次数应为 %d, 实际 %d", code, len(tags), len(detail.Rounds))
+		}
+		for i, tag := range tags {
+			if _, err := svc.UpdateRoundTag(ws, testLedgerID, detail.Rounds[i].ID, tag); err != nil {
+				t.Fatalf("设置 %s 第 %d 轮标签失败: %v", code, i+1, err)
+			}
+		}
+	}
+	assignTags(testCode, []string{models.StockTradeTagDaban, models.StockTradeTagWeipan, models.StockTradeTagDaban})
+	assignTags(testCodeB, []string{models.StockTradeTagAnalysis, models.StockTradeTagDaban, models.StockTradeTagZhuizhang})
+}
+
+func TestStatisticsTagFieldAndTagFilter(t *testing.T) {
+	svc, ws := newStockService(t)
+	seedTaggedStatRounds(t, svc, ws)
+
+	// 全量统计：每个点带对应标签
+	all, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 0, "")
+	if err != nil {
+		t.Fatalf("查询全量统计失败: %v", err)
+	}
+	if all.RoundCount != 6 || len(all.Points) != 6 {
+		t.Fatalf("全量应统计 6 笔, 实际 %+v", all)
+	}
+	wantTags := []string{
+		models.StockTradeTagDaban,
+		models.StockTradeTagAnalysis,
+		models.StockTradeTagWeipan,
+		models.StockTradeTagDaban,
+		models.StockTradeTagDaban,
+		models.StockTradeTagZhuizhang,
+	}
+	for i, want := range wantTags {
+		if all.Points[i].Tag != want {
+			t.Fatalf("第 %d 笔标签应为 %s, 实际 %s", i+1, want, all.Points[i].Tag)
+		}
+		if all.Points[i].Sequence != int64(i+1) {
+			t.Fatalf("全量第 %d 笔序号应为 %d, 实际 %d", i, i+1, all.Points[i].Sequence)
+		}
+	}
+
+	// 按「打板」筛选：只保留 3 笔，序号从 1 重新累计，累计盈亏只含筛选集合
+	daban, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 0, models.StockTradeTagDaban)
+	if err != nil {
+		t.Fatalf("查询打板统计失败: %v", err)
+	}
+	if daban.RoundCount != 3 || len(daban.Points) != 3 {
+		t.Fatalf("打板筛选应统计 3 笔, 实际 %+v", daban)
+	}
+	wantCodes := []string{testCode, testCodeB, testCode}
+	for i, code := range wantCodes {
+		p := daban.Points[i]
+		if p.Sequence != int64(i+1) || p.Tag != models.StockTradeTagDaban || p.StockCode != code {
+			t.Fatalf("打板筛选第 %d 笔错误: %+v", i+1, p)
+		}
+	}
+	if daban.Points[0].TotalPnl != 100000 || daban.Points[1].TotalPnl != 150000 || daban.Points[2].TotalPnl != 200000 {
+		t.Fatalf("打板筛选累计盈亏错误: %+v", daban.Points)
+	}
+	if daban.Points[2].WinCount != 3 || daban.Points[2].WinRate != 100 {
+		t.Fatalf("打板筛选胜负口径应按筛选集合重算: %+v", daban.Points[2])
+	}
+
+	// 其它标签逐一命中；不存在的组合返回空统计
+	for _, tag := range []string{models.StockTradeTagAnalysis, models.StockTradeTagWeipan, models.StockTradeTagZhuizhang} {
+		part, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 0, tag)
+		if err != nil {
+			t.Fatalf("查询标签 %s 失败: %v", tag, err)
+		}
+		if part.RoundCount != 1 || len(part.Points) != 1 || part.Points[0].Tag != tag {
+			t.Fatalf("标签 %s 应命中 1 笔, 实际 %+v", tag, part)
+		}
+	}
+
+	// 非法标签拒绝
+	if _, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 0, "打新"); err == nil {
+		t.Fatal("非法标签应被拒绝")
+	} else if !strings.Contains(err.Error(), "无效的交易标签") {
+		t.Fatalf("非法标签错误文案错误: %v", err)
+	}
+}
+
+func TestStatisticsTagCombinesWithMonthAndRecent(t *testing.T) {
+	svc, ws := newStockService(t)
+	seedTaggedStatRounds(t, svc, ws)
+
+	// 标签 × 月份：7 月打板 1 笔（A1），8 月打板 2 笔（B2、A3）
+	july, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-07", "2023-07", 0, models.StockTradeTagDaban)
+	if err != nil {
+		t.Fatalf("查询 7 月打板失败: %v", err)
+	}
+	if july.RoundCount != 1 || july.Points[0].StockCode != testCode || july.Points[0].Sequence != 1 {
+		t.Fatalf("7 月打板应只命中 A1, 实际 %+v", july)
+	}
+	august, err := svc.GetStatisticsRange(ws, testLedgerID, "2023-08", "2023-08", 0, models.StockTradeTagDaban)
+	if err != nil {
+		t.Fatalf("查询 8 月打板失败: %v", err)
+	}
+	if august.RoundCount != 2 || len(august.Points) != 2 {
+		t.Fatalf("8 月打板应命中 2 笔, 实际 %+v", august)
+	}
+	if august.Points[1].TotalPnl != 100000 {
+		t.Fatalf("8 月打板累计盈亏应为 100000, 实际 %d", august.Points[1].TotalPnl)
+	}
+
+	// 标签 × 最近 N：最近 1 笔打板 = A3（2023-08-02）；取最近 100 笔回到全部 3 笔
+	one, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 1, models.StockTradeTagDaban)
+	if err != nil {
+		t.Fatalf("查询最近 1 笔打板失败: %v", err)
+	}
+	if one.RoundCount != 1 || one.Points[0].StockCode != testCode || one.Points[0].StockRoundNo != 3 {
+		t.Fatalf("最近 1 笔打板应为 A3, 实际 %+v", one)
+	}
+	all, err := svc.GetStatisticsRange(ws, testLedgerID, "", "", 100, models.StockTradeTagDaban)
+	if err != nil {
+		t.Fatalf("查询最近 100 笔打板失败: %v", err)
+	}
+	if all.RoundCount != 3 || len(all.Points) != 3 {
+		t.Fatalf("最近 100 笔打板应返回全部 3 笔, 实际 %+v", all)
 	}
 }

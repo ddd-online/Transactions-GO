@@ -11,7 +11,7 @@ import { useLedgerStore } from '@/stores/ledgerStore'
 import { useStockAccountStore } from '@/stores/stockAccountStore'
 import { useStockHistoryStore } from '@/stores/stockHistoryStore'
 import { useStockStatisticsStore } from '@/stores/stockStatisticsStore'
-import type { StockPosition, StockTrade } from '@/types/transactions'
+import type { StockPosition, StockTrade, StockTradeTag } from '@/types/transactions'
 
 export const useStockPositionStore = defineStore('stockPosition', () => {
   const ledgerStore = useLedgerStore()
@@ -109,6 +109,7 @@ export const useStockPositionStore = defineStore('stockPosition', () => {
     lots: number
     tradeTime: number
     remark: string
+    tag: StockTradeTag
   }): Promise<boolean> => {
     const ledgerId = currentLedgerId()
     if (!ledgerId) return false
@@ -123,7 +124,8 @@ export const useStockPositionStore = defineStore('stockPosition', () => {
           input.price,
           input.lots,
           input.tradeTime,
-          input.remark
+          input.remark,
+          input.tag
         ),
         { errorPrefix: '记录交易失败', rethrow: true }
       )

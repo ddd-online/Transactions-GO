@@ -161,6 +161,7 @@ type StockTradeRoundDto struct {
 	RoundNo    int64           `json:"roundNo"`
 	OpenedAt   int64           `json:"openedAt"`
 	ClosedAt   int64           `json:"closedAt"`
+	Tag        string          `json:"tag"`     // 交易标签（分析/打板/尾盘/追涨）
 	Review     string          `json:"review"`  // 本轮交易复盘（500字以内）
 	Pnl        int64           `json:"pnl"`     // 本轮盈亏（分）
 	PnlRate    float64         `json:"pnlRate"` // 本轮盈亏率（%）
@@ -210,6 +211,7 @@ type StockStatisticsPointDto struct {
 	StockCode      string   `json:"stockCode"`      // 触发本统计点的股票代码
 	StockName      string   `json:"stockName"`      // 触发本统计点的股票名称
 	StockRoundNo   int64    `json:"stockRoundNo"`   // 该股第几轮（该股自己的轮次序号）
+	Tag            string   `json:"tag"`            // 交易标签（分析/打板/尾盘/追涨）
 	Pnl            int64    `json:"pnl"`            // 本笔盈亏（分）
 	PnlRate        float64  `json:"pnlRate"`        // 本笔盈亏率（%）
 	TradeCount     int64    `json:"tradeCount"`     // 本笔包含的成交笔数（建仓到清仓的全部交易）

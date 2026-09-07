@@ -179,6 +179,9 @@
         <a-form-item label="成交时间" required>
           <a-date-picker v-model:value="tradeModal.tradeTime" style="width: 100%" />
         </a-form-item>
+        <a-form-item v-if="showTagField" label="交易标签">
+          <a-select v-model:value="tradeModal.tag" :options="STOCK_TRADE_TAG_OPTIONS" />
+        </a-form-item>
       </a-form>
     </a-modal>
   </div>
@@ -193,7 +196,8 @@ import { useStockPositionStore } from '@/stores/stockPositionStore'
 import { fetchStockName } from '@/backend/api/stock'
 import { tryOrFallback } from '@/backend/errorHandler'
 import { centsToYuan } from '@/backend/functions'
-import type { StockPosition } from '@/types/transactions'
+import { STOCK_TRADE_TAG_DEFAULT, STOCK_TRADE_TAG_OPTIONS } from '@/backend/constant'
+import type { StockPosition, StockTradeTag } from '@/types/transactions'
 import type { ColumnsType } from 'ant-design-vue/es/table'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
@@ -288,6 +292,7 @@ const tradeModal = reactive({
   lots: '',
   tradeTime: dayjs() as Dayjs,
   availableLots: 0,
+  tag: STOCK_TRADE_TAG_DEFAULT as StockTradeTag,
 })
 
 // 手数列标签：加仓/减仓展示可用手数，清仓展示全仓手数
@@ -296,6 +301,14 @@ const lotsLabel = computed(() => {
   return tradeModal.tradeType === 'close'
     ? `手数（全仓 ${tradeModal.availableLots} 手）`
     : `手数（可用 ${tradeModal.availableLots} 手）`
+})
+
+// 清仓（含减仓手数等于全仓）时才会产生已归档轮次，此时才允许设置交易标签
+const showTagField = computed(() => {
+  if (tradeModal.tradeType === 'close') return true
+  if (tradeModal.tradeType !== 'reduce' || tradeModal.availableLots <= 0) return false
+  const lots = parseInt(tradeModal.lots, 10)
+  return !Number.isNaN(lots) && lots > 0 && lots === tradeModal.availableLots
 })
 
 const resetTradeModal = (tradeType: TradeType, position: StockPosition | null) => {
@@ -308,6 +321,7 @@ const resetTradeModal = (tradeType: TradeType, position: StockPosition | null) =
   tradeModal.lots = tradeType === 'close' && prefill ? String(Math.floor(prefill.quantity / 100)) : ''
   tradeModal.availableLots = prefill ? Math.floor(prefill.quantity / 100) : 0
   tradeModal.tradeTime = dayjs()
+  tradeModal.tag = STOCK_TRADE_TAG_DEFAULT
 }
 
 const openTradeModal = (tradeType: TradeType, position?: StockPosition) => {
@@ -362,6 +376,7 @@ const handleTradeSubmit = async () => {
     lots,
     tradeTime: tradeModal.tradeTime.unix(),
     remark: '',
+    tag: submitType === 'close' ? tradeModal.tag : STOCK_TRADE_TAG_DEFAULT,
   })
   if (ok) tradeModal.open = false
 }

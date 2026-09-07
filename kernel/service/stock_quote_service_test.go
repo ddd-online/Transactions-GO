@@ -37,7 +37,7 @@ func newStockServiceWithQuotes(t *testing.T, fetcher service.StockQuoteFetcher) 
 
 func openPosition(t *testing.T, svc service.StockService, ws *workspace.Workspace, code string, name string, priceCents int64, lots int64) {
 	t.Helper()
-	if _, err := svc.CreateTrade(ws, testLedgerID, code, name, models.StockTradeOpen, priceCents, lots, 1700004000, ""); err != nil {
+	if _, err := svc.CreateTrade(ws, testLedgerID, code, name, models.StockTradeOpen, priceCents, lots, 1700004000, "", ""); err != nil {
 		t.Fatalf("建仓 %s 失败: %v", code, err)
 	}
 }

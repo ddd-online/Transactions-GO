@@ -155,8 +155,24 @@ func (h *Handlers) updateStockRoundReview(c *gin.Context) (any, error) {
 	return h.StockSvc.UpdateRoundReview(ws(c), ledgerID, roundID, review)
 }
 
-// GET /api/v1/stock/statistics?ledger_id=&start_month=&end_month=&recent=
-// 逐笔结算统计；不带筛选参数为全量，start_month/end_month 为时间区间（YYYY-MM，含首尾整月），recent 为最近 N 笔。
+// PUT /api/v1/stock/history/rounds/:id/tag  body: { ledger_id, tag }  保存某轮次的交易标签（分析/打板/尾盘/追涨）
+func (h *Handlers) updateStockRoundTag(c *gin.Context) (any, error) {
+	arg, ok := JsonArg(c)
+	if !ok {
+		return nil, models.NewBadRequest("parses request failed")
+	}
+	ledgerID, ok := arg["ledger_id"].(string)
+	if !ok || ledgerID == "" {
+		return nil, models.NewBadRequest("ledger_id is required")
+	}
+	roundID := c.Param("id")
+	tag, _ := arg["tag"].(string)
+	return h.StockSvc.UpdateRoundTag(ws(c), ledgerID, roundID, tag)
+}
+
+// GET /api/v1/stock/statistics?ledger_id=&start_month=&end_month=&recent=&tag=
+// 逐笔结算统计；不带筛选参数为全量，start_month/end_month 为时间区间（YYYY-MM，含首尾整月），
+// recent 为最近 N 笔（与时间区间互斥），tag 为交易标签（分析/打板/尾盘/追涨，可与时间/最近 N 叠加）。
 func (h *Handlers) getStockStatistics(c *gin.Context) (any, error) {
 	ledgerID, err := requireLedgerID(c)
 	if err != nil {
@@ -170,10 +186,10 @@ func (h *Handlers) getStockStatistics(c *gin.Context) (any, error) {
 		}
 		recent = parsed
 	}
-	return h.StockSvc.GetStatisticsRange(ws(c), ledgerID, c.Query("start_month"), c.Query("end_month"), recent)
+	return h.StockSvc.GetStatisticsRange(ws(c), ledgerID, c.Query("start_month"), c.Query("end_month"), recent, c.Query("tag"))
 }
 
-// POST /api/v1/stock/trades  body: { ledger_id, stock_code, stock_name, trade_type, price(元), lots, trade_time(秒), remark }
+// POST /api/v1/stock/trades  body: { ledger_id, stock_code, stock_name, trade_type, price(元), lots, trade_time(秒), remark, tag? }
 func (h *Handlers) createStockTrade(c *gin.Context) (any, error) {
 	arg, ok := JsonArg(c)
 	if !ok {
@@ -193,9 +209,10 @@ func (h *Handlers) createStockTrade(c *gin.Context) (any, error) {
 	lots, _ := arg["lots"].(float64)
 	tradeTime, _ := arg["trade_time"].(float64)
 	remark, _ := arg["remark"].(string)
+	tag, _ := arg["tag"].(string)
 
 	priceCents := int64(math.Round(priceYuan * 100))
-	return h.StockSvc.CreateTrade(ws(c), ledgerID, stockCode, stockName, tradeType, priceCents, int64(lots), int64(tradeTime), remark)
+	return h.StockSvc.CreateTrade(ws(c), ledgerID, stockCode, stockName, tradeType, priceCents, int64(lots), int64(tradeTime), remark, tag)
 }
 
 // GET /api/v1/stock/name?stock_code=

@@ -5,6 +5,7 @@ import {
   fetchStockTradeHistoryDetail,
   fetchStockTradeHistorySummary,
   updateStockRoundReview,
+  updateStockRoundTag,
 } from '@/backend/api/stock'
 import { withErrorHandling } from '@/backend/errorHandler'
 import NotificationUtil from '@/backend/notification'
@@ -22,6 +23,7 @@ export const useStockHistoryStore = defineStore('stockHistory', () => {
   const summary = ref<StockTradeHistorySummary | null>(null)
   const summaryLoading = ref(false)
   const reviewSaving = ref(false)
+  const tagSaving = ref(false)
 
   const currentLedgerId = () => ledgerStore.currentLedgerId
 
@@ -105,6 +107,25 @@ export const useStockHistoryStore = defineStore('stockHistory', () => {
     }
   }
 
+  const saveRoundTag = async (roundId: string, tag: string): Promise<boolean> => {
+    const ledgerId = currentLedgerId()
+    if (!ledgerId || !roundId) return false
+    tagSaving.value = true
+    try {
+      const data = await withErrorHandling(
+        () => updateStockRoundTag(ledgerId, roundId, tag),
+        { errorPrefix: '保存交易标签失败', rethrow: true }
+      )
+      detail.value = data
+      NotificationUtil.success('交易标签已保存')
+      return true
+    } catch {
+      return false
+    } finally {
+      tagSaving.value = false
+    }
+  }
+
   const reload = async (preferCode = '') => {
     await loadHistories(preferCode)
     if (selectedCode.value) {
@@ -128,6 +149,7 @@ export const useStockHistoryStore = defineStore('stockHistory', () => {
     summary,
     summaryLoading,
     reviewSaving,
+    tagSaving,
     selectedCode,
     detail,
     detailLoading,
@@ -135,6 +157,7 @@ export const useStockHistoryStore = defineStore('stockHistory', () => {
     loadDetail,
     selectStock,
     saveRoundReview,
+    saveRoundTag,
     reload,
   }
 })

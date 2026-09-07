@@ -108,6 +108,7 @@ func ServeAPI(ginServer *gin.Engine, h *Handlers) {
 			stockTrade.GET("/history/detail", Handle(h.getStockTradeHistoryDetail))
 			stockTrade.GET("/history/summary", Handle(h.getStockTradeHistorySummary))
 			stockTrade.PUT("/history/rounds/:id/review", Handle(h.updateStockRoundReview))
+			stockTrade.PUT("/history/rounds/:id/tag", Handle(h.updateStockRoundTag))
 			stockTrade.GET("/statistics", Handle(h.getStockStatistics))
 			stockTrade.GET("/name", Handle(h.getStockName))
 			stockTrade.POST("/trades", Handle(h.createStockTrade))

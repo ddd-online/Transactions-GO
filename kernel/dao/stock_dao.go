@@ -41,6 +41,7 @@ type StockDao interface {
 	ListTradeRoundsByStock(ws *workspace.Workspace, ledgerID string, stockCode string) ([]models.StockTradeRound, error)
 	GetTradeRound(ws *workspace.Workspace, roundID string) (*models.StockTradeRound, error)
 	UpdateTradeRoundReview(ws *workspace.Workspace, roundID string, review string) error
+	UpdateTradeRoundTag(ws *workspace.Workspace, roundID string, tag string) error
 	ListTradesByRound(ws *workspace.Workspace, roundID string) ([]models.StockTrade, error)
 	MinUnattachedTradeTime(ws *workspace.Workspace, ledgerID string, stockCode string) (int64, error)
 	AttachUnattachedTrades(ws *workspace.Workspace, ledgerID string, stockCode string, roundID string) error
@@ -290,6 +291,12 @@ func (d *stockDaoImpl) UpdateTradeRoundReview(ws *workspace.Workspace, roundID s
 	return ws.GetDb().Model(&models.StockTradeRound{}).
 		Where("id = ?", roundID).
 		Update("review", review).Error
+}
+
+func (d *stockDaoImpl) UpdateTradeRoundTag(ws *workspace.Workspace, roundID string, tag string) error {
+	return ws.GetDb().Model(&models.StockTradeRound{}).
+		Where("id = ?", roundID).
+		Update("tag", tag).Error
 }
 
 func (d *stockDaoImpl) ListTradesByRound(ws *workspace.Workspace, roundID string) ([]models.StockTrade, error) {

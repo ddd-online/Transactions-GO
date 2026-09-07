@@ -209,6 +209,12 @@ export interface StockOverview {
 }
 
 /**
+ * 股票交易轮次标签（策略分类）
+ * 默认「分析」，取值：分析 / 打板 / 尾盘 / 追涨
+ */
+export type StockTradeTag = '分析' | '打板' | '尾盘' | '追涨';
+
+/**
  * 交易费用设置
  */
 export interface StockFeeSetting {
@@ -310,6 +316,7 @@ export interface StockTradeRound {
     roundNo: number;
     openedAt: number;              // 本轮首次建仓时间（Unix 秒）
     closedAt: number;              // 本轮清仓时间（Unix 秒）
+    tag: StockTradeTag;            // 交易标签（分析/打板/尾盘/追涨）
     review: string;                // 本轮交易复盘（500 字以内）
     pnl: number;                   // 本轮盈亏（分）
     pnlRate: number;               // 本轮盈亏率（%）
@@ -366,6 +373,7 @@ export interface StockStatisticsPoint {
     stockCode: string;                     // 触发本统计点的股票代码
     stockName: string;                     // 触发本统计点的股票名称
     stockRoundNo: number;                  // 该股第几轮
+    tag: StockTradeTag;                    // 交易标签（分析/打板/尾盘/追涨）
     pnl: number;                           // 本笔盈亏（分）
     pnlRate: number;                       // 本笔盈亏率（%）
     tradeCount: number;                    // 本笔包含的成交笔数

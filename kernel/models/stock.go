@@ -24,6 +24,28 @@ const (
 	StockTradeClose = "close"
 )
 
+// 轮次交易标签（策略分类，每轮一个；不设置时默认「分析」）
+const (
+	// StockTradeTagAnalysis 分析
+	StockTradeTagAnalysis = "分析"
+	// StockTradeTagDaban 打板
+	StockTradeTagDaban = "打板"
+	// StockTradeTagWeipan 尾盘
+	StockTradeTagWeipan = "尾盘"
+	// StockTradeTagZhuizhang 追涨
+	StockTradeTagZhuizhang = "追涨"
+)
+
+// IsValidStockTradeTag 判断是否为受支持的轮次交易标签。
+func IsValidStockTradeTag(tag string) bool {
+	switch tag {
+	case StockTradeTagAnalysis, StockTradeTagDaban, StockTradeTagWeipan, StockTradeTagZhuizhang:
+		return true
+	default:
+		return false
+	}
+}
+
 // StockAccount 股票账户（每个账本一个），本金以整数分存储。
 type StockAccount struct {
 	ID        string `gorm:"primaryKey;comment:账户UUID" json:"id"`
@@ -142,6 +164,7 @@ type StockTradeRound struct {
 	RoundNo   int64  `gorm:"uniqueIndex:idx_stock_trade_round_history_no,priority:2;not null;comment:轮次序号（该股从1起）" json:"roundNo"`
 	OpenedAt  int64  `gorm:"not null;default:0;comment:本轮首次建仓时间（Unix 秒）" json:"openedAt"`
 	ClosedAt  int64  `gorm:"not null;default:0;comment:本轮清仓时间（Unix 秒）" json:"closedAt"`
+	Tag       string `gorm:"type:varchar(16);not null;default:'分析';comment:交易标签（分析/打板/尾盘/追涨）" json:"tag"`
 	Review    string `gorm:"type:varchar(2000);not null;default:'';comment:本轮交易复盘（500字以内）" json:"review"`
 	CreatedAt int64  `gorm:"autoCreateTime:unix;not null;comment:创建时间" json:"createdAt"`
 }
